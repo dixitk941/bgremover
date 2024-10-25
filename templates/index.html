@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GenZ BGRemover</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+    <style>
+        /* Spinner for loading effect */
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-left-color: #4ade80;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Fading animation on the image */
+        .fade-out-bg {
+            animation: fadeOut 2s ease-in-out forwards;
+            opacity: 1;
+        }
+
+        @keyframes fadeOut {
+            0% {
+                opacity: 1;
+                filter: blur(0px);
+            }
+
+            50% {
+                opacity: 0.5;
+                filter: blur(4px);
+            }
+
+            100% {
+                opacity: 0;
+                filter: blur(6px);
+            }
+        }
+
+        /* Image preview styling */
+        #image-preview img {
+            max-width: 300px; /* Adjust width for a smaller image */
+            height: auto;
+            border-radius: 0.5rem; /* Rounded corners */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); /* Modern shadow */
+        }
+    </style>
+</head>
+
+<body class="bg-gray-900 text-gray-200 font-sans leading-relaxed">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-green-600 to-teal-500 py-4 shadow-lg sticky top-0 z-10">
+        <nav class="container mx-auto flex justify-between items-center px-6">
+            <div class="text-2xl font-bold tracking-wider">GenZ BGRemover</div>
+            <ul class="flex space-x-6 text-lg">
+                <li><a href="#home" class="hover:text-gray-300">Home</a></li>
+                <li><a href="#features" class="hover:text-gray-300">Features</a></li>
+                <li><a href="#about" class="hover:text-gray-300">About</a></li>
+                <li><a href="#contact" class="hover:text-gray-300">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero h-screen bg-gradient-to-r from-teal-500 to-blue-600 text-white py-20">
+        <div class="container mx-auto text-center px-4 md:px-6 lg:px-8 xl:px-10">
+          <h1 class="text-6xl md:text-7xl xl:text-8xl font-bold mb-4 leading-tight animate-fade-in-up">
+            Instant Background Removal
+            <span class="text-lg md:text-2xl xl:text-3xl font-light block animate-fade-in-up delay-100">Upload, Remove, Repeat.</span>
+          </h1>
+          <p class="text-lg md:text-2xl xl:text-3xl mb-8 leading-relaxed animate-fade-in-up delay-200">
+            Upload your image and receive a transparent background within seconds. No design experience needed.
+          </p>
+          <a href="#upload" class="bg-white text-blue-600 py-3 px-6 rounded-full text-lg font-semibold shadow-md hover:bg-gray-200 transition duration-300 inline-flex items-center animate-bounce-in">
+            Get Started
+            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+            </svg>
+          </a>
+        </div>
+      </section>
+
+    <!-- Features Section -->
+    <section id="features" class="container mx-auto py-20 text-center">
+        <h2 class="text-4xl font-bold mb-10">Features</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+            <div class="bg-gray-800 p-6 rounded-lg shadow-md">
+                <h3 class="text-2xl font-semibold mb-4">Quick Processing</h3>
+                <p>Upload your image and get results in seconds with our AI-powered technology.</p>
+            </div>
+            <div class="bg-gray-800 p-6 rounded-lg shadow-md">
+                <h3 class="text-2xl font-semibold mb-4">High Accuracy</h3>
+                <p>Our algorithm accurately detects and removes backgrounds with minimal effort.</p>
+            </div>
+            <div class="bg-gray-800 p-6 rounded-lg shadow-md">
+                <h3 class="text-2xl font-semibold mb-4">Free to Use</h3>
+                <p>Enjoy our background removal tool for free with no hidden charges.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="bg-gray-800 py-20">
+        <div class="container mx-auto text-center px-6">
+            <h2 class="text-4xl font-bold mb-10">About Us</h2>
+            <p class="text-lg leading-relaxed max-w-3xl mx-auto">GenZ BGRemover was built to simplify the process of removing backgrounds from images. Our cutting-edge AI model quickly processes images with high accuracy and is accessible to everyone, completely free of charge. Perfect for designers, photographers, and casual users alike.</p>
+        </div>
+    </section>
+
+    <!-- Upload Section -->
+    <section id="upload" class="container mx-auto my-20 p-10 bg-gray-800 rounded-lg shadow-lg">
+        <h2 class="text-3xl font-bold mb-6 text-center">Upload Image</h2>
+        <p class="mb-8 text-center text-gray-400">Choose an image to remove its background instantly.</p>
+
+        <form action="/upload" method="post" enctype="multipart/form-data" class="space-y-6 text-center" onsubmit="startProcessing();">
+            <label for="image" class="upload-btn bg-green-500 text-white py-3 px-6 rounded cursor-pointer hover:bg-green-600 transition duration-300 inline-block">Choose an Image</label>
+            <input type="file" id="image" name="image" accept="image/*" required class="hidden" onchange="previewImage(event)">
+            <div id="image-preview" class="mt-6 flex justify-center"></div>
+            <div id="spinner" class="hidden justify-center mt-6">
+                <div class="spinner"></div>
+            </div>
+            <button type="submit" class="submit-btn bg-gradient-to-r from-green-600 to-teal-500 text-white py-3 px-6 rounded hover:bg-green-700 transition duration-300 w-full md:w-auto">Upload & Process</button>
+        </form>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="bg-gray-900 py-20">
+        <div class="container mx-auto text-center">
+            <h2 class="text-4xl font-bold mb-10">Contact Us</h2>
+            <p class="text-lg text-gray-400 mb-10">Got questions? Reach out to us at <a href="mailto:support@genzbgremover.com" class="text-teal-400 hover:underline">support@genzbgremover.com</a></p>
+            <form action="#" method="POST" class="max-w-md mx-auto space-y-4">
+                <input type="text" name="name" placeholder="Your Name" class="w-full p-4 rounded bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500">
+                <input type="email" name="email" placeholder="Your Email" class="w-full p-4 rounded bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500">
+                <textarea name="message" rows="4" placeholder="Your Message" class="w-full p-4 rounded bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500"></textarea>
+                <button type="submit" class="bg-teal-500 text-white py-3 px-6 rounded-full hover:bg-teal-600 transition duration-300">Send Message</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-gray-400 py-6">
+        <div class="container mx-auto text-center">
+            <p>&copy; 2024 GenZ BGRemover. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Script for Image Preview -->
+    <script>
+        function previewImage(event) {
+            const input = event.target;
+            const previewContainer = document.getElementById('image-preview');
+            previewContainer.innerHTML = ''; // Clear any existing content
+
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.alt = 'Image Preview';
+                    img.className = 'rounded shadow-lg transition-opacity duration-500';
+                    previewContainer.appendChild(img);
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function startProcessing() {
+            const spinner = document.getElementById('spinner');
+            spinner.classList.remove('hidden'); // Show spinner
+        }
+    </script>
+</body>
+
+</html>
