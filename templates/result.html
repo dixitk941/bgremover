@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Background Removed</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-900 text-gray-200 font-sans leading-relaxed">
+    <header class="bg-gradient-to-r from-green-600 to-teal-500 py-4 shadow-lg sticky top-0 z-10">
+        <nav class="container mx-auto flex justify-between items-center px-6">
+            <div class="text-2xl font-bold tracking-wider">GenZ BGRemover</div>
+            <ul class="flex space-x-6 text-lg">
+                <li><a href="#home" class="hover:text-gray-300">Home</a></li>
+                <li><a href="#features" class="hover:text-gray-300">Features</a></li>
+                <li><a href="#about" class="hover:text-gray-300">About</a></li>
+                <li><a href="#contact" class="hover:text-gray-300">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container mx-auto my-20 p-10 bg-gray-800 rounded-lg shadow-lg text-center max-w-lg">
+        <h1 class="text-4xl font-bold mb-6">Background Removed!</h1>
+        <p class="text-lg mb-8">Here’s your processed image:</p>
+        
+        <img src="{{ url_for('static', filename='uploads/' + filename) }}" alt="Processed Image" class="result-image max-w-full h-auto rounded shadow-lg mb-6">
+        
+        <div class="space-x-4">
+            <a href="{{ url_for('download_file', filename=filename) }}" class="bg-gradient-to-r from-green-600 to-teal-500 text-white py-3 px-6 rounded hover:bg-green-700 transition duration-300">Download Image</a>
+            <a href="{{ url_for('index') }}" class="bg-gray-700 text-white py-3 px-6 rounded hover:bg-gray-600 transition duration-300">Process Another Image</a>
+        </div>
+    </div>
+
+    <footer class="bg-gray-800 text-gray-400 py-6">
+        <div class="container mx-auto text-center">
+            <p>&copy; 2024 AI Background Remover. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>
