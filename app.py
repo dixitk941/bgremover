@@ -3,21 +3,33 @@
 import os
 import uuid
 import datetime
+import tempfile
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory, jsonify
 from rembg import remove
 from PIL import Image, UnidentifiedImageError
 import io
-# Remove imghdr import as it's deprecated
 import logging
+import shutil
+from werkzeug.utils import secure_filename as werkzeug_secure_filename
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'static/uploads'
+
+# For better temp file handling
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload size
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+
+# Use system temp directory for uploaded files in production
+if os.environ.get('CLOUD_RUN', False):
+    # Create a subfolder in the system temp directory
+    base_temp_dir = tempfile.gettempdir()
+    app.config['UPLOAD_FOLDER'] = os.path.join(base_temp_dir, 'bgremover_uploads')
+else:
+    # Use static/uploads for local development
+    app.config['UPLOAD_FOLDER'] = 'static/uploads'
 
 # Create necessary directories
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
@@ -81,9 +93,8 @@ def upload_image():
             return jsonify({'error': 'Invalid image file'}), 400
         
         # Create secure filenames
-        secure_original_name = secure_filename(file.filename)
-        original_filename = f"original_{secure_original_name}"
-        processed_filename = f"bg_removed_{secure_original_name}"
+        original_filename = f"original_{secure_filename(file.filename)}"
+        processed_filename = f"bg_removed_{secure_filename(file.filename)}"
         
         # Save paths
         original_path = os.path.join(app.config['UPLOAD_FOLDER'], 'originals', original_filename)
@@ -94,33 +105,43 @@ def upload_image():
         
         # Perform background removal with error handling
         try:
-            # Process with PIL to ensure compatibility
+            # Process with PIL to ensure compatibility and optimize
             with Image.open(original_path) as img:
-                # Resize if the image is too large (optional)
+                # Resize if the image is too large to conserve memory
                 max_size = 1800
                 if max(img.width, img.height) > max_size:
                     ratio = max_size / max(img.width, img.height)
                     new_size = (int(img.width * ratio), int(img.height * ratio))
-                    img = img.resize(new_size, Image.Resampling.LANCZOS)
+                    try:
+                        img = img.resize(new_size, Image.Resampling.LANCZOS)
+                    except AttributeError:
+                        # Fall back for older Pillow versions
+                        img = img.resize(new_size, Image.LANCZOS)
                     img.save(original_path)
             
-            # Process with rembg
-            with open(original_path, 'rb') as input_file:
-                input_data = input_file.read()
+            # Process with rembg - use a separate try/except for better error handling
+            try:
+                with open(original_path, 'rb') as input_file:
+                    input_data = input_file.read()
+                
+                logger.info(f"Removing background from {original_filename}")
+                output_data = remove(input_data)
+                
+                # Save the result
+                with open(processed_path, 'wb') as output_file:
+                    output_file.write(output_data)
+            except Exception as rembg_error:
+                logger.error(f"Error in rembg processing: {str(rembg_error)}")
+                raise
             
-            # Process with rembg
-            output_data = remove(input_data)
+            # Create URLs to access the images
+            # Use relative URLs that work in both environments
+            original_url = f"/file/originals/{original_filename}"
+            processed_url = f"/file/processed/{processed_filename}"
             
-            # Save the result
-            with open(processed_path, 'wb') as output_file:
-                output_file.write(output_data)
+            logger.info(f"Successfully processed image: {processed_filename}")
             
-            # Use URL path format (forward slashes) instead of OS path format
-            # This is the key fix for your 404 error
-            original_url = f"/static/uploads/originals/{original_filename}"
-            processed_url = f"/static/uploads/processed/{processed_filename}"
-            
-            # Return JSON with the filename and URLs with forward slashes
+            # Return JSON with proper URLs
             return jsonify({
                 'success': True,
                 'filename': processed_filename,
@@ -130,11 +151,44 @@ def upload_image():
             
         except Exception as e:
             logger.error(f"Error processing image: {str(e)}")
+            # Clean up any partial files
+            for path in [original_path, processed_path]:
+                if os.path.exists(path):
+                    try:
+                        os.remove(path)
+                    except:
+                        pass
             return jsonify({'error': f'Error processing image: {str(e)}'}), 500
             
     except Exception as e:
         logger.error(f"Unexpected error: {str(e)}")
         return jsonify({'error': 'An unexpected error occurred'}), 500
+
+@app.route('/file/<folder>/<filename>')
+def serve_file(folder, filename):
+    """Serve files from the upload folder with better security"""
+    # Validate folder
+    if folder not in ['originals', 'processed']:
+        return jsonify({'error': 'Invalid folder'}), 400
+    
+    # Validate filename to prevent directory traversal
+    safe_filename = werkzeug_secure_filename(filename)
+    if safe_filename != filename:
+        return jsonify({'error': 'Invalid filename'}), 400
+    
+    directory = os.path.join(app.config['UPLOAD_FOLDER'], folder)
+    
+    # Verify the file exists
+    file_path = os.path.join(directory, filename)
+    if not os.path.exists(file_path):
+        return jsonify({'error': 'File not found'}), 404
+    
+    # Serve the file
+    try:
+        return send_from_directory(directory, filename)
+    except Exception as e:
+        logger.error(f"Error serving file {filename}: {str(e)}")
+        return jsonify({'error': 'Error serving file'}), 500
 
 @app.route('/download/<filename>')
 def download_file(filename):
@@ -164,13 +218,12 @@ def server_error(error):
 # Clean up old files periodically (optional)
 @app.before_request
 def cleanup_old_files():
-    """Clean up files older than 24 hours"""
-    # This would be better as a scheduled task with APScheduler or similar
-    # But for simplicity, we'll check occasionally on requests
+    """Clean up files older than 1 hour in production (Cloud Run has ephemeral storage)"""
     if request.endpoint == 'index' and request.method == 'GET':
         try:
             now = datetime.datetime.now()
-            retention_period = datetime.timedelta(hours=24)
+            # Shorter retention period for Cloud Run
+            retention_period = datetime.timedelta(hours=1) if os.environ.get('CLOUD_RUN') else datetime.timedelta(hours=24)
             
             for folder in ['originals', 'processed']:
                 directory = os.path.join(app.config['UPLOAD_FOLDER'], folder)
@@ -183,5 +236,19 @@ def cleanup_old_files():
         except Exception as e:
             logger.error(f"Error cleaning up files: {str(e)}")
 
+# Health check endpoint for Cloud Run
+@app.route('/health')
+def health_check():
+    return jsonify({'status': 'healthy'}), 200
+
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+    # Set up proper startup based on environment
+    port = int(os.environ.get('PORT', 5000))
+    debug = os.environ.get('DEBUG', 'False').lower() in ['true', '1', 't']
+    
+    # Log application startup
+    logger.info(f"Starting application on port {port} with debug={debug}")
+    logger.info(f"Upload folder: {app.config['UPLOAD_FOLDER']}")
+    
+    # Run the application
+    app.run(debug=debug, host='0.0.0.0', port=port)
