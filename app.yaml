@@ -1,0 +1,9 @@
+runtime: python310
+instance_class: F2
+
+env_variables:
+  CLOUD_RUN: 'True'
+
+handlers:
+- url: /.*
+  script: auto

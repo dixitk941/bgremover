@@ -625,21 +625,22 @@
                     clearInterval(progressInterval);
                     progressBar.style.width = '100%';
                     
-                    // Use the processed_url directly from the response
-                    currentResultUrl = data.processed_url.replace(/\\/g, '/');
+                    // Use the processed_url from the response with the new URL structure
+                    // No need to replace backslashes as our backend now returns proper URL paths
+                    currentResultUrl = data.processed_url;
                     resultPreview.src = currentResultUrl;
                     resultContainer.classList.remove('hidden');
                     
                     // Set up comparison view
-                    compareOriginal.src = currentOriginalUrl;
+                    compareOriginal.src = data.original_url;
                     compareResult.src = currentResultUrl;
                     
                     // Show the compare and download buttons
                     downloadBtn.classList.remove('hidden');
                     compareBtn.classList.remove('hidden');
                     
-                    // Save original URL as well
-                    currentOriginalUrl = data.original_url.replace(/\\/g, '/');
+                    // Save original URL
+                    currentOriginalUrl = data.original_url;
                     
                     // Save to session storage with complete information
                     saveToHistory(currentFileName, currentOriginalUrl, currentResultUrl);
@@ -662,11 +663,15 @@
                 });
             });
 
-            // Download Button
+            // Update Download Button
             downloadBtn.addEventListener('click', function() {
                 if (currentResultUrl) {
+                    // Extract filename from URL
+                    const filename = currentResultUrl.split('/').pop();
+                    const downloadUrl = `/download/${filename}`;
+                    
                     const link = document.createElement('a');
-                    link.href = currentResultUrl;
+                    link.href = downloadUrl;
                     link.download = 'bg_removed_' + currentFileName;
                     document.body.appendChild(link);
                     link.click();
@@ -905,8 +910,12 @@
                     });
                     
                     historyItem.querySelector('.download-history-btn').addEventListener('click', function() {
+                        // Extract filename from URL
+                        const filename = item.resultUrl.split('/').pop();
+                        const downloadUrl = `/download/${filename}`;
+                        
                         const link = document.createElement('a');
-                        link.href = item.resultUrl;
+                        link.href = downloadUrl;
                         link.download = 'bg_removed_' + item.filename;
                         document.body.appendChild(link);
                         link.click();
