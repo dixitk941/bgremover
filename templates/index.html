@@ -1,1038 +1,1849 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BGRemover Pro</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <!-- Add FontAwesome for more icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Add AOS for scroll animations -->
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <style>
-        /* Base animations */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        
-        @keyframes shimmer {
-            0% { background-position: -1000px 0; }
-            100% { background-position: 1000px 0; }
-        }
-        
-        /* Loading spinner */
-        .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top: 4px solid #3b82f6;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-        
-        /* Animated elements */
-        .fade-in {
-            animation: fadeIn 0.5s ease-out forwards;
-        }
-        
-        .slide-up {
-            animation: slideUp 0.5s ease-out forwards;
-        }
-        
-        .pulse-effect {
-            animation: pulse 2s infinite;
-        }
-        
-        /* Drop zone styling */
-        .drop-zone {
-            border: 2px dashed #4b5563;
-            border-radius: 1rem;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .drop-zone::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, rgba(59, 130, 246, 0), rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0));
-            transform: translateX(-100%);
-            transition: transform 0.6s ease-out;
-        }
-        
-        .drop-zone:hover::before, .drop-zone.active::before {
-            transform: translateX(100%);
-        }
-        
-        .drop-zone:hover, .drop-zone.active {
-            border-color: #3b82f6;
-            box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
-            transform: translateY(-2px);
-        }
-        
-        /* History item animations */
-        .recent-item {
-            cursor: pointer;
-            transition: all 0.3s ease;
-            opacity: 0;
-            transform: translateY(10px);
-            animation: slideUp 0.5s ease-out forwards;
-            animation-delay: calc(var(--index) * 0.1s);
-        }
-        
-        .recent-item:hover {
-            transform: scale(1.05) translateY(-5px);
-            box-shadow: 0 10px 25px -10px rgba(0, 0, 0, 0.2);
-        }
-        
-        /* Button effects */
-        .btn {
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-        
-        .btn::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 5px;
-            height: 5px;
-            background: rgba(255, 255, 255, 0.5);
-            opacity: 0;
-            border-radius: 100%;
-            transform: scale(1, 1) translate(-50%, -50%);
-            transform-origin: 50% 50%;
-        }
-        
-        .btn:hover::after {
-            animation: ripple 1s ease-out;
-        }
-        
-        @keyframes ripple {
-            0% {
-                transform: scale(0, 0);
-                opacity: 0.5;
-            }
-            100% {
-                transform: scale(100, 100);
-                opacity: 0;
-            }
-        }
-        
-        /* Skeleton loading state */
-        .skeleton {
-            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-            background-size: 1000px 100%;
-            animation: shimmer 2s infinite linear;
-            border-radius: 4px;
-        }
-        
-        /* Image comparison slider */
-        .img-compare-container {
-            position: relative;
-            overflow: hidden;
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        
-        .img-compare-before, .img-compare-after {
-            width: 100%;
-            display: block;
-        }
-        
-        .img-compare-after {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 50%;
-            height: 100%;
-            border-right: 2px solid white;
-            overflow: hidden;
-            box-shadow: 5px 0 10px -2px rgba(0,0,0,0.4);
-        }
-        
-        .img-compare-slider {
-            position: absolute;
-            z-index: 9;
-            cursor: ew-resize;
-            width: 40px;
-            height: 40px;
-            background-color: white;
-            border-radius: 50%;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
-        }
-        
-        .img-compare-slider::before, .img-compare-slider::after {
-            content: '';
-            position: absolute;
-            width: 10px;
-            height: 2px;
-            background-color: #3b82f6;
-        }
-        
-        .img-compare-slider::before {
-            transform: rotate(45deg);
-        }
-        
-        .img-compare-slider::after {
-            transform: rotate(-45deg);
-        }
-        
-        /* Glassmorphism UI elements */
-        .glass {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-        }
-        
-        /* Progress bar */
-        .progress-container {
-            width: 100%;
-            height: 8px;
-            background-color: #f0f0f0;
-            border-radius: 4px;
-            margin: 20px 0;
-            overflow: hidden;
-        }
-        
-        .progress-bar {
-            height: 100%;
-            background-color: #3b82f6;
-            border-radius: 4px;
-            width: 0%;
-            transition: width 0.4s ease;
-        }
-        
-        /* Confetti effect for successful operations */
-        .confetti {
-            position: fixed;
-            width: 10px;
-            height: 10px;
-            background-color: #f00;
-            opacity: 0;
-            animation: confetti-fall 5s ease-out forwards;
-            z-index: 1000;
-        }
-        
-        @keyframes confetti-fall {
-            0% {
-                transform: translateY(-100vh) rotate(0deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(100vh) rotate(720deg);
-                opacity: 0;
-            }
-        }
-        
-        /* Theme toggle */
-        .theme-switch {
-            display: inline-block;
-            height: 24px;
-            position: relative;
-            width: 50px;
-        }
-        
-        .theme-switch input {
-            display: none;
-        }
-        
-        .slider {
-            background-color: #ccc;
-            bottom: 0;
-            cursor: pointer;
-            left: 0;
-            position: absolute;
-            right: 0;
-            top: 0;
-            transition: .4s;
-            border-radius: 34px;
-        }
-        
-        .slider:before {
-            background-color: white;
-            bottom: 4px;
-            content: "";
-            height: 16px;
-            left: 4px;
-            position: absolute;
-            transition: .4s;
-            width: 16px;
-            border-radius: 50%;
-        }
-        
-        input:checked + .slider {
-            background-color: #3b82f6;
-        }
-        
-        input:checked + .slider:before {
-            transform: translateX(26px);
-        }
-        
-        /* Dark mode */
-        .dark-mode {
-            background-color: #1f2937;
-            color: #f3f4f6;
-        }
-        
-        .dark-mode .bg-white {
-            background-color: #374151 !important;
-            color: #f3f4f6;
-        }
-        
-        .dark-mode .text-gray-800 {
-            color: #f3f4f6 !important;
-        }
-        
-        .dark-mode .text-gray-600, .dark-mode .text-gray-500 {
-            color: #d1d5db !important;
-        }
-        
-        .dark-mode .border-gray-200 {
-            border-color: #4b5563 !important;
-        }
-        
-        .dark-mode .drop-zone {
-            border-color: #6b7280;
-        }
-        
-        .dark-mode .drop-zone:hover, .dark-mode .drop-zone.active {
-            border-color: #60a5fa;
-        }
-        
-        .dark-mode .skeleton {
-            background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
-        }
-    </style>
-</head>
+    <title>AI Background Remover | Remove Backgrounds Instantly</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+   :root {
+    --primary-color: #6c63ff;
+    --primary-light: #8a84ff;
+    --primary-dark: #5046e5;
+    --secondary-color: #ff6584;
+    --dark-color: #2d3748;
+    --light-color: #f7fafc;
+    --gray-color: #a0aec0;
+    --success-color: #48bb78;
+    --warning-color: #f6ad55;
+    --danger-color: #f56565;
+}
 
-<body class="bg-gray-50 text-gray-800 min-h-screen transition-colors duration-300">
-    <!-- Header with animation -->
-    <header class="bg-white shadow-sm py-4 transition-all duration-300" data-aos="fade-down">
-        <div class="container mx-auto px-4 flex justify-between items-center">
-            <div class="flex items-center">
-                <div class="text-2xl font-bold text-blue-600 mr-2">
-                    <i class="fas fa-cut mr-2"></i>BGRemover Pro
-                </div>
-                <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Beta</span>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    line-height: 1.6;
+    color: var(--dark-color);
+    background-color: var(--light-color);
+    overflow-x: hidden;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+}
+
+h1 {
+    font-size: 3.5rem;
+}
+
+h2 {
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+h3 {
+    font-size: 1.5rem;
+}
+
+p {
+    margin-bottom: 1rem;
+}
+
+a {
+    text-decoration: none;
+    color: var(--primary-color);
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: var(--primary-dark);
+}
+
+/* Layout */
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+section {
+    padding: 5rem 2rem;
+}
+
+/* Header & Navigation */
+header {
+    background-color: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.logo {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--dark-color);
+}
+
+.logo span {
+    color: var(--primary-color);
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+}
+
+.nav-links li {
+    margin: 0 1.2rem;
+}
+
+.nav-links a {
+    color: var(--dark-color);
+    font-weight: 500;
+}
+
+.nav-links a:hover {
+    color: var(--primary-color);
+}
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    font-weight: 500;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+    border: 2px solid var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+    color: white;
+}
+
+.btn-outline {
+    background-color: transparent;
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
+}
+
+.btn-outline:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-large {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+}
+
+.cta-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+/* Hero Section */
+.hero {
+    display: flex;
+    align-items: center;
+    min-height: 80vh;
+    padding: 2rem;
+    background: linear-gradient(135deg, #f6f9fc 0%, #f1f4f9 100%);
+}
+
+.hero-content {
+    flex: 1;
+    max-width: 600px;
+    padding: 2rem;
+}
+
+.hero-image {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.animated-title {
+    margin-bottom: 1.5rem;
+    line-height: 1.2;
+}
+
+.animated-title span {
+    color: var(--primary-color);
+    position: relative;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    color: #4a5568;
+    margin-bottom: 2rem;
+}
+
+/* Upload Box */
+.upload-box {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.upload-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+}
+
+.upload-container {
+    border: 2px dashed #cbd5e0;
+    border-radius: 8px;
+    padding: 2.5rem;
+    text-align: center;
+    transition: border-color 0.3s ease;
+}
+
+.upload-container:hover {
+    border-color: var(--primary-color);
+}
+
+.upload-container i {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.upload-container p {
+    margin-bottom: 1.5rem;
+    color: #4a5568;
+}
+
+.upload-container p span {
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
+/* Features Highlight */
+.features-highlight {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+}
+
+.features-highlight .feature {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.features-highlight .feature i {
+    color: var(--primary-color);
+}
+
+/* How It Works Section */
+.steps-container {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    margin-top: 3rem;
+    flex-wrap: wrap;
+}
+
+.step {
+    flex: 1;
+    min-width: 250px;
+    max-width: 300px;
+    text-align: center;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    position: relative;
+    transition: transform 0.3s ease;
+}
+
+.step:hover {
+    transform: translateY(-10px);
+}
+
+.step-number {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 40px;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 700;
+}
+
+.step-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: #f0eeff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 1.5rem auto;
+}
+
+.step-icon i {
+    font-size: 2rem;
+    color: var(--primary-color);
+}
+
+/* Features Section */
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.feature-card {
+    background-color: white;
+    border-radius: 10px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+}
+
+.feature-card i {
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+/* Demo Section */
+.demo {
+    background-color: #f6f9fc;
+    padding: 6rem 2rem;
+}
+
+.demo-slider {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Modern Before-After Slider */
+.before-after-container {
+    position: relative;
+    width: 100%;
+    height: 450px;
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    background-color: #fff;
+}
+
+.image-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.before-image,
+.after-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.after-image {
+    width: 50%;
+    clip-path: inset(0 0 0 50%);
+    transition: clip-path 0.2s ease-out;
+}
+
+.slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: col-resize;
+    z-index: 30;
+}
+
+.slider-button {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+    z-index: 20;
+}
+
+.slider-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.slider-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 12px;
+    box-sizing: border-box;
+}
+
+.slider-circle i {
+    color: var(--primary-color);
+    font-size: 14px;
+}
+
+.labels {
+    position: absolute;
+    width: 100%;
+    bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px;
+    box-sizing: border-box;
+    z-index: 20;
+}
+
+.before-label, 
+.after-label {
+    padding: 6px 14px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+/* Add a glowing effect to the slider line */
+@keyframes glow {
+    0% {
+        box-shadow: 0 0 10px rgba(108, 99, 255, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 15px rgba(108, 99, 255, 0.8);
+    }
+    100% {
+        box-shadow: 0 0 10px rgba(108, 99, 255, 0.5);
+    }
+}
+
+.slider-line {
+    animation: glow 2s infinite;
+}
+
+/* Add a pulse effect to the slider circle on hover */
+.before-after-container:hover .slider-circle {
+    transform: scale(1.1);
+    transition: transform 0.3s ease;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .before-after-container {
+        height: 350px;
+    }
+    
+    .slider-circle {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+@media (max-width: 480px) {
+    .before-after-container {
+        height: 250px;
+    }
+    
+    .labels {
+        bottom: 10px;
+    }
+    
+    .before-label, .after-label {
+        padding: 4px 10px;
+        font-size: 0.8rem;
+    }
+}
+
+/* Pricing Section */
+.pricing-cards {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 3rem;
+    flex-wrap: wrap;
+}
+
+.pricing-card {
+    flex: 1;
+    min-width: 280px;
+    max-width: 350px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+}
+
+.pricing-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+}
+
+.pricing-card.featured {
+    border: 2px solid var(--primary-color);
+    transform: scale(1.05);
+}
+
+.pricing-card.featured:hover {
+    transform: scale(1.05) translateY(-10px);
+}
+
+.popular-tag {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background-color: var(--primary-color);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.pricing-header {
+    padding: 2rem;
+    text-align: center;
+    border-bottom: 1px solid #edf2f7;
+}
+
+.price {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin: 1rem 0;
+}
+
+.price span {
+    font-size: 1rem;
+    color: var(--gray-color);
+}
+
+.pricing-features {
+    list-style: none;
+    padding: 2rem;
+}
+
+.pricing-features li {
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.pricing-features i {
+    margin-right: 10px;
+    width: 20px;
+}
+
+.pricing-features .fa-check {
+    color: var(--success-color);
+}
+
+.pricing-features .fa-times {
+    color: var(--danger-color);
+}
+
+.pricing-card .btn {
+    display: block;
+    margin: 0 2rem 2rem;
+}
+
+/* FAQ Section */
+.faq-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.faq-item {
+    border-bottom: 1px solid #edf2f7;
+    margin-bottom: 1rem;
+}
+
+.faq-question {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 1rem;
+    cursor: pointer;
+}
+
+.faq-question h3 {
+    margin-bottom: 0;
+}
+
+.toggle-icon {
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    transition: transform 0.3s ease;
+}
+
+.faq-answer {
+    padding: 0 1rem 1.5rem;
+    display: none;
+}
+
+.faq-item.active .toggle-icon {
+    transform: rotate(45deg);
+}
+
+.faq-item.active .faq-answer {
+    display: block;
+}
+
+/* CTA Section */
+.cta {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: white;
+    text-align: center;
+    padding: 5rem 2rem;
+}
+
+.cta h2 {
+    margin-bottom: 1.5rem;
+    color: white;
+}
+
+.cta p {
+    max-width: 600px;
+    margin: 0 auto 2rem;
+    font-size: 1.2rem;
+}
+
+/* Footer */
+footer {
+    background-color: #1a202c;
+    color: white;
+    padding: 4rem 2rem 2rem;
+}
+
+.footer-content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.footer-column {
+    flex: 1;
+    min-width: 200px;
+}
+
+.footer-column h4 {
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+    color: white;
+}
+
+.footer-column ul {
+    list-style: none;
+}
+
+.footer-column ul li {
+    margin-bottom: 0.8rem;
+}
+
+.footer-column ul li a {
+    color: #cbd5e0;
+    transition: color 0.3s ease;
+}
+
+.footer-column ul li a:hover {
+    color: white;
+}
+
+.social-icons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.social-icons a {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+.social-icons a:hover {
+    background-color: var(--primary-color);
+}
+
+.footer-bottom {
+    max-width: 1200px;
+    margin: 4rem auto 0;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+    font-size: 0.9rem;
+    color: #a0aec0;
+}
+
+/* Responsive Styles */
+@media (max-width: 1024px) {
+    h1 {
+        font-size: 3rem;
+    }
+    
+    h2 {
+        font-size: 2.2rem;
+    }
+    
+    .hero {
+        flex-direction: column;
+    }
+    
+    .hero-content {
+        max-width: 100%;
+        text-align: center;
+    }
+    
+    .steps-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .step {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2.5rem;
+    }
+    
+    nav {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    
+    .nav-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+    }
+    
+    .pricing-cards {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .pricing-card.featured {
+        transform: scale(1);
+    }
+    
+    .pricing-card.featured:hover {
+        transform: translateY(-10px);
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 2rem;
+    }
+    
+    h2 {
+        font-size: 1.8rem;
+    }
+    
+    .cta-buttons {
+        flex-direction: column;
+    }
+    
+    .features-highlight {
+        flex-direction: column;
+        gap: 1rem;
+    }
+}
+/* Title Animation */
+.animated-title {
+    opacity: 0;
+    animation: fadeIn 1s ease forwards, slideUp 1s ease forwards;
+}
+
+.animated-title span {
+    display: inline-block;
+    background: linear-gradient(45deg, var(--primary-color), var(--primary-light));
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    background-size: 200%;
+    animation: gradientFlow 3s ease infinite;
+}
+
+.subtitle {
+    opacity: 0;
+    animation: fadeIn 1s ease 0.3s forwards, slideUp 1s ease 0.3s forwards;
+}
+
+.upload-box {
+    opacity: 0;
+    animation: fadeIn 1s ease 0.6s forwards, slideUp 1s ease 0.6s forwards;
+}
+
+.features-highlight {
+    opacity: 0;
+    animation: fadeIn 1s ease 0.9s forwards, slideUp 1s ease 0.9s forwards;
+}
+
+/* Before-After Animation */
+.image-animation {
+    width: 400px;
+    height: 400px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.before-image {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: url("{{ url_for('static', filename='uploads/originals/original_20250526110254_13217e0e.jpg') }}");
+    background-size: cover;
+    background-position: center;
+    z-index: 1;
+    animation: fadeInOut 6s infinite;
+}
+
+.processing-animation {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(108, 99, 255, 0.2) 0%, rgba(138, 132, 255, 0.4) 100%);
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    animation: processing 6s infinite;
+}
+
+.processing-animation::before {
+    content: '';
+    width: 60px;
+    height: 60px;
+    border: 5px solid rgba(255, 255, 255, 0.5);
+    border-top: 5px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.after-image {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: url("{{ url_for('static', filename='uploads/processed/bg_removed_20250526110254_13217e0e.jpg') }}");
+    background-size: cover;
+    background-position: center;
+    z-index: 3;
+    opacity: 0;
+    animation: fadeIn 1s ease 2s infinite;
+    animation: revealAfter 6s infinite;
+}
+
+/* How It Works Animation */
+.step {
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+.step:nth-child(1) {
+    animation: fadeIn 0.6s ease forwards, slideUp 0.6s ease forwards;
+    animation-delay: 0.3s;
+}
+
+.step:nth-child(2) {
+    animation: fadeIn 0.6s ease forwards, slideUp 0.6s ease forwards;
+    animation-delay: 0.6s;
+}
+
+.step:nth-child(3) {
+    animation: fadeIn 0.6s ease forwards, slideUp 0.6s ease forwards;
+    animation-delay: 0.9s;
+}
+
+.step-icon {
+    position: relative;
+}
+
+.step-icon::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(108, 99, 255, 0.2);
+    border-radius: 50%;
+    transform: scale(0);
+    animation: pulse 2s infinite;
+}
+
+/* Feature Cards Animation */
+.feature-card {
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+.features-grid .feature-card:nth-child(1) {
+    animation: fadeIn 0.6s ease forwards, slideUp 0.6s ease forwards;
+    animation-delay: 0.1s;
+}
+
+.features-grid .feature-card:nth-child(2) {
+    animation: fadeIn 0.6s ease forwards, slideUp 0.6s ease forwards;
+    animation-delay: 0.2s;
+}
+
+.features-grid .feature-card:nth-child(3) {
+    animation: fadeIn 0.6s ease forwards, slideUp 0.6s ease forwards;
+    animation-delay: 0.3s;
+}
+
+.features-grid .feature-card:nth-child(4) {
+    animation: fadeIn 0.6s ease forwards, slideUp 0.6s ease forwards;
+    animation-delay: 0.4s;
+}
+
+.features-grid .feature-card:nth-child(5) {
+    animation: fadeIn 0.6s ease forwards, slideUp 0.6s ease forwards;
+    animation-delay: 0.5s;
+}
+
+.features-grid .feature-card:nth-child(6) {
+    animation: fadeIn 0.6s ease forwards, slideUp 0.6s ease forwards;
+    animation-delay: 0.6s;
+}
+
+/* Before-After Slider Animation */
+.before-after-slider::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background-color: white;
+    transform: translateX(-50%);
+    z-index: 2;
+}
+
+.before-after-slider::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 40px;
+    height: 40px;
+    background-color: white;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 3;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%236c63ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='15 18 9 12 15 6'%3E%3C/polyline%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%236c63ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='9 18 15 12 9 6'%3E%3C/polyline%3E%3C/svg%3E");
+    background-position: 8px center, 28px center;
+    background-repeat: no-repeat, no-repeat;
+    cursor: ew-resize;
+}
+
+/* Keyframes */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(30px);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+@keyframes gradientFlow {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(0);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1.5);
+        opacity: 0;
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes fadeInOut {
+    0% {
+        opacity: 1;
+    }
+    30% {
+        opacity: 1;
+    }
+    33% {
+        opacity: 0;
+    }
+    70% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes processing {
+    0% {
+        opacity: 0;
+    }
+    33% {
+        opacity: 1;
+    }
+    66% {
+        opacity: 1;
+    }
+    70% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes revealAfter {
+    0% {
+        opacity: 0;
+    }
+    66% {
+        opacity: 0;
+    }
+    70% {
+        opacity: 1;
+    }
+    97% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+/* Scroll Animation - triggers when elements enter viewport */
+.fade-in-element {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.fade-in-element.visible {
+    opacity: 1;
+    transform: translateY(0);
+} 
+</style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <span>BG</span>Remover
             </div>
-            <div class="flex items-center space-x-4">
-                <a href="#" id="view-history" class="text-blue-600 hover:text-blue-800 transition-all">
-                    <i class="fas fa-history mr-1"></i> History
-                </a>
-                <label class="theme-switch">
-                    <input type="checkbox" id="theme-toggle">
-                    <span class="slider"></span>
-                </label>
+            <ul class="nav-links">
+                <li><a href="#how-it-works">How It Works</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#pricing">Pricing</a></li>
+                <li><a href="#faq">FAQ</a></li>
+            </ul>
+            <div class="cta-buttons">
+                <a href="#" class="btn btn-outline">Log In</a>
+                <a href="#" class="btn btn-primary">Sign Up Free</a>
             </div>
-        </div>
+        </nav>
     </header>
 
-    <!-- Main Content -->
-    <main class="container mx-auto px-4 py-8">
-        <div class="max-w-4xl mx-auto">
-            <!-- Hero Section with animations -->
-            <section class="text-center mb-10" data-aos="fade-up">
-                <h1 class="text-4xl font-bold mb-4 relative">
-                    <span class="inline-block">Remove</span>
-                    <span class="inline-block ml-2 text-blue-600">Image Background</span>
-                </h1>
-                <p class="text-lg text-gray-600 mb-6">100% automatic and free - powered by AI</p>
-                <div class="flex justify-center space-x-4">
-                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm flex items-center">
-                        <i class="fas fa-bolt mr-1"></i> Fast Processing
-                    </span>
-                    <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm flex items-center">
-                        <i class="fas fa-lock mr-1"></i> Privacy First
-                    </span>
-                    <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm flex items-center">
-                        <i class="fas fa-magic mr-1"></i> AI Powered
-                    </span>
-                </div>
-            </section>
-
-            <!-- Upload Section with enhanced animations -->
-            <section class="mb-12" data-aos="fade-up" data-aos-delay="200">
-                <div id="upload-container" class="drop-zone rounded-lg p-10 text-center bg-white shadow-md transition-all duration-300">
-                    <div id="drop-text" class="transition-all duration-300">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400 mb-4 pulse-effect" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        <p class="text-lg mb-2">Drag and drop an image here</p>
-                        <p class="text-gray-500 mb-4">or</p>
-                        <label for="image" class="btn bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-md cursor-pointer transition-all">
-                            <i class="fas fa-upload mr-2"></i> Upload Image
-                        </label>
-                        <input type="file" id="image" name="image" accept="image/*" class="hidden">
-                    </div>
-                    
-                    <div id="preview-container" class="hidden transition-all duration-300">
-                        <!-- Regular preview mode -->
-                        <div id="standard-preview" class="flex flex-col md:flex-row items-center justify-center gap-6">
-                            <div class="relative">
-                                <p class="text-sm text-gray-500 mb-2">Original</p>
-                                <img id="original-preview" class="max-h-64 max-w-full rounded border border-gray-200 shadow-sm transition-all duration-300" alt="Original image">
-                            </div>
-                            <div id="result-container" class="hidden relative">
-                                <p class="text-sm text-gray-500 mb-2">Result</p>
-                                <img id="result-preview" class="max-h-64 max-w-full rounded border border-gray-200 shadow-sm transition-all duration-300" alt="Result image">
-                            </div>
-                        </div>
-                        
-                        <!-- Comparison slider mode (hidden by default) -->
-                        <div id="comparison-preview" class="hidden mt-4">
-                            <p class="text-sm text-gray-500 mb-2 text-center">Drag slider to compare</p>
-                            <div class="img-compare-container rounded overflow-hidden border border-gray-200 shadow-sm">
-                                <img id="compare-original" class="img-compare-before" alt="Original image">
-                                <div class="img-compare-after">
-                                    <img id="compare-result" alt="Result image">
-                                </div>
-                                <div class="img-compare-slider">
-                                    <i class="fas fa-arrows-alt-h text-blue-600"></i>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Processing indicators -->
-                        <div id="processing-indicator" class="hidden mt-8 text-center">
-                            <p class="text-sm text-gray-600 mb-2">Processing your image...</p>
-                            <div class="progress-container">
-                                <div id="progress-bar" class="progress-bar"></div>
-                            </div>
-                            <div id="spinner" class="flex justify-center mt-4">
-                                <div class="spinner"></div>
-                            </div>
-                        </div>
-                        
-                        <!-- Controls -->
-                        <div id="controls" class="mt-8 flex flex-wrap justify-center gap-4">
-                            <button id="remove-bg-btn" class="btn bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-md transition-all">
-                                <i class="fas fa-magic mr-2"></i> Remove Background
-                            </button>
-                            <button id="download-btn" class="btn hidden bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-md transition-all">
-                                <i class="fas fa-download mr-2"></i> Download
-                            </button>
-                            <button id="compare-btn" class="btn hidden bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-6 rounded-md transition-all">
-                                <i class="fas fa-exchange-alt mr-2"></i> Compare
-                            </button>
-                            <button id="upload-new-btn" class="btn bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-6 rounded-md transition-all">
-                                <i class="fas fa-redo-alt mr-2"></i> New Image
-                            </button>
-                        </div>
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <h1 class="animated-title">Remove Image Backgrounds <span>Instantly</span></h1>
+                <p class="subtitle">Powered by AI, our tool removes backgrounds from images with pixel-perfect precision in seconds.</p>
+                <div class="upload-box">
+                    <div class="upload-container">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Drag & drop your image here, or <span>browse</span></p>
+                        <input type="file" id="image-upload" accept="image/*" hidden>
+                        <label for="image-upload" class="btn btn-primary">Upload Image</label>
                     </div>
                 </div>
-            </section>
+                <div class="features-highlight">
+                    <div class="feature">
+                        <i class="fas fa-bolt"></i>
+                        <span>Fast Processing</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>100% Privacy</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-magic"></i>
+                        <span>High Quality</span>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="image-animation">
+                    <div class="before-image"></div>
+                    <div class="processing-animation"></div>
+                    <div class="after-image"></div>
+                </div>
+            </div>
+        </section>
 
-            <!-- Recent Images Section with animations -->
-            <section id="history-section" class="hidden transition-all duration-300" data-aos="fade-up">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-2xl font-bold">Recent Images</h2>
-                    <button id="clear-history-btn" class="text-red-500 hover:text-red-700 text-sm transition-all">
-                        <i class="fas fa-trash-alt mr-1"></i> Clear All
-                    </button>
+        <section id="how-it-works" class="how-it-works">
+            <h2>How It Works</h2>
+            <div class="steps-container">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-icon">
+                        <i class="fas fa-upload"></i>
+                    </div>
+                    <h3>Upload Image</h3>
+                    <p>Drag & drop or browse to upload your image file (JPG, PNG, or WebP).</p>
                 </div>
-                <div id="recent-images" class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <!-- Recent images will be added here dynamically -->
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-icon">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <h3>AI Processing</h3>
+                    <p>Our advanced AI algorithms identify and remove the background automatically.</p>
                 </div>
-                <div class="text-center mt-8 py-12" id="no-history-message">
-                    <i class="fas fa-history text-gray-300 text-5xl mb-4"></i>
-                    <p class="text-gray-500">No recent images found</p>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-icon">
+                        <i class="fas fa-download"></i>
+                    </div>
+                    <h3>Download Result</h3>
+                    <p>Download your image with transparent background in PNG or any format you need.</p>
                 </div>
-            </section>
-        </div>
+            </div>
+        </section>
+
+        <section id="features" class="features">
+            <h2>Powerful Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <i class="fas fa-robot"></i>
+                    <h3>AI-Powered Precision</h3>
+                    <p>Our machine learning algorithm ensures accurate edge detection, even with complex subjects.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <h3>Lightning Fast</h3>
+                    <p>Get results in seconds, not minutes. Process batches of images efficiently.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-lock"></i>
+                    <h3>Privacy First</h3>
+                    <p>Your images are processed securely and never stored without your permission.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-palette"></i>
+                    <h3>Background Replacement</h3>
+                    <p>Add solid colors, gradients, or custom backgrounds to your images instantly.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-code"></i>
+                    <h3>API Access</h3>
+                    <p>Integrate our background removal into your own applications with our developer API.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-mobile-alt"></i>
+                    <h3>Works Everywhere</h3>
+                    <p>Use our tool on any device - desktop, tablet, or smartphone with no installation required.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="demo">
+            <h2>See the Magic in Action</h2>
+            <div class="demo-slider">
+                <div class="demo-example">
+                    <div class="before-after-container">
+                        <div class="image-container">
+                            <img class="before-image" src="{{ url_for('static', filename='uploads/originals/original_20250526110254_13217e0e.jpg') }}" alt="Original image">
+                            <img class="after-image" src="{{ url_for('static', filename='uploads/processed/bg_removed_20250526110254_13217e0e.jpg') }}" alt="Image with background removed">
+                        </div>
+                        <input type="range" min="0" max="100" value="50" class="slider" id="before-after-slider">
+                        <div class="slider-button">
+                            <div class="slider-line"></div>
+                            <div class="slider-circle">
+                                <i class="fas fa-chevron-left"></i>
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </div>
+                        <div class="labels">
+                            <span class="before-label">BEFORE</span>
+                            <span class="after-label">AFTER</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="pricing" class="pricing">
+            <h2>Simple, Transparent Pricing</h2>
+            <div class="pricing-cards">
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3>Free</h3>
+                        <div class="price">$0</div>
+                        <p>Perfect for occasional use</p>
+                    </div>
+                    <ul class="pricing-features">
+                        <li><i class="fas fa-check"></i> 5 image credits per month</li>
+                        <li><i class="fas fa-check"></i> Standard resolution</li>
+                        <li><i class="fas fa-check"></i> Basic editing tools</li>
+                        <li><i class="fas fa-times"></i> Batch processing</li>
+                        <li><i class="fas fa-times"></i> API access</li>
+                    </ul>
+                    <a href="#" class="btn btn-outline">Get Started</a>
+                </div>
+                <div class="pricing-card featured">
+                    <div class="popular-tag">Most Popular</div>
+                    <div class="pricing-header">
+                        <h3>Pro</h3>
+                        <div class="price">$9.99<span>/month</span></div>
+                        <p>For regular content creators</p>
+                    </div>
+                    <ul class="pricing-features">
+                        <li><i class="fas fa-check"></i> 100 image credits per month</li>
+                        <li><i class="fas fa-check"></i> HD resolution</li>
+                        <li><i class="fas fa-check"></i> Advanced editing tools</li>
+                        <li><i class="fas fa-check"></i> Batch processing (up to 20)</li>
+                        <li><i class="fas fa-times"></i> API access</li>
+                    </ul>
+                    <a href="#" class="btn btn-primary">Choose Plan</a>
+                </div>
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3>Business</h3>
+                        <div class="price">$29.99<span>/month</span></div>
+                        <p>For professional usage</p>
+                    </div>
+                    <ul class="pricing-features">
+                        <li><i class="fas fa-check"></i> Unlimited image credits</li>
+                        <li><i class="fas fa-check"></i> Ultra HD resolution</li>
+                        <li><i class="fas fa-check"></i> All editing tools</li>
+                        <li><i class="fas fa-check"></i> Unlimited batch processing</li>
+                        <li><i class="fas fa-check"></i> API access</li>
+                    </ul>
+                    <a href="#" class="btn btn-outline">Choose Plan</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="faq" class="faq">
+            <h2>Frequently Asked Questions</h2>
+            <div class="faq-container">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>How accurate is the background removal?</h3>
+                        <span class="toggle-icon"><i class="fas fa-plus"></i></span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Our AI has been trained on millions of images to provide professional-grade background removal. It excels with portraits, products, and even complex subjects like hair and transparent objects.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>What file formats are supported?</h3>
+                        <span class="toggle-icon"><i class="fas fa-plus"></i></span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>You can upload images in JPG, PNG, or WebP formats. Download your processed images with transparent backgrounds in PNG format, or with new backgrounds in JPG or WebP.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>Is there a file size limit?</h3>
+                        <span class="toggle-icon"><i class="fas fa-plus"></i></span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Free users can upload images up to 5MB. Pro and Business users can upload images up to 25MB.</p>
+                    </div>
+                </div>
+                <!-- More FAQ items would go here -->
+            </div>
+        </section>
+
+        <section class="cta">
+            <h2>Ready to Remove Backgrounds?</h2>
+            <p>Join thousands of satisfied users who save time with our AI-powered background removal tool.</p>
+            <a href="#" class="btn btn-primary btn-large">Try for Free - No Credit Card Required</a>
+        </section>
     </main>
 
-    <!-- Minimal Footer -->
-    <footer class="py-6 bg-white border-t border-gray-200 transition-all duration-300" data-aos="fade-up">
-        <div class="container mx-auto px-4 text-center text-gray-500">
-            <p>&copy; 2024 BGRemover Pro. All rights reserved.</p>
-            <div class="flex justify-center mt-3 space-x-3">
-                <a href="https://www.x.com/dixitk941" class="text-gray-400 hover:text-gray-600 transition-colors">
-                    <i class="fab fa-twitter"></i>
-                </a>
-                <!-- <a href="#" class="text-gray-400 hover:text-gray-600 transition-colors">
-                    <i class="fab fa-facebook"></i>
-                </a> -->
-                <a href="https://www.instagram.com/karan_dixit19" class="text-gray-400 hover:text-gray-600 transition-colors">
-                    <i class="fab fa-instagram"></i>
-                </a>
-                <a href="https://www.github.com/dixitk941" class="text-gray-400 hover:text-gray-600 transition-colors">
-                    <i class="fab fa-github"></i>
-                </a>
+    <footer>
+        <div class="footer-content">
+            <div class="footer-column">
+                <div class="logo">
+                    <span>BG</span>Remover
+                </div>
+                <p>AI-powered background removal made simple and fast.</p>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                </div>
             </div>
+            <div class="footer-column">
+                <h4>Product</h4>
+                <ul>
+                    <li><a href="#">Features</a></li>
+                    <li><a href="#">Pricing</a></li>
+                    <li><a href="#">API</a></li>
+                    <li><a href="#">Examples</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Tutorials</a></li>
+                    <li><a href="#">Support</a></li>
+                    <li><a href="#">Documentation</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 BGRemover. All rights reserved.</p>
         </div>
     </footer>
 
-    <!-- Scripts -->
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script>
+    <script >
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize AOS animations
-            AOS.init({
-                duration: 800,
-                once: true
-            });
+    // Upload box functionality
+    const uploadBox = document.querySelector('.upload-container');
+    const fileInput = document.getElementById('image-upload');
+    
+    if (uploadBox && fileInput) {
+        uploadBox.addEventListener('click', function() {
+            fileInput.click();
+        });
+        
+        uploadBox.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            uploadBox.classList.add('drag-over');
+        });
+        
+        uploadBox.addEventListener('dragleave', function() {
+            uploadBox.classList.remove('drag-over');
+        });
+        
+        uploadBox.addEventListener('drop', function(e) {
+            e.preventDefault();
+            uploadBox.classList.remove('drag-over');
             
-            // DOM Elements
-            const fileInput = document.getElementById('image');
-            const uploadContainer = document.getElementById('upload-container');
-            const dropText = document.getElementById('drop-text');
-            const previewContainer = document.getElementById('preview-container');
-            const originalPreview = document.getElementById('original-preview');
-            const resultContainer = document.getElementById('result-container');
-            const resultPreview = document.getElementById('result-preview');
-            const processingIndicator = document.getElementById('processing-indicator');
-            const progressBar = document.getElementById('progress-bar');
-            const spinner = document.getElementById('spinner');
-            const removeBgBtn = document.getElementById('remove-bg-btn');
-            const downloadBtn = document.getElementById('download-btn');
-            const compareBtn = document.getElementById('compare-btn');
-            const uploadNewBtn = document.getElementById('upload-new-btn');
-            const viewHistoryBtn = document.getElementById('view-history');
-            const clearHistoryBtn = document.getElementById('clear-history-btn');
-            const historySection = document.getElementById('history-section');
-            const recentImagesContainer = document.getElementById('recent-images');
-            const noHistoryMessage = document.getElementById('no-history-message');
-            const standardPreview = document.getElementById('standard-preview');
-            const comparisonPreview = document.getElementById('comparison-preview');
-            const compareOriginal = document.getElementById('compare-original');
-            const compareResult = document.getElementById('compare-result');
-            const themeToggle = document.getElementById('theme-toggle');
-            
-            // Comparison slider elements
-            const slider = document.querySelector('.img-compare-slider');
-            const afterContainer = document.querySelector('.img-compare-after');
-            
-            let currentFileName = '';
-            let currentOriginalUrl = '';
-            let currentResultUrl = '';
-            let isSliderActive = false;
-            
-            // Initialize from session storage
-            loadHistory();
-            initializeTheme();
-            
-            // Theme toggle
-            themeToggle.addEventListener('change', function() {
-                document.body.classList.toggle('dark-mode');
-                localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
-            });
-            
-            // Initialize theme based on localStorage
-            function initializeTheme() {
-                if (localStorage.getItem('darkMode') === 'true') {
-                    document.body.classList.add('dark-mode');
-                    themeToggle.checked = true;
-                }
-            }
-            
-            // File Input Change Handler
-            fileInput.addEventListener('change', function(e) {
-                handleFileSelection(e.target.files[0]);
-            });
-
-            // Drag & Drop Handlers
-            uploadContainer.addEventListener('dragover', function(e) {
-                e.preventDefault();
-                uploadContainer.classList.add('active');
-            });
-
-            uploadContainer.addEventListener('dragleave', function() {
-                uploadContainer.classList.remove('active');
-            });
-
-            uploadContainer.addEventListener('drop', function(e) {
-                e.preventDefault();
-                uploadContainer.classList.remove('active');
-                
-                if (e.dataTransfer.files.length) {
-                    handleFileSelection(e.dataTransfer.files[0]);
-                }
-            });
-
-            // Remove Background Button
-            removeBgBtn.addEventListener('click', function() {
-                if (!currentFileName) return;
-                
-                const formData = new FormData();
-                formData.append('image', fileInput.files[0]);
-                
-                processingIndicator.classList.remove('hidden');
-                removeBgBtn.disabled = true;
-                
-                // Simulate progress for better UX
-                let progress = 0;
-                const progressInterval = setInterval(() => {
-                    progress += Math.random() * 15;
-                    if (progress > 90) progress = 90; // Leave the last 10% for actual completion
-                    progressBar.style.width = progress + '%';
-                }, 500);
-                
-                fetch('/upload', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(data => {
-                            throw new Error(data.error || 'Network response was not ok');
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Response data:', data);
-                    
-                    if (!data.success) {
-                        throw new Error('Invalid response from server');
-                    }
-                    
-                    // Complete progress bar
-                    clearInterval(progressInterval);
-                    progressBar.style.width = '100%';
-                    
-                    // Try to use base64 data if available, otherwise fall back to URLs
-                    if (data.processed_data) {
-                        currentResultUrl = data.processed_data;
-                        currentOriginalUrl = data.original_data || data.original_url;
-                    } else {
-                        currentResultUrl = data.processed_url;
-                        currentOriginalUrl = data.original_url;
-                    }
-                    
-                    // Display images
-                    resultPreview.src = currentResultUrl;
-                    resultContainer.classList.remove('hidden');
-                    
-                    // Set up comparison view
-                    compareOriginal.src = currentOriginalUrl;
-                    compareResult.src = currentResultUrl;
-                    
-                    // Show the compare and download buttons
-                    downloadBtn.classList.remove('hidden');
-                    compareBtn.classList.remove('hidden');
-                    
-                    // Save to session storage with complete information and store filename for download
-                    saveToHistory(currentFileName, currentOriginalUrl, currentResultUrl, data.filename);
-                    
-                    // Create confetti effect for successful operation
-                    createConfetti();
-                    
-                    // Hide processing indicator with a slight delay for smoothness
-                    setTimeout(() => {
-                        processingIndicator.classList.add('hidden');
-                    }, 500);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    clearInterval(progressInterval);
-                    alert('Error processing image: ' + error.message);
-                })
-                .finally(() => {
-                    removeBgBtn.disabled = false;
-                });
-            });
-
-            // Update Download Button
-            downloadBtn.addEventListener('click', function() {
-                if (currentResultUrl) {
-                    if (currentResultUrl.startsWith('data:')) {
-                        // For base64 data
-                        const link = document.createElement('a');
-                        link.href = currentResultUrl;
-                        link.download = 'bg_removed_' + currentFileName;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                    } else {
-                        // For URL path
-                        // Extract filename from URL
-                        const filename = currentResultUrl.split('/').pop();
-                        const downloadUrl = `/download/${filename}`;
-                        
-                        const link = document.createElement('a');
-                        link.href = downloadUrl;
-                        link.download = 'bg_removed_' + currentFileName;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                    }
-                    
-                    // Add bounce animation to button for feedback
-                    downloadBtn.classList.add('animate-bounce');
-                    setTimeout(() => {
-                        downloadBtn.classList.remove('animate-bounce');
-                    }, 1000);
-                }
-            });
-            
-            // Compare Button
-            compareBtn.addEventListener('click', function() {
-                if (standardPreview.classList.contains('hidden')) {
-                    // Switch to standard view
-                    standardPreview.classList.remove('hidden');
-                    comparisonPreview.classList.add('hidden');
-                    compareBtn.innerHTML = '<i class="fas fa-exchange-alt mr-2"></i> Compare';
-                } else {
-                    // Switch to comparison view
-                    standardPreview.classList.add('hidden');
-                    comparisonPreview.classList.remove('hidden');
-                    compareBtn.innerHTML = '<i class="fas fa-th-large mr-2"></i> Standard View';
-                }
-            });
-
-            // Upload New Button
-            uploadNewBtn.addEventListener('click', function() {
-                resetUI();
-            });
-
-            // View History Button
-            viewHistoryBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                historySection.classList.toggle('hidden');
-                if (!historySection.classList.contains('hidden')) {
-                    loadHistory();
-                    historySection.scrollIntoView({ behavior: 'smooth' });
-                }
-            });
-            
-            // Clear History Button
-            clearHistoryBtn.addEventListener('click', function() {
-                if (confirm('Are you sure you want to clear all history?')) {
-                    sessionStorage.removeItem('bgRemoverHistory');
-                    loadHistory();
-                }
-            });
-
-            // Handle file selection
-            function handleFileSelection(file) {
-                if (!file || !file.type.match('image.*')) return;
-                
-                currentFileName = file.name;
-                const reader = new FileReader();
-                
-                reader.onload = function(e) {
-                    currentOriginalUrl = e.target.result;
-                    originalPreview.src = currentOriginalUrl;
-                    dropText.classList.add('hidden');
-                    previewContainer.classList.remove('hidden');
-                    resultContainer.classList.add('hidden');
-                    downloadBtn.classList.add('hidden');
-                    compareBtn.classList.add('hidden');
-                    
-                    // Reset comparison view if active
-                    standardPreview.classList.remove('hidden');
-                    comparisonPreview.classList.add('hidden');
-                    compareBtn.innerHTML = '<i class="fas fa-exchange-alt mr-2"></i> Compare';
-                };
-                
-                reader.readAsDataURL(file);
-            }
-
-            // Reset UI to initial state
-            function resetUI() {
-                fileInput.value = '';
-                dropText.classList.remove('hidden');
-                previewContainer.classList.add('hidden');
-                resultContainer.classList.add('hidden');
-                processingIndicator.classList.add('hidden');
-                progressBar.style.width = '0%';
-                currentFileName = '';
-                currentOriginalUrl = '';
-                currentResultUrl = '';
-                
-                // Reset comparison view
-                standardPreview.classList.remove('hidden');
-                comparisonPreview.classList.add('hidden');
-            }
-
-            // Session Storage Functions
-            function saveToHistory(filename, originalUrl, resultUrl, downloadFilename) {
-                const history = JSON.parse(sessionStorage.getItem('bgRemoverHistory') || '[]');
-                
-                // Check if already exists and remove it
-                const filtered = history.filter(item => item.filename !== filename);
-                
-                // Add current item to the beginning
-                filtered.unshift({
-                    filename: filename,
-                    originalUrl: originalUrl,
-                    resultUrl: resultUrl,
-                    downloadFilename: downloadFilename || filename,
-                    timestamp: Date.now()
-                });
-                
-                // Limit to 8 items
-                const limitedHistory = filtered.slice(0, 8);
-                
-                sessionStorage.setItem('bgRemoverHistory', JSON.stringify(limitedHistory));
-                
-                // Update history display if visible
-                if (!historySection.classList.contains('hidden')) {
-                    loadHistory();
-                }
-            }
-
-            function loadHistory() {
-                const history = JSON.parse(sessionStorage.getItem('bgRemoverHistory') || '[]');
-                recentImagesContainer.innerHTML = '';
-                
-                if (history.length === 0) {
-                    noHistoryMessage.classList.remove('hidden');
-                    clearHistoryBtn.style.display = 'none';
-                    return;
-                }
-                
-                noHistoryMessage.classList.add('hidden');
-                clearHistoryBtn.style.display = 'block';
-                
-                history.forEach((item, index) => {
-                    const historyItem = document.createElement('div');
-                    historyItem.className = 'recent-item bg-white p-2 rounded shadow-sm border border-gray-200 transition-all';
-                    historyItem.style.setProperty('--index', index);
-                    
-                    const date = new Date(item.timestamp);
-                    const formattedDate = `${date.getMonth()+1}/${date.getDate()}/${date.getFullYear()} ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
-                    
-                    historyItem.innerHTML = `
-                        <div class="relative group">
-                            <img src="${item.resultUrl}" alt="${item.filename}" class="w-full h-32 object-contain mb-2 rounded">
-                            <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center rounded">
-                                <button class="preview-history-btn p-1 bg-white rounded-full m-1">
-                                    <i class="fas fa-eye text-blue-600"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <p class="text-xs truncate font-medium">${item.filename}</p>
-                        <p class="text-xs text-gray-500 mb-2">${formattedDate}</p>
-                        <div class="flex justify-between mt-1">
-                            <button class="reuse-btn text-xs text-blue-600 hover:text-blue-800 transition-colors">
-                                <i class="fas fa-sync-alt mr-1"></i> Reuse
-                            </button>
-                            <button class="download-history-btn text-xs text-green-600 hover:text-green-800 transition-colors">
-                                <i class="fas fa-download mr-1"></i> Download
-                            </button>
-                        </div>
-                    `;
-                    
-                    historyItem.querySelector('.preview-history-btn').addEventListener('click', function(e) {
-                        e.preventDefault();
-                        // Create a modal preview
-                        const modal = document.createElement('div');
-                        modal.className = 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 fade-in';
-                        modal.innerHTML = `
-                            <div class="bg-white rounded-lg p-4 max-w-4xl max-h-screen overflow-auto relative">
-                                <button class="absolute top-2 right-2 text-gray-600 hover:text-gray-900">
-                                    <i class="fas fa-times text-xl"></i>
-                                </button>
-                                <div class="flex flex-col md:flex-row gap-4">
-                                    <div>
-                                        <p class="text-sm text-gray-500 mb-2">Original</p>
-                                        <img src="${item.originalUrl}" alt="Original" class="max-h-80 rounded border">
-                                    </div>
-                                    <div>
-                                        <p class="text-sm text-gray-500 mb-2">Background Removed</p>
-                                        <img src="${item.resultUrl}" alt="Result" class="max-h-80 rounded border">
-                                    </div>
-                                </div>
-                                <div class="mt-4 text-center">
-                                    <button class="btn bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
-                                        <i class="fas fa-download mr-1"></i> Download
-                                    </button>
-                                </div>
-                            </div>
-                        `;
-                        
-                        document.body.appendChild(modal);
-                        
-                        // Close modal on click
-                        modal.addEventListener('click', function(e) {
-                            if (e.target === modal || e.target.closest('button')) {
-                                modal.classList.add('fade-out');
-                                setTimeout(() => {
-                                    document.body.removeChild(modal);
-                                }, 300);
-                            }
-                        });
-                        
-                        // Download from modal
-                        modal.querySelector('.btn').addEventListener('click', function() {
-                            const link = document.createElement('a');
-                            link.href = item.resultUrl;
-                            link.download = 'bg_removed_' + item.filename;
-                            document.body.appendChild(link);
-                            link.click();
-                            document.body.removeChild(link);
-                        });
-                    });
-                    
-                    historyItem.querySelector('.reuse-btn').addEventListener('click', function() {
-                        originalPreview.src = item.originalUrl;
-                        resultPreview.src = item.resultUrl;
-                        currentFileName = item.filename;
-                        currentOriginalUrl = item.originalUrl;
-                        currentResultUrl = item.resultUrl;
-                        
-                        // Setup comparison view
-                        compareOriginal.src = currentOriginalUrl;
-                        compareResult.src = currentResultUrl;
-                        
-                        dropText.classList.add('hidden');
-                        previewContainer.classList.remove('hidden');
-                        resultContainer.classList.remove('hidden');
-                        downloadBtn.classList.remove('hidden');
-                        compareBtn.classList.remove('hidden');
-                        
-                        // Reset to standard view
-                        standardPreview.classList.remove('hidden');
-                        comparisonPreview.classList.add('hidden');
-                        
-                        // Scroll to upload section
-                        uploadContainer.scrollIntoView({ behavior: 'smooth' });
-                    });
-                    
-                    historyItem.querySelector('.download-history-btn').addEventListener('click', function() {
-                        if (item.resultUrl.startsWith('data:')) {
-                            // For base64 data
-                            const link = document.createElement('a');
-                            link.href = item.resultUrl;
-                            link.download = 'bg_removed_' + item.filename;
-                            document.body.appendChild(link);
-                            link.click();
-                            document.body.removeChild(link);
-                        } else {
-                            // For URL path
-                            // Extract filename from URL or use the stored download filename
-                            const filename = item.downloadFilename || item.resultUrl.split('/').pop();
-                            const downloadUrl = `/download/${filename}`;
-                            
-                            const link = document.createElement('a');
-                            link.href = downloadUrl;
-                            link.download = 'bg_removed_' + item.filename;
-                            document.body.appendChild(link);
-                            link.click();
-                            document.body.removeChild(link);
-                        }
-                        
-                        // Provide visual feedback
-                        this.innerHTML = '<i class="fas fa-check mr-1"></i> Downloaded';
-                        setTimeout(() => {
-                            this.innerHTML = '<i class="fas fa-download mr-1"></i> Download';
-                        }, 2000);
-                    });
-                    
-                    recentImagesContainer.appendChild(historyItem);
-                });
-            }
-            
-            // Image comparison slider functionality
-            if (slider) {
-                slider.addEventListener('mousedown', function(e) {
-                    e.preventDefault();
-                    isSliderActive = true;
-                });
-                
-                window.addEventListener('mouseup', function() {
-                    isSliderActive = false;
-                });
-                
-                window.addEventListener('mousemove', function(e) {
-                    if (!isSliderActive) return;
-                    
-                    const container = document.querySelector('.img-compare-container');
-                    const rect = container.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    let percent = (x / rect.width) * 100;
-                    
-                    // Constrain within bounds
-                    percent = Math.max(0, Math.min(100, percent));
-                    
-                    // Update slider position
-                    afterContainer.style.width = percent + '%';
-                });
-                
-                // Touch support
-                slider.addEventListener('touchstart', function(e) {
-                    e.preventDefault();
-                    isSliderActive = true;
-                });
-                
-                window.addEventListener('touchend', function() {
-                    isSliderActive = false;
-                });
-                
-                window.addEventListener('touchmove', function(e) {
-                    if (!isSliderActive) return;
-                    
-                    const container = document.querySelector('.img-compare-container');
-                    const rect = container.getBoundingClientRect();
-                    const x = e.touches[0].clientX - rect.left;
-                    let percent = (x / rect.width) * 100;
-                    
-                    // Constrain within bounds
-                    percent = Math.max(0, Math.min(100, percent));
-                    
-                    // Update slider position
-                    afterContainer.style.width = percent + '%';
-                });
-            }
-            
-            // Create confetti effect
-            function createConfetti() {
-                const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
-                
-                for (let i = 0; i < 100; i++) {
-                    const confetti = document.createElement('div');
-                    confetti.className = 'confetti';
-                    confetti.style.left = Math.random() * 100 + 'vw';
-                    confetti.style.animationDelay = Math.random() * 5 + 's';
-                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                    confetti.style.width = Math.random() * 10 + 5 + 'px';
-                    confetti.style.height = Math.random() * 10 + 5 + 'px';
-                    document.body.appendChild(confetti);
-                    
-                    // Remove after animation completes
-                    setTimeout(() => {
-                        document.body.removeChild(confetti);
-                    }, 6000);
-                }
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                handleFileUpload(e.dataTransfer.files[0]);
             }
         });
+        
+        fileInput.addEventListener('change', function() {
+            if (fileInput.files.length) {
+                handleFileUpload(fileInput.files[0]);
+            }
+        });
+    }
+    
+    function handleFileUpload(file) {
+        // Create a FormData object to store the file
+        const formData = new FormData();
+        formData.append('image', file);
+        
+        // Store the file in sessionStorage temporarily (as base64)
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            // Save the file to sessionStorage
+            sessionStorage.setItem('uploadedImage', e.target.result);
+            sessionStorage.setItem('uploadedImageName', file.name);
+            
+            // Show loading indicator
+            const loadingOverlay = document.createElement('div');
+            loadingOverlay.style.position = 'fixed';
+            loadingOverlay.style.top = '0';
+            loadingOverlay.style.left = '0';
+            loadingOverlay.style.width = '100%';
+            loadingOverlay.style.height = '100%';
+            loadingOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+            loadingOverlay.style.display = 'flex';
+            loadingOverlay.style.justifyContent = 'center';
+            loadingOverlay.style.alignItems = 'center';
+            loadingOverlay.style.zIndex = '9999';
+            
+            const spinner = document.createElement('div');
+            spinner.style.border = '4px solid rgba(255, 255, 255, 0.3)';
+            spinner.style.borderTop = '4px solid var(--primary-color)';
+            spinner.style.borderRadius = '50%';
+            spinner.style.width = '50px';
+            spinner.style.height = '50px';
+            spinner.style.animation = 'spin 1s linear infinite';
+            
+            loadingOverlay.appendChild(spinner);
+            document.body.appendChild(loadingOverlay);
+            
+            // Redirect to the bgremove.html page after a short delay
+            setTimeout(() => {
+                window.location.href = '/bgremove';
+            }, 800);
+        };
+        
+        reader.readAsDataURL(file);
+    }
+    
+    // FAQ Accordion
+    const faqItems = document.querySelectorAll('.faq-item');
+    
+    if (faqItems.length) {
+        faqItems.forEach(item => {
+            const question = item.querySelector('.faq-question');
+            
+            question.addEventListener('click', () => {
+                const isActive = item.classList.contains('active');
+                
+                // Close all items
+                faqItems.forEach(faq => {
+                    faq.classList.remove('active');
+                });
+                
+                // Open clicked item if it wasn't already active
+                if (!isActive) {
+                    item.classList.add('active');
+                }
+            });
+        });
+    }
+    
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const targetId = this.getAttribute('href');
+            
+            if (targetId === '#') return;
+            
+            const targetElement = document.querySelector(targetId);
+            
+            if (targetElement) {
+                window.scrollTo({
+                    top: targetElement.offsetTop - 100,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+
+    // Before-After Slider Interaction
+    const slider = document.querySelector('.before-after-slider');
+    
+    if (slider) {
+        let isDragging = false;
+        let startX;
+        let startPercentage = 50; // Default split is 50%
+        
+        // Set initial state
+        const before = slider.querySelector('.before');
+        before.style.clipPath = `polygon(0 0, ${startPercentage}% 0, ${startPercentage}% 100%, 0 100%)`;
+        
+        // Mouse events
+        slider.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startX = e.pageX;
+            slider.style.cursor = 'grabbing';
+            e.preventDefault(); // Prevent text selection during drag
+        });
+        
+        window.addEventListener('mouseup', () => {
+            if (isDragging) {
+                isDragging = false;
+                slider.style.cursor = 'grab';
+            }
+        });
+        
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            
+            const rect = slider.getBoundingClientRect();
+            const x = e.pageX - rect.left;
+            const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100));
+            
+            before.style.clipPath = `polygon(0 0, ${percentage}% 0, ${percentage}% 100%, 0 100%)`;
+        });
+        
+        // Touch events for mobile
+        slider.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            startX = e.touches[0].pageX;
+            e.preventDefault();
+        });
+        
+        window.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+        
+        window.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            
+            const rect = slider.getBoundingClientRect();
+            const x = e.touches[0].pageX - rect.left;
+            const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100));
+            
+            before.style.clipPath = `polygon(0 0, ${percentage}% 0, ${percentage}% 100%, 0 100%)`;
+            e.preventDefault();
+        });
+        
+        // Add a divider line indicator to make it more clear this is draggable
+        const divider = document.createElement('div');
+        divider.className = 'slider-divider';
+        divider.innerHTML = '<div class="slider-handle"></div>';
+        slider.appendChild(divider);
+        
+        // Add some initial animation to show the slider functionality
+        setTimeout(() => {
+            before.style.clipPath = 'polygon(0 0, 65% 0, 65% 100%, 0 100%)';
+            setTimeout(() => {
+                before.style.clipPath = 'polygon(0 0, 35% 0, 35% 100%, 0 100%)';
+                setTimeout(() => {
+                    before.style.clipPath = 'polygon(0 0, 50% 0, 50% 100%, 0 100%)';
+                }, 800);
+            }, 800);
+        }, 1000);
+    }
+});
+    </script>
+    <script> 
+        document.addEventListener('DOMContentLoaded', function() {
+    // Scroll animation for elements
+    const fadeElements = document.querySelectorAll('section h2, .feature-card, .step, .pricing-card');
+    
+    // Add the fade-in-element class to all elements we want to animate
+    fadeElements.forEach(element => {
+        element.classList.add('fade-in-element');
+    });
+    
+    // Function to check if an element is in viewport
+    function isInViewport(element) {
+        const rect = element.getBoundingClientRect();
+        return (
+            rect.top <= (window.innerHeight || document.documentElement.clientHeight) * 0.8
+        );
+    }
+    
+    // Function to handle scroll and animate elements
+    function handleScroll() {
+        fadeElements.forEach(element => {
+            if (isInViewport(element)) {
+                element.classList.add('visible');
+            }
+        });
+    }
+    
+    // Call once on load
+    handleScroll();
+    
+    // Add scroll event listener
+    window.addEventListener('scroll', handleScroll);
+    
+    // Counter animation for statistics
+    function animateCounter(element, target, duration = 2000) {
+        const start = 0;
+        const increment = target / (duration / 16);
+        let current = start;
+        
+        const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+                element.textContent = target.toLocaleString();
+                clearInterval(timer);
+            } else {
+                element.textContent = Math.floor(current).toLocaleString();
+            }
+        }, 16);
+    }
+    
+    // Animate the hero image sequence
+    const heroImage = document.querySelector('.image-animation');
+    if (heroImage) {
+        heroImage.classList.add('animate');
+    }
+    
+    // Type writer effect for title
+    function typeWriter(element, text, speed = 50, delay = 0) {
+        let i = 0;
+        
+        setTimeout(() => {
+            const interval = setInterval(() => {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                } else {
+                    clearInterval(interval);
+                }
+            }, speed);
+        }, delay);
+    }
+    
+    // Animate the before-after slider on hover
+    const beforeAfterSlider = document.querySelector('.before-after-slider');
+    
+    if (beforeAfterSlider) {
+        beforeAfterSlider.addEventListener('mouseover', () => {
+            const before = beforeAfterSlider.querySelector('.before');
+            
+            // Create a CSS animation to move the slider back and forth
+            before.style.animation = 'sliderAnimation 3s ease-in-out forwards';
+            
+            // Remove the animation after it completes
+            setTimeout(() => {
+                before.style.animation = '';
+            }, 3000);
+        });
+    }
+    
+    // Add keyframes for the slider animation dynamically
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes sliderAnimation {
+            0% { clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%); }
+            50% { clip-path: polygon(0 0, 80% 0, 80% 100%, 0 100%); }
+            100% { clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%); }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Parallax effect for sections
+    window.addEventListener('scroll', () => {
+        const scrollPosition = window.pageYOffset;
+        
+        document.querySelectorAll('.parallax').forEach(element => {
+            const speed = element.getAttribute('data-speed') || 0.5;
+            element.style.transform = `translateY(${scrollPosition * speed}px)`;
+        });
+    });
+    
+    // Initialize the interactive demos
+    initializeAnimatedDemos();
+});
+
+// Function to initialize the animated demos
+function initializeAnimatedDemos() {
+    // This function would set up any interactive demos
+    // In a real implementation, you might want to connect to your backend API
+    // or use a service like Cloudinary to do the actual background removal
+    
+    console.log('Animated demos initialized');
+}
+
+// Modern Before-After Slider Functionality
+function initBeforeAfterSlider() {
+    const slider = document.getElementById('before-after-slider');
+    const sliderButton = document.querySelector('.slider-button');
+    const afterImage = document.querySelector('.after-image');
+    
+    if (!slider || !sliderButton || !afterImage) return;
+    
+    // Initialize position
+    updateSliderPosition(50);
+    
+    // Handle slider input event
+    slider.addEventListener('input', function() {
+        updateSliderPosition(this.value);
+    });
+    
+    // Add touch support
+    slider.addEventListener('touchstart', function() {
+        document.body.style.overflow = 'hidden'; // Prevent page scrolling while dragging
+    });
+    
+    slider.addEventListener('touchend', function() {
+        document.body.style.overflow = ''; // Restore page scrolling
+    });
+    
+    // Add auto-animation on page load
+    setTimeout(() => {
+        animateSlider();
+    }, 1000);
+    
+    // Function to update the slider position
+    function updateSliderPosition(value) {
+        const percent = value + '%';
+        sliderButton.style.left = percent;
+        afterImage.style.clipPath = `inset(0 0 0 ${percent})`;
+    }
+    
+    // Function to animate the slider automatically
+    function animateSlider() {
+        let value = 50;
+        let direction = 1;
+        let speed = 1;
+        let animating = true;
+        
+        const animate = () => {
+            if (!animating) return;
+            
+            value += speed * direction;
+            
+            if (value >= 80) {
+                value = 80;
+                direction = -1;
+            } else if (value <= 20) {
+                value = 20;
+                direction = 1;
+            }
+            
+            updateSliderPosition(value);
+            
+            // Only run animation for a few cycles
+            if (value === 50 && direction === 1) {
+                animating = false;
+                slider.value = 50;
+            } else {
+                requestAnimationFrame(animate);
+            }
+        };
+        
+        animate();
+    }
+    
+    // Reset animation on hover
+    const container = document.querySelector('.before-after-container');
+    container.addEventListener('mouseenter', () => {
+        sliderButton.classList.add('hover-effect');
+    });
+    
+    container.addEventListener('mouseleave', () => {
+        sliderButton.classList.remove('hover-effect');
+    });
+}
+
+// Initialize when the DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Your existing initialization code...
+    
+    // Initialize the before-after slider
+    initBeforeAfterSlider();
+});
     </script>
 </body>
-
 </html>

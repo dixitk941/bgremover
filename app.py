@@ -71,6 +71,11 @@ def index():
     """Render the main application page"""
     return render_template('index.html')
 
+@app.route('/bgremove')
+def bgremove():
+    """Render the background removal tool page"""
+    return render_template('bgremove.html')
+
 @app.route('/upload', methods=['POST'])
 def upload_image():
     """Handle image upload and background removal"""
