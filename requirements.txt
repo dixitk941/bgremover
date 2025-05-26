@@ -5,3 +5,5 @@ rembg
 numpy
 requests
 Werkzeug
+onnxruntime
+gunicorn

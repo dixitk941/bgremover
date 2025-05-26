@@ -4,180 +4,998 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GenZ BGRemover</title>
+    <title>BGRemover Pro</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-
+    <!-- Add FontAwesome for more icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Add AOS for scroll animations -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <style>
-        /* Spinner for loading effect */
+        /* Base animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+        
+        /* Loading spinner */
         .spinner {
             border: 4px solid rgba(255, 255, 255, 0.3);
-            border-left-color: #4ade80;
             border-radius: 50%;
+            border-top: 4px solid #3b82f6;
             width: 40px;
             height: 40px;
             animation: spin 1s linear infinite;
         }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+        
+        /* Animated elements */
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
         }
-
-        /* Fading animation on the image */
-        .fade-out-bg {
-            animation: fadeOut 2s ease-in-out forwards;
-            opacity: 1;
+        
+        .slide-up {
+            animation: slideUp 0.5s ease-out forwards;
         }
-
-        @keyframes fadeOut {
+        
+        .pulse-effect {
+            animation: pulse 2s infinite;
+        }
+        
+        /* Drop zone styling */
+        .drop-zone {
+            border: 2px dashed #4b5563;
+            border-radius: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .drop-zone::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0), rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0));
+            transform: translateX(-100%);
+            transition: transform 0.6s ease-out;
+        }
+        
+        .drop-zone:hover::before, .drop-zone.active::before {
+            transform: translateX(100%);
+        }
+        
+        .drop-zone:hover, .drop-zone.active {
+            border-color: #3b82f6;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        /* History item animations */
+        .recent-item {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: slideUp 0.5s ease-out forwards;
+            animation-delay: calc(var(--index) * 0.1s);
+        }
+        
+        .recent-item:hover {
+            transform: scale(1.05) translateY(-5px);
+            box-shadow: 0 10px 25px -10px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Button effects */
+        .btn {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%, -50%);
+            transform-origin: 50% 50%;
+        }
+        
+        .btn:hover::after {
+            animation: ripple 1s ease-out;
+        }
+        
+        @keyframes ripple {
             0% {
-                opacity: 1;
-                filter: blur(0px);
-            }
-
-            50% {
+                transform: scale(0, 0);
                 opacity: 0.5;
-                filter: blur(4px);
             }
-
             100% {
+                transform: scale(100, 100);
                 opacity: 0;
-                filter: blur(6px);
             }
         }
-
-        /* Image preview styling */
-        #image-preview img {
-            max-width: 300px; /* Adjust width for a smaller image */
-            height: auto;
-            border-radius: 0.5rem; /* Rounded corners */
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); /* Modern shadow */
+        
+        /* Skeleton loading state */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 1000px 100%;
+            animation: shimmer 2s infinite linear;
+            border-radius: 4px;
+        }
+        
+        /* Image comparison slider */
+        .img-compare-container {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .img-compare-before, .img-compare-after {
+            width: 100%;
+            display: block;
+        }
+        
+        .img-compare-after {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 50%;
+            height: 100%;
+            border-right: 2px solid white;
+            overflow: hidden;
+            box-shadow: 5px 0 10px -2px rgba(0,0,0,0.4);
+        }
+        
+        .img-compare-slider {
+            position: absolute;
+            z-index: 9;
+            cursor: ew-resize;
+            width: 40px;
+            height: 40px;
+            background-color: white;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+        
+        .img-compare-slider::before, .img-compare-slider::after {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 2px;
+            background-color: #3b82f6;
+        }
+        
+        .img-compare-slider::before {
+            transform: rotate(45deg);
+        }
+        
+        .img-compare-slider::after {
+            transform: rotate(-45deg);
+        }
+        
+        /* Glassmorphism UI elements */
+        .glass {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+        
+        /* Progress bar */
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: #3b82f6;
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+        
+        /* Confetti effect for successful operations */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            opacity: 0;
+            animation: confetti-fall 5s ease-out forwards;
+            z-index: 1000;
+        }
+        
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+        
+        /* Theme toggle */
+        .theme-switch {
+            display: inline-block;
+            height: 24px;
+            position: relative;
+            width: 50px;
+        }
+        
+        .theme-switch input {
+            display: none;
+        }
+        
+        .slider {
+            background-color: #ccc;
+            bottom: 0;
+            cursor: pointer;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            background-color: white;
+            bottom: 4px;
+            content: "";
+            height: 16px;
+            left: 4px;
+            position: absolute;
+            transition: .4s;
+            width: 16px;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #3b82f6;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        /* Dark mode */
+        .dark-mode {
+            background-color: #1f2937;
+            color: #f3f4f6;
+        }
+        
+        .dark-mode .bg-white {
+            background-color: #374151 !important;
+            color: #f3f4f6;
+        }
+        
+        .dark-mode .text-gray-800 {
+            color: #f3f4f6 !important;
+        }
+        
+        .dark-mode .text-gray-600, .dark-mode .text-gray-500 {
+            color: #d1d5db !important;
+        }
+        
+        .dark-mode .border-gray-200 {
+            border-color: #4b5563 !important;
+        }
+        
+        .dark-mode .drop-zone {
+            border-color: #6b7280;
+        }
+        
+        .dark-mode .drop-zone:hover, .dark-mode .drop-zone.active {
+            border-color: #60a5fa;
+        }
+        
+        .dark-mode .skeleton {
+            background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
         }
     </style>
 </head>
 
-<body class="bg-gray-900 text-gray-200 font-sans leading-relaxed">
-    <!-- Header -->
-    <header class="bg-gradient-to-r from-green-600 to-teal-500 py-4 shadow-lg sticky top-0 z-10">
-        <nav class="container mx-auto flex justify-between items-center px-6">
-            <div class="text-2xl font-bold tracking-wider">GenZ BGRemover</div>
-            <ul class="flex space-x-6 text-lg">
-                <li><a href="#home" class="hover:text-gray-300">Home</a></li>
-                <li><a href="#features" class="hover:text-gray-300">Features</a></li>
-                <li><a href="#about" class="hover:text-gray-300">About</a></li>
-                <li><a href="#contact" class="hover:text-gray-300">Contact</a></li>
-            </ul>
-        </nav>
+<body class="bg-gray-50 text-gray-800 min-h-screen transition-colors duration-300">
+    <!-- Header with animation -->
+    <header class="bg-white shadow-sm py-4 transition-all duration-300" data-aos="fade-down">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <div class="flex items-center">
+                <div class="text-2xl font-bold text-blue-600 mr-2">
+                    <i class="fas fa-cut mr-2"></i>BGRemover Pro
+                </div>
+                <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Beta</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <a href="#" id="view-history" class="text-blue-600 hover:text-blue-800 transition-all">
+                    <i class="fas fa-history mr-1"></i> History
+                </a>
+                <label class="theme-switch">
+                    <input type="checkbox" id="theme-toggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
     </header>
 
-    <!-- Hero Section -->
-    <section id="home" class="hero h-screen bg-gradient-to-r from-teal-500 to-blue-600 text-white py-20">
-        <div class="container mx-auto text-center px-4 md:px-6 lg:px-8 xl:px-10">
-          <h1 class="text-6xl md:text-7xl xl:text-8xl font-bold mb-4 leading-tight animate-fade-in-up">
-            Instant Background Removal
-            <span class="text-lg md:text-2xl xl:text-3xl font-light block animate-fade-in-up delay-100">Upload, Remove, Repeat.</span>
-          </h1>
-          <p class="text-lg md:text-2xl xl:text-3xl mb-8 leading-relaxed animate-fade-in-up delay-200">
-            Upload your image and receive a transparent background within seconds. No design experience needed.
-          </p>
-          <a href="#upload" class="bg-white text-blue-600 py-3 px-6 rounded-full text-lg font-semibold shadow-md hover:bg-gray-200 transition duration-300 inline-flex items-center animate-bounce-in">
-            Get Started
-            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-            </svg>
-          </a>
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            <!-- Hero Section with animations -->
+            <section class="text-center mb-10" data-aos="fade-up">
+                <h1 class="text-4xl font-bold mb-4 relative">
+                    <span class="inline-block">Remove</span>
+                    <span class="inline-block ml-2 text-blue-600">Image Background</span>
+                </h1>
+                <p class="text-lg text-gray-600 mb-6">100% automatic and free - powered by AI</p>
+                <div class="flex justify-center space-x-4">
+                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm flex items-center">
+                        <i class="fas fa-bolt mr-1"></i> Fast Processing
+                    </span>
+                    <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm flex items-center">
+                        <i class="fas fa-lock mr-1"></i> Privacy First
+                    </span>
+                    <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm flex items-center">
+                        <i class="fas fa-magic mr-1"></i> AI Powered
+                    </span>
+                </div>
+            </section>
+
+            <!-- Upload Section with enhanced animations -->
+            <section class="mb-12" data-aos="fade-up" data-aos-delay="200">
+                <div id="upload-container" class="drop-zone rounded-lg p-10 text-center bg-white shadow-md transition-all duration-300">
+                    <div id="drop-text" class="transition-all duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400 mb-4 pulse-effect" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <p class="text-lg mb-2">Drag and drop an image here</p>
+                        <p class="text-gray-500 mb-4">or</p>
+                        <label for="image" class="btn bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-md cursor-pointer transition-all">
+                            <i class="fas fa-upload mr-2"></i> Upload Image
+                        </label>
+                        <input type="file" id="image" name="image" accept="image/*" class="hidden">
+                    </div>
+                    
+                    <div id="preview-container" class="hidden transition-all duration-300">
+                        <!-- Regular preview mode -->
+                        <div id="standard-preview" class="flex flex-col md:flex-row items-center justify-center gap-6">
+                            <div class="relative">
+                                <p class="text-sm text-gray-500 mb-2">Original</p>
+                                <img id="original-preview" class="max-h-64 max-w-full rounded border border-gray-200 shadow-sm transition-all duration-300" alt="Original image">
+                            </div>
+                            <div id="result-container" class="hidden relative">
+                                <p class="text-sm text-gray-500 mb-2">Result</p>
+                                <img id="result-preview" class="max-h-64 max-w-full rounded border border-gray-200 shadow-sm transition-all duration-300" alt="Result image">
+                            </div>
+                        </div>
+                        
+                        <!-- Comparison slider mode (hidden by default) -->
+                        <div id="comparison-preview" class="hidden mt-4">
+                            <p class="text-sm text-gray-500 mb-2 text-center">Drag slider to compare</p>
+                            <div class="img-compare-container rounded overflow-hidden border border-gray-200 shadow-sm">
+                                <img id="compare-original" class="img-compare-before" alt="Original image">
+                                <div class="img-compare-after">
+                                    <img id="compare-result" alt="Result image">
+                                </div>
+                                <div class="img-compare-slider">
+                                    <i class="fas fa-arrows-alt-h text-blue-600"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Processing indicators -->
+                        <div id="processing-indicator" class="hidden mt-8 text-center">
+                            <p class="text-sm text-gray-600 mb-2">Processing your image...</p>
+                            <div class="progress-container">
+                                <div id="progress-bar" class="progress-bar"></div>
+                            </div>
+                            <div id="spinner" class="flex justify-center mt-4">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Controls -->
+                        <div id="controls" class="mt-8 flex flex-wrap justify-center gap-4">
+                            <button id="remove-bg-btn" class="btn bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-md transition-all">
+                                <i class="fas fa-magic mr-2"></i> Remove Background
+                            </button>
+                            <button id="download-btn" class="btn hidden bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-md transition-all">
+                                <i class="fas fa-download mr-2"></i> Download
+                            </button>
+                            <button id="compare-btn" class="btn hidden bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-6 rounded-md transition-all">
+                                <i class="fas fa-exchange-alt mr-2"></i> Compare
+                            </button>
+                            <button id="upload-new-btn" class="btn bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-6 rounded-md transition-all">
+                                <i class="fas fa-redo-alt mr-2"></i> New Image
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Recent Images Section with animations -->
+            <section id="history-section" class="hidden transition-all duration-300" data-aos="fade-up">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold">Recent Images</h2>
+                    <button id="clear-history-btn" class="text-red-500 hover:text-red-700 text-sm transition-all">
+                        <i class="fas fa-trash-alt mr-1"></i> Clear All
+                    </button>
+                </div>
+                <div id="recent-images" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <!-- Recent images will be added here dynamically -->
+                </div>
+                <div class="text-center mt-8 py-12" id="no-history-message">
+                    <i class="fas fa-history text-gray-300 text-5xl mb-4"></i>
+                    <p class="text-gray-500">No recent images found</p>
+                </div>
+            </section>
         </div>
-      </section>
+    </main>
 
-    <!-- Features Section -->
-    <section id="features" class="container mx-auto py-20 text-center">
-        <h2 class="text-4xl font-bold mb-10">Features</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
-            <div class="bg-gray-800 p-6 rounded-lg shadow-md">
-                <h3 class="text-2xl font-semibold mb-4">Quick Processing</h3>
-                <p>Upload your image and get results in seconds with our AI-powered technology.</p>
+    <!-- Minimal Footer -->
+    <footer class="py-6 bg-white border-t border-gray-200 transition-all duration-300" data-aos="fade-up">
+        <div class="container mx-auto px-4 text-center text-gray-500">
+            <p>&copy; 2024 BGRemover Pro. All rights reserved.</p>
+            <div class="flex justify-center mt-3 space-x-3">
+                <a href="#" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fab fa-facebook"></i>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fab fa-github"></i>
+                </a>
             </div>
-            <div class="bg-gray-800 p-6 rounded-lg shadow-md">
-                <h3 class="text-2xl font-semibold mb-4">High Accuracy</h3>
-                <p>Our algorithm accurately detects and removes backgrounds with minimal effort.</p>
-            </div>
-            <div class="bg-gray-800 p-6 rounded-lg shadow-md">
-                <h3 class="text-2xl font-semibold mb-4">Free to Use</h3>
-                <p>Enjoy our background removal tool for free with no hidden charges.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- About Section -->
-    <section id="about" class="bg-gray-800 py-20">
-        <div class="container mx-auto text-center px-6">
-            <h2 class="text-4xl font-bold mb-10">About Us</h2>
-            <p class="text-lg leading-relaxed max-w-3xl mx-auto">GenZ BGRemover was built to simplify the process of removing backgrounds from images. Our cutting-edge AI model quickly processes images with high accuracy and is accessible to everyone, completely free of charge. Perfect for designers, photographers, and casual users alike.</p>
-        </div>
-    </section>
-
-    <!-- Upload Section -->
-    <section id="upload" class="container mx-auto my-20 p-10 bg-gray-800 rounded-lg shadow-lg">
-        <h2 class="text-3xl font-bold mb-6 text-center">Upload Image</h2>
-        <p class="mb-8 text-center text-gray-400">Choose an image to remove its background instantly.</p>
-
-        <form action="/upload" method="post" enctype="multipart/form-data" class="space-y-6 text-center" onsubmit="startProcessing();">
-            <label for="image" class="upload-btn bg-green-500 text-white py-3 px-6 rounded cursor-pointer hover:bg-green-600 transition duration-300 inline-block">Choose an Image</label>
-            <input type="file" id="image" name="image" accept="image/*" required class="hidden" onchange="previewImage(event)">
-            <div id="image-preview" class="mt-6 flex justify-center"></div>
-            <div id="spinner" class="hidden justify-center mt-6">
-                <div class="spinner"></div>
-            </div>
-            <button type="submit" class="submit-btn bg-gradient-to-r from-green-600 to-teal-500 text-white py-3 px-6 rounded hover:bg-green-700 transition duration-300 w-full md:w-auto">Upload & Process</button>
-        </form>
-    </section>
-
-    <!-- Contact Section -->
-    <section id="contact" class="bg-gray-900 py-20">
-        <div class="container mx-auto text-center">
-            <h2 class="text-4xl font-bold mb-10">Contact Us</h2>
-            <p class="text-lg text-gray-400 mb-10">Got questions? Reach out to us at <a href="mailto:support@genzbgremover.com" class="text-teal-400 hover:underline">support@genzbgremover.com</a></p>
-            <form action="#" method="POST" class="max-w-md mx-auto space-y-4">
-                <input type="text" name="name" placeholder="Your Name" class="w-full p-4 rounded bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500">
-                <input type="email" name="email" placeholder="Your Email" class="w-full p-4 rounded bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500">
-                <textarea name="message" rows="4" placeholder="Your Message" class="w-full p-4 rounded bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500"></textarea>
-                <button type="submit" class="bg-teal-500 text-white py-3 px-6 rounded-full hover:bg-teal-600 transition duration-300">Send Message</button>
-            </form>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="bg-gray-800 text-gray-400 py-6">
-        <div class="container mx-auto text-center">
-            <p>&copy; 2024 GenZ BGRemover. All rights reserved.</p>
         </div>
     </footer>
 
-    <!-- Script for Image Preview -->
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        function previewImage(event) {
-            const input = event.target;
-            const previewContainer = document.getElementById('image-preview');
-            previewContainer.innerHTML = ''; // Clear any existing content
-
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.alt = 'Image Preview';
-                    img.className = 'rounded shadow-lg transition-opacity duration-500';
-                    previewContainer.appendChild(img);
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        function startProcessing() {
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize AOS animations
+            AOS.init({
+                duration: 800,
+                once: true
+            });
+            
+            // DOM Elements
+            const fileInput = document.getElementById('image');
+            const uploadContainer = document.getElementById('upload-container');
+            const dropText = document.getElementById('drop-text');
+            const previewContainer = document.getElementById('preview-container');
+            const originalPreview = document.getElementById('original-preview');
+            const resultContainer = document.getElementById('result-container');
+            const resultPreview = document.getElementById('result-preview');
+            const processingIndicator = document.getElementById('processing-indicator');
+            const progressBar = document.getElementById('progress-bar');
             const spinner = document.getElementById('spinner');
-            spinner.classList.remove('hidden'); // Show spinner
-        }
+            const removeBgBtn = document.getElementById('remove-bg-btn');
+            const downloadBtn = document.getElementById('download-btn');
+            const compareBtn = document.getElementById('compare-btn');
+            const uploadNewBtn = document.getElementById('upload-new-btn');
+            const viewHistoryBtn = document.getElementById('view-history');
+            const clearHistoryBtn = document.getElementById('clear-history-btn');
+            const historySection = document.getElementById('history-section');
+            const recentImagesContainer = document.getElementById('recent-images');
+            const noHistoryMessage = document.getElementById('no-history-message');
+            const standardPreview = document.getElementById('standard-preview');
+            const comparisonPreview = document.getElementById('comparison-preview');
+            const compareOriginal = document.getElementById('compare-original');
+            const compareResult = document.getElementById('compare-result');
+            const themeToggle = document.getElementById('theme-toggle');
+            
+            // Comparison slider elements
+            const slider = document.querySelector('.img-compare-slider');
+            const afterContainer = document.querySelector('.img-compare-after');
+            
+            let currentFileName = '';
+            let currentOriginalUrl = '';
+            let currentResultUrl = '';
+            let isSliderActive = false;
+            
+            // Initialize from session storage
+            loadHistory();
+            initializeTheme();
+            
+            // Theme toggle
+            themeToggle.addEventListener('change', function() {
+                document.body.classList.toggle('dark-mode');
+                localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+            });
+            
+            // Initialize theme based on localStorage
+            function initializeTheme() {
+                if (localStorage.getItem('darkMode') === 'true') {
+                    document.body.classList.add('dark-mode');
+                    themeToggle.checked = true;
+                }
+            }
+            
+            // File Input Change Handler
+            fileInput.addEventListener('change', function(e) {
+                handleFileSelection(e.target.files[0]);
+            });
+
+            // Drag & Drop Handlers
+            uploadContainer.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                uploadContainer.classList.add('active');
+            });
+
+            uploadContainer.addEventListener('dragleave', function() {
+                uploadContainer.classList.remove('active');
+            });
+
+            uploadContainer.addEventListener('drop', function(e) {
+                e.preventDefault();
+                uploadContainer.classList.remove('active');
+                
+                if (e.dataTransfer.files.length) {
+                    handleFileSelection(e.dataTransfer.files[0]);
+                }
+            });
+
+            // Remove Background Button
+            removeBgBtn.addEventListener('click', function() {
+                if (!currentFileName) return;
+                
+                const formData = new FormData();
+                formData.append('image', fileInput.files[0]);
+                
+                processingIndicator.classList.remove('hidden');
+                removeBgBtn.disabled = true;
+                
+                // Simulate progress for better UX
+                let progress = 0;
+                const progressInterval = setInterval(() => {
+                    progress += Math.random() * 15;
+                    if (progress > 90) progress = 90; // Leave the last 10% for actual completion
+                    progressBar.style.width = progress + '%';
+                }, 500);
+                
+                fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(data => {
+                            throw new Error(data.error || 'Network response was not ok');
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Response data:', data);
+                    
+                    if (!data.success || !data.processed_url) {
+                        throw new Error('Invalid response from server');
+                    }
+                    
+                    // Complete progress bar
+                    clearInterval(progressInterval);
+                    progressBar.style.width = '100%';
+                    
+                    // Use the processed_url directly from the response
+                    currentResultUrl = data.processed_url.replace(/\\/g, '/');
+                    resultPreview.src = currentResultUrl;
+                    resultContainer.classList.remove('hidden');
+                    
+                    // Set up comparison view
+                    compareOriginal.src = currentOriginalUrl;
+                    compareResult.src = currentResultUrl;
+                    
+                    // Show the compare and download buttons
+                    downloadBtn.classList.remove('hidden');
+                    compareBtn.classList.remove('hidden');
+                    
+                    // Save original URL as well
+                    currentOriginalUrl = data.original_url.replace(/\\/g, '/');
+                    
+                    // Save to session storage with complete information
+                    saveToHistory(currentFileName, currentOriginalUrl, currentResultUrl);
+                    
+                    // Create confetti effect for successful operation
+                    createConfetti();
+                    
+                    // Hide processing indicator with a slight delay for smoothness
+                    setTimeout(() => {
+                        processingIndicator.classList.add('hidden');
+                    }, 500);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    clearInterval(progressInterval);
+                    alert('Error processing image: ' + error.message);
+                })
+                .finally(() => {
+                    removeBgBtn.disabled = false;
+                });
+            });
+
+            // Download Button
+            downloadBtn.addEventListener('click', function() {
+                if (currentResultUrl) {
+                    const link = document.createElement('a');
+                    link.href = currentResultUrl;
+                    link.download = 'bg_removed_' + currentFileName;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    // Add bounce animation to button for feedback
+                    downloadBtn.classList.add('animate-bounce');
+                    setTimeout(() => {
+                        downloadBtn.classList.remove('animate-bounce');
+                    }, 1000);
+                }
+            });
+            
+            // Compare Button
+            compareBtn.addEventListener('click', function() {
+                if (standardPreview.classList.contains('hidden')) {
+                    // Switch to standard view
+                    standardPreview.classList.remove('hidden');
+                    comparisonPreview.classList.add('hidden');
+                    compareBtn.innerHTML = '<i class="fas fa-exchange-alt mr-2"></i> Compare';
+                } else {
+                    // Switch to comparison view
+                    standardPreview.classList.add('hidden');
+                    comparisonPreview.classList.remove('hidden');
+                    compareBtn.innerHTML = '<i class="fas fa-th-large mr-2"></i> Standard View';
+                }
+            });
+
+            // Upload New Button
+            uploadNewBtn.addEventListener('click', function() {
+                resetUI();
+            });
+
+            // View History Button
+            viewHistoryBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                historySection.classList.toggle('hidden');
+                if (!historySection.classList.contains('hidden')) {
+                    loadHistory();
+                    historySection.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+            
+            // Clear History Button
+            clearHistoryBtn.addEventListener('click', function() {
+                if (confirm('Are you sure you want to clear all history?')) {
+                    sessionStorage.removeItem('bgRemoverHistory');
+                    loadHistory();
+                }
+            });
+
+            // Handle file selection
+            function handleFileSelection(file) {
+                if (!file || !file.type.match('image.*')) return;
+                
+                currentFileName = file.name;
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    currentOriginalUrl = e.target.result;
+                    originalPreview.src = currentOriginalUrl;
+                    dropText.classList.add('hidden');
+                    previewContainer.classList.remove('hidden');
+                    resultContainer.classList.add('hidden');
+                    downloadBtn.classList.add('hidden');
+                    compareBtn.classList.add('hidden');
+                    
+                    // Reset comparison view if active
+                    standardPreview.classList.remove('hidden');
+                    comparisonPreview.classList.add('hidden');
+                    compareBtn.innerHTML = '<i class="fas fa-exchange-alt mr-2"></i> Compare';
+                };
+                
+                reader.readAsDataURL(file);
+            }
+
+            // Reset UI to initial state
+            function resetUI() {
+                fileInput.value = '';
+                dropText.classList.remove('hidden');
+                previewContainer.classList.add('hidden');
+                resultContainer.classList.add('hidden');
+                processingIndicator.classList.add('hidden');
+                progressBar.style.width = '0%';
+                currentFileName = '';
+                currentOriginalUrl = '';
+                currentResultUrl = '';
+                
+                // Reset comparison view
+                standardPreview.classList.remove('hidden');
+                comparisonPreview.classList.add('hidden');
+            }
+
+            // Session Storage Functions
+            function saveToHistory(filename, originalUrl, resultUrl) {
+                const history = JSON.parse(sessionStorage.getItem('bgRemoverHistory') || '[]');
+                
+                // Check if already exists and remove it
+                const filtered = history.filter(item => item.filename !== filename);
+                
+                // Add current item to the beginning
+                filtered.unshift({
+                    filename: filename,
+                    originalUrl: originalUrl,
+                    resultUrl: resultUrl,
+                    timestamp: Date.now()
+                });
+                
+                // Limit to 8 items
+                const limitedHistory = filtered.slice(0, 8);
+                
+                sessionStorage.setItem('bgRemoverHistory', JSON.stringify(limitedHistory));
+                
+                // Update history display if visible
+                if (!historySection.classList.contains('hidden')) {
+                    loadHistory();
+                }
+            }
+
+            function loadHistory() {
+                const history = JSON.parse(sessionStorage.getItem('bgRemoverHistory') || '[]');
+                recentImagesContainer.innerHTML = '';
+                
+                if (history.length === 0) {
+                    noHistoryMessage.classList.remove('hidden');
+                    clearHistoryBtn.style.display = 'none';
+                    return;
+                }
+                
+                noHistoryMessage.classList.add('hidden');
+                clearHistoryBtn.style.display = 'block';
+                
+                history.forEach((item, index) => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'recent-item bg-white p-2 rounded shadow-sm border border-gray-200 transition-all';
+                    historyItem.style.setProperty('--index', index);
+                    
+                    const date = new Date(item.timestamp);
+                    const formattedDate = `${date.getMonth()+1}/${date.getDate()}/${date.getFullYear()} ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
+                    
+                    historyItem.innerHTML = `
+                        <div class="relative group">
+                            <img src="${item.resultUrl}" alt="${item.filename}" class="w-full h-32 object-contain mb-2 rounded">
+                            <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center rounded">
+                                <button class="preview-history-btn p-1 bg-white rounded-full m-1">
+                                    <i class="fas fa-eye text-blue-600"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <p class="text-xs truncate font-medium">${item.filename}</p>
+                        <p class="text-xs text-gray-500 mb-2">${formattedDate}</p>
+                        <div class="flex justify-between mt-1">
+                            <button class="reuse-btn text-xs text-blue-600 hover:text-blue-800 transition-colors">
+                                <i class="fas fa-sync-alt mr-1"></i> Reuse
+                            </button>
+                            <button class="download-history-btn text-xs text-green-600 hover:text-green-800 transition-colors">
+                                <i class="fas fa-download mr-1"></i> Download
+                            </button>
+                        </div>
+                    `;
+                    
+                    historyItem.querySelector('.preview-history-btn').addEventListener('click', function(e) {
+                        e.preventDefault();
+                        // Create a modal preview
+                        const modal = document.createElement('div');
+                        modal.className = 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 fade-in';
+                        modal.innerHTML = `
+                            <div class="bg-white rounded-lg p-4 max-w-4xl max-h-screen overflow-auto relative">
+                                <button class="absolute top-2 right-2 text-gray-600 hover:text-gray-900">
+                                    <i class="fas fa-times text-xl"></i>
+                                </button>
+                                <div class="flex flex-col md:flex-row gap-4">
+                                    <div>
+                                        <p class="text-sm text-gray-500 mb-2">Original</p>
+                                        <img src="${item.originalUrl}" alt="Original" class="max-h-80 rounded border">
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500 mb-2">Background Removed</p>
+                                        <img src="${item.resultUrl}" alt="Result" class="max-h-80 rounded border">
+                                    </div>
+                                </div>
+                                <div class="mt-4 text-center">
+                                    <button class="btn bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
+                                        <i class="fas fa-download mr-1"></i> Download
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        
+                        document.body.appendChild(modal);
+                        
+                        // Close modal on click
+                        modal.addEventListener('click', function(e) {
+                            if (e.target === modal || e.target.closest('button')) {
+                                modal.classList.add('fade-out');
+                                setTimeout(() => {
+                                    document.body.removeChild(modal);
+                                }, 300);
+                            }
+                        });
+                        
+                        // Download from modal
+                        modal.querySelector('.btn').addEventListener('click', function() {
+                            const link = document.createElement('a');
+                            link.href = item.resultUrl;
+                            link.download = 'bg_removed_' + item.filename;
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                        });
+                    });
+                    
+                    historyItem.querySelector('.reuse-btn').addEventListener('click', function() {
+                        originalPreview.src = item.originalUrl;
+                        resultPreview.src = item.resultUrl;
+                        currentFileName = item.filename;
+                        currentOriginalUrl = item.originalUrl;
+                        currentResultUrl = item.resultUrl;
+                        
+                        // Setup comparison view
+                        compareOriginal.src = currentOriginalUrl;
+                        compareResult.src = currentResultUrl;
+                        
+                        dropText.classList.add('hidden');
+                        previewContainer.classList.remove('hidden');
+                        resultContainer.classList.remove('hidden');
+                        downloadBtn.classList.remove('hidden');
+                        compareBtn.classList.remove('hidden');
+                        
+                        // Reset to standard view
+                        standardPreview.classList.remove('hidden');
+                        comparisonPreview.classList.add('hidden');
+                        
+                        // Scroll to upload section
+                        uploadContainer.scrollIntoView({ behavior: 'smooth' });
+                    });
+                    
+                    historyItem.querySelector('.download-history-btn').addEventListener('click', function() {
+                        const link = document.createElement('a');
+                        link.href = item.resultUrl;
+                        link.download = 'bg_removed_' + item.filename;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        
+                        // Provide visual feedback
+                        this.innerHTML = '<i class="fas fa-check mr-1"></i> Downloaded';
+                        setTimeout(() => {
+                            this.innerHTML = '<i class="fas fa-download mr-1"></i> Download';
+                        }, 2000);
+                    });
+                    
+                    recentImagesContainer.appendChild(historyItem);
+                });
+            }
+            
+            // Image comparison slider functionality
+            if (slider) {
+                slider.addEventListener('mousedown', function(e) {
+                    e.preventDefault();
+                    isSliderActive = true;
+                });
+                
+                window.addEventListener('mouseup', function() {
+                    isSliderActive = false;
+                });
+                
+                window.addEventListener('mousemove', function(e) {
+                    if (!isSliderActive) return;
+                    
+                    const container = document.querySelector('.img-compare-container');
+                    const rect = container.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    let percent = (x / rect.width) * 100;
+                    
+                    // Constrain within bounds
+                    percent = Math.max(0, Math.min(100, percent));
+                    
+                    // Update slider position
+                    afterContainer.style.width = percent + '%';
+                });
+                
+                // Touch support
+                slider.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    isSliderActive = true;
+                });
+                
+                window.addEventListener('touchend', function() {
+                    isSliderActive = false;
+                });
+                
+                window.addEventListener('touchmove', function(e) {
+                    if (!isSliderActive) return;
+                    
+                    const container = document.querySelector('.img-compare-container');
+                    const rect = container.getBoundingClientRect();
+                    const x = e.touches[0].clientX - rect.left;
+                    let percent = (x / rect.width) * 100;
+                    
+                    // Constrain within bounds
+                    percent = Math.max(0, Math.min(100, percent));
+                    
+                    // Update slider position
+                    afterContainer.style.width = percent + '%';
+                });
+            }
+            
+            // Create confetti effect
+            function createConfetti() {
+                const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+                
+                for (let i = 0; i < 100; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.animationDelay = Math.random() * 5 + 's';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.width = Math.random() * 10 + 5 + 'px';
+                    confetti.style.height = Math.random() * 10 + 5 + 'px';
+                    document.body.appendChild(confetti);
+                    
+                    // Remove after animation completes
+                    setTimeout(() => {
+                        document.body.removeChild(confetti);
+                    }, 6000);
+                }
+            }
+        });
     </script>
 </body>
 
