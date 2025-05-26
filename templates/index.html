@@ -617,7 +617,7 @@
                 .then(data => {
                     console.log('Response data:', data);
                     
-                    if (!data.success || !data.processed_url) {
+                    if (!data.success) {
                         throw new Error('Invalid response from server');
                     }
                     
@@ -625,25 +625,29 @@
                     clearInterval(progressInterval);
                     progressBar.style.width = '100%';
                     
-                    // Use the processed_url from the response with the new URL structure
-                    // No need to replace backslashes as our backend now returns proper URL paths
-                    currentResultUrl = data.processed_url;
+                    // Try to use base64 data if available, otherwise fall back to URLs
+                    if (data.processed_data) {
+                        currentResultUrl = data.processed_data;
+                        currentOriginalUrl = data.original_data || data.original_url;
+                    } else {
+                        currentResultUrl = data.processed_url;
+                        currentOriginalUrl = data.original_url;
+                    }
+                    
+                    // Display images
                     resultPreview.src = currentResultUrl;
                     resultContainer.classList.remove('hidden');
                     
                     // Set up comparison view
-                    compareOriginal.src = data.original_url;
+                    compareOriginal.src = currentOriginalUrl;
                     compareResult.src = currentResultUrl;
                     
                     // Show the compare and download buttons
                     downloadBtn.classList.remove('hidden');
                     compareBtn.classList.remove('hidden');
                     
-                    // Save original URL
-                    currentOriginalUrl = data.original_url;
-                    
-                    // Save to session storage with complete information
-                    saveToHistory(currentFileName, currentOriginalUrl, currentResultUrl);
+                    // Save to session storage with complete information and store filename for download
+                    saveToHistory(currentFileName, currentOriginalUrl, currentResultUrl, data.filename);
                     
                     // Create confetti effect for successful operation
                     createConfetti();
@@ -666,16 +670,27 @@
             // Update Download Button
             downloadBtn.addEventListener('click', function() {
                 if (currentResultUrl) {
-                    // Extract filename from URL
-                    const filename = currentResultUrl.split('/').pop();
-                    const downloadUrl = `/download/${filename}`;
-                    
-                    const link = document.createElement('a');
-                    link.href = downloadUrl;
-                    link.download = 'bg_removed_' + currentFileName;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
+                    if (currentResultUrl.startsWith('data:')) {
+                        // For base64 data
+                        const link = document.createElement('a');
+                        link.href = currentResultUrl;
+                        link.download = 'bg_removed_' + currentFileName;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    } else {
+                        // For URL path
+                        // Extract filename from URL
+                        const filename = currentResultUrl.split('/').pop();
+                        const downloadUrl = `/download/${filename}`;
+                        
+                        const link = document.createElement('a');
+                        link.href = downloadUrl;
+                        link.download = 'bg_removed_' + currentFileName;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    }
                     
                     // Add bounce animation to button for feedback
                     downloadBtn.classList.add('animate-bounce');
@@ -766,7 +781,7 @@
             }
 
             // Session Storage Functions
-            function saveToHistory(filename, originalUrl, resultUrl) {
+            function saveToHistory(filename, originalUrl, resultUrl, downloadFilename) {
                 const history = JSON.parse(sessionStorage.getItem('bgRemoverHistory') || '[]');
                 
                 // Check if already exists and remove it
@@ -777,6 +792,7 @@
                     filename: filename,
                     originalUrl: originalUrl,
                     resultUrl: resultUrl,
+                    downloadFilename: downloadFilename || filename,
                     timestamp: Date.now()
                 });
                 
@@ -910,16 +926,27 @@
                     });
                     
                     historyItem.querySelector('.download-history-btn').addEventListener('click', function() {
-                        // Extract filename from URL
-                        const filename = item.resultUrl.split('/').pop();
-                        const downloadUrl = `/download/${filename}`;
-                        
-                        const link = document.createElement('a');
-                        link.href = downloadUrl;
-                        link.download = 'bg_removed_' + item.filename;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
+                        if (item.resultUrl.startsWith('data:')) {
+                            // For base64 data
+                            const link = document.createElement('a');
+                            link.href = item.resultUrl;
+                            link.download = 'bg_removed_' + item.filename;
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                        } else {
+                            // For URL path
+                            // Extract filename from URL or use the stored download filename
+                            const filename = item.downloadFilename || item.resultUrl.split('/').pop();
+                            const downloadUrl = `/download/${filename}`;
+                            
+                            const link = document.createElement('a');
+                            link.href = downloadUrl;
+                            link.download = 'bg_removed_' + item.filename;
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                        }
                         
                         // Provide visual feedback
                         this.innerHTML = '<i class="fas fa-check mr-1"></i> Downloaded';

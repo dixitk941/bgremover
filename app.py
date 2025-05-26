@@ -10,6 +10,7 @@ from PIL import Image, UnidentifiedImageError
 import io
 import logging
 import shutil
+import base64
 from werkzeug.utils import secure_filename as werkzeug_secure_filename
 
 # Set up logging
@@ -93,8 +94,9 @@ def upload_image():
             return jsonify({'error': 'Invalid image file'}), 400
         
         # Create secure filenames
-        original_filename = f"original_{secure_filename(file.filename)}"
-        processed_filename = f"bg_removed_{secure_filename(file.filename)}"
+        secure_original_name = secure_filename(file.filename)
+        original_filename = f"original_{secure_original_name}"
+        processed_filename = f"bg_removed_{secure_original_name}"
         
         # Save paths
         original_path = os.path.join(app.config['UPLOAD_FOLDER'], 'originals', original_filename)
@@ -105,9 +107,9 @@ def upload_image():
         
         # Perform background removal with error handling
         try:
-            # Process with PIL to ensure compatibility and optimize
+            # Process with PIL to ensure compatibility
             with Image.open(original_path) as img:
-                # Resize if the image is too large to conserve memory
+                # Resize if the image is too large
                 max_size = 1800
                 if max(img.width, img.height) > max_size:
                     ratio = max_size / max(img.width, img.height)
@@ -115,49 +117,48 @@ def upload_image():
                     try:
                         img = img.resize(new_size, Image.Resampling.LANCZOS)
                     except AttributeError:
-                        # Fall back for older Pillow versions
                         img = img.resize(new_size, Image.LANCZOS)
                     img.save(original_path)
             
-            # Process with rembg - use a separate try/except for better error handling
-            try:
-                with open(original_path, 'rb') as input_file:
-                    input_data = input_file.read()
-                
-                logger.info(f"Removing background from {original_filename}")
-                output_data = remove(input_data)
-                
-                # Save the result
-                with open(processed_path, 'wb') as output_file:
-                    output_file.write(output_data)
-            except Exception as rembg_error:
-                logger.error(f"Error in rembg processing: {str(rembg_error)}")
-                raise
+            # Process with rembg
+            with open(original_path, 'rb') as input_file:
+                input_data = input_file.read()
             
-            # Create URLs to access the images
-            # Use relative URLs that work in both environments
+            output_data = remove(input_data)
+            
+            # Save the result
+            with open(processed_path, 'wb') as output_file:
+                output_file.write(output_data)
+            
+            # Create URLs and base64 data for direct embedding
             original_url = f"/file/originals/{original_filename}"
             processed_url = f"/file/processed/{processed_filename}"
             
-            logger.info(f"Successfully processed image: {processed_filename}")
+            # Also provide base64 data for direct embedding
+            with open(original_path, 'rb') as f:
+                original_base64 = base64.b64encode(f.read()).decode('utf-8')
             
-            # Return JSON with proper URLs
+            with open(processed_path, 'rb') as f:
+                processed_base64 = base64.b64encode(f.read()).decode('utf-8')
+            
+            # Determine mime type
+            original_mime = 'image/jpeg'
+            processed_mime = 'image/png'  # rembg typically outputs PNG with transparency
+            if original_filename.lower().endswith('.png'):
+                original_mime = 'image/png'
+            
+            # Return JSON with the filename, URLs and base64 data
             return jsonify({
                 'success': True,
                 'filename': processed_filename,
                 'original_url': original_url,
-                'processed_url': processed_url
+                'processed_url': processed_url,
+                'original_data': f"data:{original_mime};base64,{original_base64}",
+                'processed_data': f"data:{processed_mime};base64,{processed_base64}"
             })
             
         except Exception as e:
             logger.error(f"Error processing image: {str(e)}")
-            # Clean up any partial files
-            for path in [original_path, processed_path]:
-                if os.path.exists(path):
-                    try:
-                        os.remove(path)
-                    except:
-                        pass
             return jsonify({'error': f'Error processing image: {str(e)}'}), 500
             
     except Exception as e:
@@ -181,14 +182,14 @@ def serve_file(folder, filename):
     # Verify the file exists
     file_path = os.path.join(directory, filename)
     if not os.path.exists(file_path):
-        return jsonify({'error': 'File not found'}), 404
+        return jsonify({'error': f'File not found: {file_path}'}), 404
     
-    # Serve the file
-    try:
-        return send_from_directory(directory, filename)
-    except Exception as e:
-        logger.error(f"Error serving file {filename}: {str(e)}")
-        return jsonify({'error': 'Error serving file'}), 500
+    # Set appropriate content type and headers
+    response = send_from_directory(directory, filename)
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
 
 @app.route('/download/<filename>')
 def download_file(filename):
