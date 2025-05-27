@@ -170,9 +170,9 @@
                         <div class="max-w-md">
                           <!-- Before/After Image Demo -->
 <div class="mb-6 rounded-lg overflow-hidden shadow-lg before-after-container">
-    <img src="{{ url_for('static', filename='uploads/originals/original.jpg') }}" alt="Original image" class="before">
+    <img src="https://firebasestorage.googleapis.com/v0/b/yogocab-ainor.firebasestorage.app/o/photos%2Foriginal.jpg?alt=media&token=fe185ee3-5173-46f4-8126-cc43fe11b036" alt="Original image" class="before">
     <div class="after">
-        <img src="{{ url_for('static', filename='uploads/processed/processed.jpg') }}" alt="Processed image">
+        <img src="https://firebasestorage.googleapis.com/v0/b/yogocab-ainor.firebasestorage.app/o/photos%2Fprocessed.jpg?alt=media&token=a7add7d2-3ba7-4fb3-8db6-824f1f9b5c6f" alt="Processed image">
     </div>
     <div class="slider-handle">
         <i class="fas fa-arrows-alt-h text-blue-600"></i>
@@ -557,7 +557,7 @@
             }
             
             // Image slider for quality examples
-            const slider = document.getElementById('quality-slider');
+            const qualitySlider = document.getElementById('quality-slider');
             const dots = document.querySelectorAll('.slider-dot');
             const prevBtn = document.getElementById('prev-slide');
             const nextBtn = document.getElementById('next-slide');
@@ -569,7 +569,7 @@
                 if (index >= totalSlides) index = 0;
                 
                 currentSlide = index;
-                slider.style.transform = `translateX(-${currentSlide * 100}%)`;
+                qualitySlider.style.transform = `translateX(-${currentSlide * 100}%)`;
                 
                 // Update dots
                 dots.forEach((dot, i) => {
@@ -596,9 +596,9 @@
             let slideInterval = setInterval(() => goToSlide(currentSlide + 1), 5000);
             
             // Pause auto-advance when hovering over slider
-            const sliderContainer = slider.parentElement;
-            sliderContainer.addEventListener('mouseenter', () => clearInterval(slideInterval));
-            sliderContainer.addEventListener('mouseleave', () => {
+            const qualitySliderContainer = qualitySlider.parentElement;
+            qualitySliderContainer.addEventListener('mouseenter', () => clearInterval(slideInterval));
+            qualitySliderContainer.addEventListener('mouseleave', () => {
                 clearInterval(slideInterval);
                 slideInterval = setInterval(() => goToSlide(currentSlide + 1), 5000);
             });
