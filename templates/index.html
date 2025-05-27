@@ -3,1847 +3,533 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Background Remover | Remove Backgrounds Instantly</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<style>
-   :root {
-    --primary-color: #6c63ff;
-    --primary-light: #8a84ff;
-    --primary-dark: #5046e5;
-    --secondary-color: #ff6584;
-    --dark-color: #2d3748;
-    --light-color: #f7fafc;
-    --gray-color: #a0aec0;
-    --success-color: #48bb78;
-    --warning-color: #f6ad55;
-    --danger-color: #f56565;
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Poppins', sans-serif;
-    line-height: 1.6;
-    color: var(--dark-color);
-    background-color: var(--light-color);
-    overflow-x: hidden;
-}
-
-/* Typography */
-h1, h2, h3, h4, h5, h6 {
-    font-weight: 700;
-    line-height: 1.2;
-    margin-bottom: 1rem;
-}
-
-h1 {
-    font-size: 3.5rem;
-}
-
-h2 {
-    font-size: 2.5rem;
-    text-align: center;
-    margin-bottom: 3rem;
-}
-
-h3 {
-    font-size: 1.5rem;
-}
-
-p {
-    margin-bottom: 1rem;
-}
-
-a {
-    text-decoration: none;
-    color: var(--primary-color);
-    transition: color 0.3s ease;
-}
-
-a:hover {
-    color: var(--primary-dark);
-}
-
-/* Layout */
-.container {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1.5rem;
-}
-
-section {
-    padding: 5rem 2rem;
-}
-
-/* Header & Navigation */
-header {
-    background-color: white;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
-
-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.5rem 2rem;
-    max-width: 1400px;
-    margin: 0 auto;
-}
-
-.logo {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--dark-color);
-}
-
-.logo span {
-    color: var(--primary-color);
-}
-
-.nav-links {
-    display: flex;
-    list-style: none;
-}
-
-.nav-links li {
-    margin: 0 1.2rem;
-}
-
-.nav-links a {
-    color: var(--dark-color);
-    font-weight: 500;
-}
-
-.nav-links a:hover {
-    color: var(--primary-color);
-}
-
-/* Buttons */
-.btn {
-    display: inline-block;
-    padding: 0.75rem 1.5rem;
-    border-radius: 4px;
-    font-weight: 500;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.btn-primary {
-    background-color: var(--primary-color);
-    color: white;
-    border: 2px solid var(--primary-color);
-}
-
-.btn-primary:hover {
-    background-color: var(--primary-dark);
-    border-color: var(--primary-dark);
-    color: white;
-}
-
-.btn-outline {
-    background-color: transparent;
-    color: var(--primary-color);
-    border: 2px solid var(--primary-color);
-}
-
-.btn-outline:hover {
-    background-color: var(--primary-color);
-    color: white;
-}
-
-.btn-large {
-    padding: 1rem 2rem;
-    font-size: 1.1rem;
-}
-
-.cta-buttons {
-    display: flex;
-    gap: 1rem;
-}
-
-/* Hero Section */
-.hero {
-    display: flex;
-    align-items: center;
-    min-height: 80vh;
-    padding: 2rem;
-    background: linear-gradient(135deg, #f6f9fc 0%, #f1f4f9 100%);
-}
-
-.hero-content {
-    flex: 1;
-    max-width: 600px;
-    padding: 2rem;
-}
-
-.hero-image {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-}
-
-.animated-title {
-    margin-bottom: 1.5rem;
-    line-height: 1.2;
-}
-
-.animated-title span {
-    color: var(--primary-color);
-    position: relative;
-}
-
-.subtitle {
-    font-size: 1.2rem;
-    color: #4a5568;
-    margin-bottom: 2rem;
-}
-
-/* Upload Box */
-.upload-box {
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    padding: 2rem;
-    margin-bottom: 2rem;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.upload-box:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
-}
-
-.upload-container {
-    border: 2px dashed #cbd5e0;
-    border-radius: 8px;
-    padding: 2.5rem;
-    text-align: center;
-    transition: border-color 0.3s ease;
-}
-
-.upload-container:hover {
-    border-color: var(--primary-color);
-}
-
-.upload-container i {
-    font-size: 2.5rem;
-    color: var(--primary-color);
-    margin-bottom: 1rem;
-}
-
-.upload-container p {
-    margin-bottom: 1.5rem;
-    color: #4a5568;
-}
-
-.upload-container p span {
-    color: var(--primary-color);
-    font-weight: 500;
-}
-
-/* Features Highlight */
-.features-highlight {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 2rem;
-}
-
-.features-highlight .feature {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.features-highlight .feature i {
-    color: var(--primary-color);
-}
-
-/* How It Works Section */
-.steps-container {
-    display: flex;
-    justify-content: center;
-    gap: 3rem;
-    margin-top: 3rem;
-    flex-wrap: wrap;
-}
-
-.step {
-    flex: 1;
-    min-width: 250px;
-    max-width: 300px;
-    text-align: center;
-    padding: 2rem;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    position: relative;
-    transition: transform 0.3s ease;
-}
-
-.step:hover {
-    transform: translateY(-10px);
-}
-
-.step-number {
-    position: absolute;
-    top: -20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 40px;
-    height: 40px;
-    background-color: var(--primary-color);
-    color: white;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: 700;
-}
-
-.step-icon {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background-color: #f0eeff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 1.5rem auto;
-}
-
-.step-icon i {
-    font-size: 2rem;
-    color: var(--primary-color);
-}
-
-/* Features Section */
-.features-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 2rem;
-    margin-top: 3rem;
-}
-
-.feature-card {
-    background-color: white;
-    border-radius: 10px;
-    padding: 2rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.feature-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
-}
-
-.feature-card i {
-    font-size: 2rem;
-    color: var(--primary-color);
-    margin-bottom: 1rem;
-}
-
-/* Demo Section */
-.demo {
-    background-color: #f6f9fc;
-    padding: 6rem 2rem;
-}
-
-.demo-slider {
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-/* Modern Before-After Slider */
-.before-after-container {
-    position: relative;
-    width: 100%;
-    height: 450px;
-    overflow: hidden;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-    background-color: #fff;
-}
-
-.image-container {
-    position: relative;
-    width: 100%;
-    height: 100%;
-}
-
-.before-image,
-.after-image {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.after-image {
-    width: 50%;
-    clip-path: inset(0 0 0 50%);
-    transition: clip-path 0.2s ease-out;
-}
-
-.slider {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    cursor: col-resize;
-    z-index: 30;
-}
-
-.slider-button {
-    position: absolute;
-    top: 0;
-    left: 50%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    pointer-events: none;
-    z-index: 20;
-}
-
-.slider-line {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 4px;
-    background-color: white;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-}
-
-.slider-circle {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background-color: white;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 12px;
-    box-sizing: border-box;
-}
-
-.slider-circle i {
-    color: var(--primary-color);
-    font-size: 14px;
-}
-
-.labels {
-    position: absolute;
-    width: 100%;
-    bottom: 20px;
-    display: flex;
-    justify-content: space-between;
-    padding: 0 20px;
-    box-sizing: border-box;
-    z-index: 20;
-}
-
-.before-label, 
-.after-label {
-    padding: 6px 14px;
-    background-color: rgba(0, 0, 0, 0.7);
-    color: white;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    letter-spacing: 1px;
-}
-
-/* Add a glowing effect to the slider line */
-@keyframes glow {
-    0% {
-        box-shadow: 0 0 10px rgba(108, 99, 255, 0.5);
-    }
-    50% {
-        box-shadow: 0 0 15px rgba(108, 99, 255, 0.8);
-    }
-    100% {
-        box-shadow: 0 0 10px rgba(108, 99, 255, 0.5);
-    }
-}
-
-.slider-line {
-    animation: glow 2s infinite;
-}
-
-/* Add a pulse effect to the slider circle on hover */
-.before-after-container:hover .slider-circle {
-    transform: scale(1.1);
-    transition: transform 0.3s ease;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .before-after-container {
-        height: 350px;
-    }
-    
-    .slider-circle {
-        width: 40px;
-        height: 40px;
-    }
-}
-
-@media (max-width: 480px) {
-    .before-after-container {
-        height: 250px;
-    }
-    
-    .labels {
-        bottom: 10px;
-    }
-    
-    .before-label, .after-label {
-        padding: 4px 10px;
-        font-size: 0.8rem;
-    }
-}
-
-/* Pricing Section */
-.pricing-cards {
-    display: flex;
-    justify-content: center;
-    gap: 2rem;
-    margin-top: 3rem;
-    flex-wrap: wrap;
-}
-
-.pricing-card {
-    flex: 1;
-    min-width: 280px;
-    max-width: 350px;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    position: relative;
-}
-
-.pricing-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
-}
-
-.pricing-card.featured {
-    border: 2px solid var(--primary-color);
-    transform: scale(1.05);
-}
-
-.pricing-card.featured:hover {
-    transform: scale(1.05) translateY(-10px);
-}
-
-.popular-tag {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background-color: var(--primary-color);
-    color: white;
-    padding: 5px 10px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 500;
-}
-
-.pricing-header {
-    padding: 2rem;
-    text-align: center;
-    border-bottom: 1px solid #edf2f7;
-}
-
-.price {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: var(--primary-color);
-    margin: 1rem 0;
-}
-
-.price span {
-    font-size: 1rem;
-    color: var(--gray-color);
-}
-
-.pricing-features {
-    list-style: none;
-    padding: 2rem;
-}
-
-.pricing-features li {
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-}
-
-.pricing-features i {
-    margin-right: 10px;
-    width: 20px;
-}
-
-.pricing-features .fa-check {
-    color: var(--success-color);
-}
-
-.pricing-features .fa-times {
-    color: var(--danger-color);
-}
-
-.pricing-card .btn {
-    display: block;
-    margin: 0 2rem 2rem;
-}
-
-/* FAQ Section */
-.faq-container {
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-.faq-item {
-    border-bottom: 1px solid #edf2f7;
-    margin-bottom: 1rem;
-}
-
-.faq-question {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.5rem 1rem;
-    cursor: pointer;
-}
-
-.faq-question h3 {
-    margin-bottom: 0;
-}
-
-.toggle-icon {
-    font-size: 1.2rem;
-    color: var(--primary-color);
-    transition: transform 0.3s ease;
-}
-
-.faq-answer {
-    padding: 0 1rem 1.5rem;
-    display: none;
-}
-
-.faq-item.active .toggle-icon {
-    transform: rotate(45deg);
-}
-
-.faq-item.active .faq-answer {
-    display: block;
-}
-
-/* CTA Section */
-.cta {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-    color: white;
-    text-align: center;
-    padding: 5rem 2rem;
-}
-
-.cta h2 {
-    margin-bottom: 1.5rem;
-    color: white;
-}
-
-.cta p {
-    max-width: 600px;
-    margin: 0 auto 2rem;
-    font-size: 1.2rem;
-}
-
-/* Footer */
-footer {
-    background-color: #1a202c;
-    color: white;
-    padding: 4rem 2rem 2rem;
-}
-
-.footer-content {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.footer-column {
-    flex: 1;
-    min-width: 200px;
-}
-
-.footer-column h4 {
-    font-size: 1.2rem;
-    margin-bottom: 1.5rem;
-    color: white;
-}
-
-.footer-column ul {
-    list-style: none;
-}
-
-.footer-column ul li {
-    margin-bottom: 0.8rem;
-}
-
-.footer-column ul li a {
-    color: #cbd5e0;
-    transition: color 0.3s ease;
-}
-
-.footer-column ul li a:hover {
-    color: white;
-}
-
-.social-icons {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1.5rem;
-}
-
-.social-icons a {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.1);
-    color: white;
-    transition: background-color 0.3s ease;
-}
-
-.social-icons a:hover {
-    background-color: var(--primary-color);
-}
-
-.footer-bottom {
-    max-width: 1200px;
-    margin: 4rem auto 0;
-    padding-top: 2rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    text-align: center;
-    font-size: 0.9rem;
-    color: #a0aec0;
-}
-
-/* Responsive Styles */
-@media (max-width: 1024px) {
-    h1 {
-        font-size: 3rem;
-    }
-    
-    h2 {
-        font-size: 2.2rem;
-    }
-    
-    .hero {
-        flex-direction: column;
-    }
-    
-    .hero-content {
-        max-width: 100%;
-        text-align: center;
-    }
-    
-    .steps-container {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .step {
-        max-width: 100%;
-    }
-}
-
-@media (max-width: 768px) {
-    h1 {
-        font-size: 2.5rem;
-    }
-    
-    nav {
-        flex-direction: column;
-        gap: 1.5rem;
-    }
-    
-    .nav-links {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 1rem;
-    }
-    
-    .pricing-cards {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .pricing-card.featured {
-        transform: scale(1);
-    }
-    
-    .pricing-card.featured:hover {
-        transform: translateY(-10px);
-    }
-}
-
-@media (max-width: 480px) {
-    h1 {
-        font-size: 2rem;
-    }
-    
-    h2 {
-        font-size: 1.8rem;
-    }
-    
-    .cta-buttons {
-        flex-direction: column;
-    }
-    
-    .features-highlight {
-        flex-direction: column;
-        gap: 1rem;
-    }
-}
-/* Title Animation */
-.animated-title {
-    opacity: 0;
-    animation: fadeIn 1s ease forwards, slideUp 1s ease forwards;
-}
-
-.animated-title span {
-    display: inline-block;
-    background: linear-gradient(45deg, var(--primary-color), var(--primary-light));
-    background-clip: text;
-    -webkit-background-clip: text;
-    color: transparent;
-    background-size: 200%;
-    animation: gradientFlow 3s ease infinite;
-}
-
-.subtitle {
-    opacity: 0;
-    animation: fadeIn 1s ease 0.3s forwards, slideUp 1s ease 0.3s forwards;
-}
-
-.upload-box {
-    opacity: 0;
-    animation: fadeIn 1s ease 0.6s forwards, slideUp 1s ease 0.6s forwards;
-}
-
-.features-highlight {
-    opacity: 0;
-    animation: fadeIn 1s ease 0.9s forwards, slideUp 1s ease 0.9s forwards;
-}
-
-/* Before-After Animation */
-.image-animation {
-    width: 400px;
-    height: 400px;
-    position: relative;
-    overflow: hidden;
-    border-radius: 10px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-}
-
-.before-image {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background-image: url("{{ url_for('static', filename='uploads/originals/original_20250526110254_13217e0e.jpg') }}");
-    background-size: cover;
-    background-position: center;
-    z-index: 1;
-    animation: fadeInOut 6s infinite;
-}
-
-.processing-animation {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(45deg, rgba(108, 99, 255, 0.2) 0%, rgba(138, 132, 255, 0.4) 100%);
-    z-index: 2;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    opacity: 0;
-    animation: processing 6s infinite;
-}
-
-.processing-animation::before {
-    content: '';
-    width: 60px;
-    height: 60px;
-    border: 5px solid rgba(255, 255, 255, 0.5);
-    border-top: 5px solid var(--primary-color);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-.after-image {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background-image: url("{{ url_for('static', filename='uploads/processed/bg_removed_20250526110254_13217e0e.jpg') }}");
-    background-size: cover;
-    background-position: center;
-    z-index: 3;
-    opacity: 0;
-    animation: fadeIn 1s ease 2s infinite;
-    animation: revealAfter 6s infinite;
-}
-
-/* How It Works Animation */
-.step {
-    opacity: 0;
-    transform: translateY(30px);
-}
-
-.step:nth-child(1) {
-    animation: fadeIn 0.6s ease forwards, slideUp 0.6s ease forwards;
-    animation-delay: 0.3s;
-}
-
-.step:nth-child(2) {
-    animation: fadeIn 0.6s ease forwards, slideUp 0.6s ease forwards;
-    animation-delay: 0.6s;
-}
-
-.step:nth-child(3) {
-    animation: fadeIn 0.6s ease forwards, slideUp 0.6s ease forwards;
-    animation-delay: 0.9s;
-}
-
-.step-icon {
-    position: relative;
-}
-
-.step-icon::after {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(108, 99, 255, 0.2);
-    border-radius: 50%;
-    transform: scale(0);
-    animation: pulse 2s infinite;
-}
-
-/* Feature Cards Animation */
-.feature-card {
-    opacity: 0;
-    transform: translateY(30px);
-}
-
-.features-grid .feature-card:nth-child(1) {
-    animation: fadeIn 0.6s ease forwards, slideUp 0.6s ease forwards;
-    animation-delay: 0.1s;
-}
-
-.features-grid .feature-card:nth-child(2) {
-    animation: fadeIn 0.6s ease forwards, slideUp 0.6s ease forwards;
-    animation-delay: 0.2s;
-}
-
-.features-grid .feature-card:nth-child(3) {
-    animation: fadeIn 0.6s ease forwards, slideUp 0.6s ease forwards;
-    animation-delay: 0.3s;
-}
-
-.features-grid .feature-card:nth-child(4) {
-    animation: fadeIn 0.6s ease forwards, slideUp 0.6s ease forwards;
-    animation-delay: 0.4s;
-}
-
-.features-grid .feature-card:nth-child(5) {
-    animation: fadeIn 0.6s ease forwards, slideUp 0.6s ease forwards;
-    animation-delay: 0.5s;
-}
-
-.features-grid .feature-card:nth-child(6) {
-    animation: fadeIn 0.6s ease forwards, slideUp 0.6s ease forwards;
-    animation-delay: 0.6s;
-}
-
-/* Before-After Slider Animation */
-.before-after-slider::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: 0;
-    bottom: 0;
-    width: 4px;
-    background-color: white;
-    transform: translateX(-50%);
-    z-index: 2;
-}
-
-.before-after-slider::before {
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 40px;
-    height: 40px;
-    background-color: white;
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 3;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%236c63ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='15 18 9 12 15 6'%3E%3C/polyline%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%236c63ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='9 18 15 12 9 6'%3E%3C/polyline%3E%3C/svg%3E");
-    background-position: 8px center, 28px center;
-    background-repeat: no-repeat, no-repeat;
-    cursor: ew-resize;
-}
-
-/* Keyframes */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
-
-@keyframes slideUp {
-    from {
-        transform: translateY(30px);
-    }
-    to {
-        transform: translateY(0);
-    }
-}
-
-@keyframes gradientFlow {
-    0% {
-        background-position: 0% 50%;
-    }
-    50% {
-        background-position: 100% 50%;
-    }
-    100% {
-        background-position: 0% 50%;
-    }
-}
-
-@keyframes pulse {
-    0% {
-        transform: scale(0);
-        opacity: 1;
-    }
-    100% {
-        transform: scale(1.5);
-        opacity: 0;
-    }
-}
-
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
-@keyframes fadeInOut {
-    0% {
-        opacity: 1;
-    }
-    30% {
-        opacity: 1;
-    }
-    33% {
-        opacity: 0;
-    }
-    70% {
-        opacity: 0;
-    }
-    100% {
-        opacity: 1;
-    }
-}
-
-@keyframes processing {
-    0% {
-        opacity: 0;
-    }
-    33% {
-        opacity: 1;
-    }
-    66% {
-        opacity: 1;
-    }
-    70% {
-        opacity: 0;
-    }
-    100% {
-        opacity: 0;
-    }
-}
-
-@keyframes revealAfter {
-    0% {
-        opacity: 0;
-    }
-    66% {
-        opacity: 0;
-    }
-    70% {
-        opacity: 1;
-    }
-    97% {
-        opacity: 1;
-    }
-    100% {
-        opacity: 0;
-    }
-}
-
-/* Scroll Animation - triggers when elements enter viewport */
-.fade-in-element {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
-}
-
-.fade-in-element.visible {
-    opacity: 1;
-    transform: translateY(0);
-} 
-</style>
+    <title>BGRemover - Remove Image Backgrounds Instantly</title>
+    <meta name="description" content="Remove backgrounds from images in seconds with our powerful AI tool. Free, fast, and no signup required.">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .yellow-accent {
+            background-color: #FFD34E;
+        }
+        .yellow-text {
+            color: #FFD34E;
+        }
+        .btn-primary {
+            background-color: #1877F2;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #0f60cf;
+        }
+        .category-pill {
+            border-radius: 9999px;
+            padding: 0.5rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .category-pill.active {
+            background-color: #f3f4f6;
+            color: #4b5563;
+        }
+        .category-pill:hover:not(.active) {
+            background-color: #f9fafb;
+        }
+        .image-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 1rem;
+        }
+        .image-container::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            width: 50%;
+            background: repeating-linear-gradient(45deg, rgba(255,255,255,0.1) 0px, rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.3) 10px, rgba(255,255,255,0.3) 20px);
+        }
+        .upload-zone {
+            border: 2px dashed #e5e7eb;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .upload-zone:hover {
+            border-color: #1877F2;
+            background-color: rgba(24, 119, 242, 0.05);
+        }
+        .bg-brush {
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='40' viewBox='0 0 100 40' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7.87109 30.5391C14.4141 27.9844 20.3906 26.7266 26.0859 24.7188C37.9219 20.5078 48.5547 13.375 60.0781 8.57031C68.0312 5.17969 77.3281 3.35938 85.8906 2.80469C87.5 2.69531 89.6094 2.55469 91.0938 3.14844C92.7734 3.82031 92.7734 5.71875 92.1797 7.01953C90.4219 10.5859 88.0859 13.8672 85.5 16.875C71.6719 32.625 50.9688 39.8906 29.2734 39.9844C24.0625 40.0078 18.6719 39.7812 13.7109 38.0859C12.5234 37.6562 11.3203 37.1172 10.3359 36.3516C8.78906 35.1328 8.67969 33.8203 10.125 32.5859C11.0859 31.7734 12.3281 31.3438 13.4531 30.9844C17.9297 29.5156 22.6875 29.4219 27.3828 28.8672' stroke='%23FFD34E' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(-5%); }
+            50% { transform: translateY(0); }
+        }
+        .bounce {
+            animation: bounce 2s infinite ease-in-out;
+        }
+        .wiggle {
+            position: absolute;
+            width: 150px;
+            height: 80px;
+            top: -40px;
+            right: -50px;
+            transform: rotate(10deg);
+            background-image: url("data:image/svg+xml,%3Csvg width='150' height='80' viewBox='0 0 150 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10,40 C30,10 50,60 70,40 C90,20 110,70 140,40' stroke='%231877F2' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            z-index: -1;
+        }
+        .before-after-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 1rem;
+        }
+        .before-after-container .before,
+        .before-after-container .after {
+            display: block;
+            width: 100%;
+        }
+        .before-after-container .after {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 50%;
+            height: 100%;
+            border-right: 2px solid white;
+            overflow: hidden;
+        }
+        .slider-handle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: ew-resize;
+            z-index: 10;
+        }
+        .slider-handle::before,
+        .slider-handle::after {
+            content: '';
+            position: absolute;
+            width: 2px;
+            height: 15px;
+            background-color: #1877F2;
+        }
+        .slider-handle::before {
+            transform: rotate(-45deg);
+        }
+        .slider-handle::after {
+            transform: rotate(45deg);
+        }
+    </style>
 </head>
-<body>
-    <header>
-        <nav>
-            <div class="logo">
-                <span>BG</span>Remover
+<body class="bg-white text-gray-800">
+    <!-- Header - Simple and Clean -->
+    <header class="py-4 shadow-sm">
+        <div class="container mx-auto px-4">
+            <div class="text-xl md:text-2xl font-bold text-gray-700">
+                <i class="fas fa-cut mr-2 text-blue-600"></i>BGRemover
             </div>
-            <ul class="nav-links">
-                <li><a href="#how-it-works">How It Works</a></li>
-                <li><a href="#features">Features</a></li>
-                <li><a href="#pricing">Pricing</a></li>
-                <li><a href="#faq">FAQ</a></li>
-            </ul>
-            <div class="cta-buttons">
-                <a href="#" class="btn btn-outline">Log In</a>
-                <a href="#" class="btn btn-primary">Sign Up Free</a>
-            </div>
-        </nav>
+        </div>
     </header>
 
-    <main>
-        <section class="hero">
-            <div class="hero-content">
-                <h1 class="animated-title">Remove Image Backgrounds <span>Instantly</span></h1>
-                <p class="subtitle">Powered by AI, our tool removes backgrounds from images with pixel-perfect precision in seconds.</p>
-                <div class="upload-box">
-                    <div class="upload-container">
-                        <i class="fas fa-cloud-upload-alt"></i>
-                        <p>Drag & drop your image here, or <span>browse</span></p>
-                        <input type="file" id="image-upload" accept="image/*" hidden>
-                        <label for="image-upload" class="btn btn-primary">Upload Image</label>
-                    </div>
-                </div>
-                <div class="features-highlight">
-                    <div class="feature">
-                        <i class="fas fa-bolt"></i>
-                        <span>Fast Processing</span>
-                    </div>
-                    <div class="feature">
-                        <i class="fas fa-shield-alt"></i>
-                        <span>100% Privacy</span>
-                    </div>
-                    <div class="feature">
-                        <i class="fas fa-magic"></i>
-                        <span>High Quality</span>
-                    </div>
-                </div>
-            </div>
-            <div class="hero-image">
-                <div class="image-animation">
-                    <div class="before-image"></div>
-                    <div class="processing-animation"></div>
-                    <div class="after-image"></div>
-                </div>
-            </div>
-        </section>
-
-        <section id="how-it-works" class="how-it-works">
-            <h2>How It Works</h2>
-            <div class="steps-container">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <div class="step-icon">
-                        <i class="fas fa-upload"></i>
-                    </div>
-                    <h3>Upload Image</h3>
-                    <p>Drag & drop or browse to upload your image file (JPG, PNG, or WebP).</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <div class="step-icon">
-                        <i class="fas fa-cogs"></i>
-                    </div>
-                    <h3>AI Processing</h3>
-                    <p>Our advanced AI algorithms identify and remove the background automatically.</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <div class="step-icon">
-                        <i class="fas fa-download"></i>
-                    </div>
-                    <h3>Download Result</h3>
-                    <p>Download your image with transparent background in PNG or any format you need.</p>
-                </div>
-            </div>
-        </section>
-
-        <section id="features" class="features">
-            <h2>Powerful Features</h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <i class="fas fa-robot"></i>
-                    <h3>AI-Powered Precision</h3>
-                    <p>Our machine learning algorithm ensures accurate edge detection, even with complex subjects.</p>
-                </div>
-                <div class="feature-card">
-                    <i class="fas fa-tachometer-alt"></i>
-                    <h3>Lightning Fast</h3>
-                    <p>Get results in seconds, not minutes. Process batches of images efficiently.</p>
-                </div>
-                <div class="feature-card">
-                    <i class="fas fa-lock"></i>
-                    <h3>Privacy First</h3>
-                    <p>Your images are processed securely and never stored without your permission.</p>
-                </div>
-                <div class="feature-card">
-                    <i class="fas fa-palette"></i>
-                    <h3>Background Replacement</h3>
-                    <p>Add solid colors, gradients, or custom backgrounds to your images instantly.</p>
-                </div>
-                <div class="feature-card">
-                    <i class="fas fa-code"></i>
-                    <h3>API Access</h3>
-                    <p>Integrate our background removal into your own applications with our developer API.</p>
-                </div>
-                <div class="feature-card">
-                    <i class="fas fa-mobile-alt"></i>
-                    <h3>Works Everywhere</h3>
-                    <p>Use our tool on any device - desktop, tablet, or smartphone with no installation required.</p>
-                </div>
-            </div>
-        </section>
-
-        <section class="demo">
-            <h2>See the Magic in Action</h2>
-            <div class="demo-slider">
-                <div class="demo-example">
-                    <div class="before-after-container">
-                        <div class="image-container">
-                            <img class="before-image" src="{{ url_for('static', filename='uploads/originals/original_20250526110254_13217e0e.jpg') }}" alt="Original image">
-                            <img class="after-image" src="{{ url_for('static', filename='uploads/processed/bg_removed_20250526110254_13217e0e.jpg') }}" alt="Image with background removed">
+    <!-- Main Content Area -->
+    <main class="min-h-screen">
+        <!-- Hero Section with Upload -->
+        <section class="py-8 md:py-16">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row items-center justify-center md:space-x-8">
+                    <!-- Left Column - Hero Text and Demo Image -->
+                    <div class="md:w-1/2 flex flex-col items-center md:items-start mb-8 md:mb-0">
+                        <div class="max-w-md">
+                            <!-- Before/After Image Demo -->
+                            <div class="mb-6 rounded-lg overflow-hidden shadow-lg before-after-container">
+                                <img src="/file/originals/original_20250526220620_3bc62701.jpg" alt="Original image" class="before">
+                                <div class="after">
+                                    <img src="/file/processed/bg_removed_20250526220620_3bc62701.jpg" alt="Processed image">
+                                </div>
+                                <div class="slider-handle">
+                                    <i class="fas fa-arrows-alt-h text-blue-600"></i>
+                                </div>
+                            </div>
+                            
+                            <!-- Main Headline -->
+                            <h1 class="text-3xl md:text-4xl font-bold text-gray-800 text-center md:text-left mb-2">
+                                Remove Image Background
+                            </h1>
+                            
+                            <!-- Subtitle with Free highlight -->
+                            <p class="text-lg text-center md:text-left mb-4">
+                                100% Automatically and <span class="relative px-2 py-1">
+                                    <span class="relative z-10 yellow-text font-semibold">Free</span>
+                                    <span class="absolute inset-0 bg-brush bg-no-repeat bg-cover bg-center z-0"></span>
+                                </span>
+                            </p>
                         </div>
-                        <input type="range" min="0" max="100" value="50" class="slider" id="before-after-slider">
-                        <div class="slider-button">
-                            <div class="slider-line"></div>
-                            <div class="slider-circle">
-                                <i class="fas fa-chevron-left"></i>
-                                <i class="fas fa-chevron-right"></i>
+                    </div>
+                    
+                    <!-- Right Column - Upload Widget -->
+                    <div class="md:w-1/2 max-w-md w-full relative">
+                        <!-- Decorative elements -->
+                        <div class="wiggle"></div>
+                        
+                        <!-- Upload zone -->
+                        <div class="upload-zone bg-gray-50 rounded-xl p-6 text-center relative">
+                            <input type="file" id="file-upload" class="hidden" accept="image/*">
+                            
+                            <div class="text-blue-600 text-5xl mb-4">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            
+                            <h3 class="text-xl font-semibold mb-2">Upload Image</h3>
+                            <p class="text-gray-600 mb-6">or drop a file, paste an image or URL</p>
+                            
+                            <a href="bgremove" class="btn-primary text-white font-semibold py-3 px-8 rounded-full text-center inline-block shadow-lg">
+                                Upload Image
+                            </a>
+                            
+                            <p class="mt-5 text-sm text-gray-500">
+                                By uploading an image you agree to our <a href="#" class="text-blue-600">Terms of Service</a>
+                            </p>
+                        </div>
+                        
+                        <!-- Sample images section -->
+                        <div class="mt-4 text-center">
+                            <p class="text-sm text-gray-500">No image? Try one of these:</p>
+                            <div class="flex justify-center mt-2 space-x-3">
+                                <div class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden cursor-pointer sample-image">
+                                    <img src="/file/originals/original_20250526220620_3bc62701.jpg" alt="Sample 1" class="w-full h-full object-cover">
+                                </div>
+                                <div class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden cursor-pointer sample-image">
+                                    <img src="https://images.unsplash.com/photo-1560343090-f0409e92791a?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=40&w=40" alt="Sample 2" class="w-full h-full object-cover">
+                                </div>
+                                <div class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden cursor-pointer sample-image">
+                                    <img src="https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=40&w=40" alt="Sample 3" class="w-full h-full object-cover">
+                                </div>
+                                <div class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden cursor-pointer sample-image">
+                                    <img src="https://images.unsplash.com/photo-1544816155-12df9643f363?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=40&w=40" alt="Sample 4" class="w-full h-full object-cover">
+                                </div>
                             </div>
                         </div>
-                        <div class="labels">
-                            <span class="before-label">BEFORE</span>
-                            <span class="after-label">AFTER</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Categories Section -->
+        <section class="py-4 border-t border-gray-100">
+            <div class="container mx-auto px-4">
+                <div class="flex justify-center space-x-2 overflow-x-auto pb-2">
+                    <button class="category-pill active">Products</button>
+                    <button class="category-pill">People</button>
+                    <button class="category-pill">Animals</button>
+                    <button class="category-pill">Cars</button>
+                    <button class="category-pill">Graphics</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stunning Quality Examples Section -->
+        <section class="py-8">
+            <div class="container mx-auto px-4">
+                <h2 class="text-2xl font-bold text-center text-gray-700 mb-6">
+                    Stunning quality
+                </h2>
+                
+                <div class="relative rounded-xl overflow-hidden shadow-lg mb-6">
+                    <img src="/file/processed/bg_removed_20250526220620_3bc62701.jpg" alt="Product example" class="w-full">
+                    
+                    <!-- Navigation dots -->
+                    <div class="absolute inset-x-0 bottom-4 flex justify-center space-x-2">
+                        <span class="w-2 h-2 rounded-full bg-white opacity-50"></span>
+                        <span class="w-2 h-2 rounded-full bg-white"></span>
+                        <span class="w-2 h-2 rounded-full bg-white opacity-50"></span>
+                    </div>
+                    
+                    <!-- Navigation arrows -->
+                    <div class="absolute inset-y-0 left-2 flex items-center">
+                        <button class="w-8 h-8 rounded-full bg-white bg-opacity-80 flex items-center justify-center shadow">
+                            <i class="fas fa-chevron-left text-gray-600"></i>
+                        </button>
+                    </div>
+                    <div class="absolute inset-y-0 right-2 flex items-center">
+                        <button class="w-8 h-8 rounded-full bg-white bg-opacity-80 flex items-center justify-center shadow">
+                            <i class="fas fa-chevron-right text-gray-600"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <a href="#more-examples" class="inline-flex items-center text-blue-500 font-semibold">
+                        See more samples
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+        
+        <!-- How It Works Section -->
+        <section class="py-10 bg-gray-50">
+            <div class="container mx-auto px-4">
+                <h2 class="text-2xl font-bold text-center text-gray-700 mb-8">How It Works</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Step 1 -->
+                    <div class="bg-white p-5 rounded-lg shadow-sm text-center">
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-upload text-blue-600"></i>
                         </div>
+                        <h3 class="font-semibold mb-2">1. Upload Image</h3>
+                        <p class="text-sm text-gray-600">Select any image with a background</p>
+                    </div>
+                    
+                    <!-- Step 2 -->
+                    <div class="bg-white p-5 rounded-lg shadow-sm text-center">
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-magic text-blue-600"></i>
+                        </div>
+                        <h3 class="font-semibold mb-2">2. Auto Remove</h3>
+                        <p class="text-sm text-gray-600">Our AI removes the background instantly</p>
+                    </div>
+                    
+                    <!-- Step 3 -->
+                    <div class="bg-white p-5 rounded-lg shadow-sm text-center">
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-download text-blue-600"></i>
+                        </div>
+                        <h3 class="font-semibold mb-2">3. Download</h3>
+                        <p class="text-sm text-gray-600">Get your transparent image immediately</p>
                     </div>
                 </div>
             </div>
         </section>
         
-        <section id="pricing" class="pricing">
-            <h2>Simple, Transparent Pricing</h2>
-            <div class="pricing-cards">
-                <div class="pricing-card">
-                    <div class="pricing-header">
-                        <h3>Free</h3>
-                        <div class="price">$0</div>
-                        <p>Perfect for occasional use</p>
+        <!-- Features Section -->
+        <section class="py-10">
+            <div class="container mx-auto px-4">
+                <h2 class="text-2xl font-bold text-center text-gray-700 mb-6">
+                    Remove backgrounds 100% automatically in 5 seconds
+                </h2>
+                <p class="text-center text-gray-600 max-w-2xl mx-auto mb-10">
+                    Thanks to our clever AI, you can slash editing time - and have more fun! No matter if you want to make a background transparent, add a white background, extract the subject, or get a cutout.
+                </p>
+                
+                <div class="flex flex-col md:flex-row items-center justify-center">
+                    <div class="md:w-1/2 mb-6 md:mb-0 md:pr-8">
+                                            <img src="https://sb.kaleidousercontent.com/67418/658x756/361846cee7/all-pages-2.png" alt="BGRemover features" class="max-w-full mx-auto md:max-w-md rounded-lg">
+
                     </div>
-                    <ul class="pricing-features">
-                        <li><i class="fas fa-check"></i> 5 image credits per month</li>
-                        <li><i class="fas fa-check"></i> Standard resolution</li>
-                        <li><i class="fas fa-check"></i> Basic editing tools</li>
-                        <li><i class="fas fa-times"></i> Batch processing</li>
-                        <li><i class="fas fa-times"></i> API access</li>
-                    </ul>
-                    <a href="#" class="btn btn-outline">Get Started</a>
-                </div>
-                <div class="pricing-card featured">
-                    <div class="popular-tag">Most Popular</div>
-                    <div class="pricing-header">
-                        <h3>Pro</h3>
-                        <div class="price">$9.99<span>/month</span></div>
-                        <p>For regular content creators</p>
+                    <div class="md:w-1/2 max-w-md">
+                        <ul class="space-y-4">
+                            <li class="flex items-start">
+                                <div class="flex-shrink-0 mt-1">
+                                    <div class="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-check text-blue-600 text-xs"></i>
+                                    </div>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="font-medium">Lightning Fast</h3>
+                                    <p class="text-gray-600 text-sm">Remove backgrounds in seconds, not minutes</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <div class="flex-shrink-0 mt-1">
+                                    <div class="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-check text-blue-600 text-xs"></i>
+                                    </div>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="font-medium">100% Automatically</h3>
+                                    <p class="text-gray-600 text-sm">No manual editing required</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <div class="flex-shrink-0 mt-1">
+                                    <div class="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-check text-blue-600 text-xs"></i>
+                                    </div>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="font-medium">High Quality Results</h3>
+                                    <p class="text-gray-600 text-sm">Perfect edges, even with hair and complex details</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <div class="flex-shrink-0 mt-1">
+                                    <div class="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-check text-blue-600 text-xs"></i>
+                                    </div>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="font-medium">Free to Use</h3>
+                                    <p class="text-gray-600 text-sm">No registration required for basic usage</p>
+                                </div>
+                            </li>
+                        </ul>
+                        
+                        <div class="mt-6">
+                            <a href="bgremove" class="btn-primary text-white font-semibold py-3 px-8 rounded-lg inline-block shadow-md">
+                                Try BGRemover Now
+                            </a>
+                        </div>
                     </div>
-                    <ul class="pricing-features">
-                        <li><i class="fas fa-check"></i> 100 image credits per month</li>
-                        <li><i class="fas fa-check"></i> HD resolution</li>
-                        <li><i class="fas fa-check"></i> Advanced editing tools</li>
-                        <li><i class="fas fa-check"></i> Batch processing (up to 20)</li>
-                        <li><i class="fas fa-times"></i> API access</li>
-                    </ul>
-                    <a href="#" class="btn btn-primary">Choose Plan</a>
-                </div>
-                <div class="pricing-card">
-                    <div class="pricing-header">
-                        <h3>Business</h3>
-                        <div class="price">$29.99<span>/month</span></div>
-                        <p>For professional usage</p>
-                    </div>
-                    <ul class="pricing-features">
-                        <li><i class="fas fa-check"></i> Unlimited image credits</li>
-                        <li><i class="fas fa-check"></i> Ultra HD resolution</li>
-                        <li><i class="fas fa-check"></i> All editing tools</li>
-                        <li><i class="fas fa-check"></i> Unlimited batch processing</li>
-                        <li><i class="fas fa-check"></i> API access</li>
-                    </ul>
-                    <a href="#" class="btn btn-outline">Choose Plan</a>
                 </div>
             </div>
-        </section>
-
-        <section id="faq" class="faq">
-            <h2>Frequently Asked Questions</h2>
-            <div class="faq-container">
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>How accurate is the background removal?</h3>
-                        <span class="toggle-icon"><i class="fas fa-plus"></i></span>
-                    </div>
-                    <div class="faq-answer">
-                        <p>Our AI has been trained on millions of images to provide professional-grade background removal. It excels with portraits, products, and even complex subjects like hair and transparent objects.</p>
-                    </div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>What file formats are supported?</h3>
-                        <span class="toggle-icon"><i class="fas fa-plus"></i></span>
-                    </div>
-                    <div class="faq-answer">
-                        <p>You can upload images in JPG, PNG, or WebP formats. Download your processed images with transparent backgrounds in PNG format, or with new backgrounds in JPG or WebP.</p>
-                    </div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Is there a file size limit?</h3>
-                        <span class="toggle-icon"><i class="fas fa-plus"></i></span>
-                    </div>
-                    <div class="faq-answer">
-                        <p>Free users can upload images up to 5MB. Pro and Business users can upload images up to 25MB.</p>
-                    </div>
-                </div>
-                <!-- More FAQ items would go here -->
-            </div>
-        </section>
-
-        <section class="cta">
-            <h2>Ready to Remove Backgrounds?</h2>
-            <p>Join thousands of satisfied users who save time with our AI-powered background removal tool.</p>
-            <a href="#" class="btn btn-primary btn-large">Try for Free - No Credit Card Required</a>
         </section>
     </main>
 
-    <footer>
-        <div class="footer-content">
-            <div class="footer-column">
-                <div class="logo">
-                    <span>BG</span>Remover
-                </div>
-                <p>AI-powered background removal made simple and fast.</p>
-                <div class="social-icons">
-                    <a href="#"><i class="fab fa-twitter"></i></a>
-                    <a href="#"><i class="fab fa-facebook"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-linkedin"></i></a>
-                </div>
-            </div>
-            <div class="footer-column">
-                <h4>Product</h4>
-                <ul>
-                    <li><a href="#">Features</a></li>
-                    <li><a href="#">Pricing</a></li>
-                    <li><a href="#">API</a></li>
-                    <li><a href="#">Examples</a></li>
-                </ul>
-            </div>
-            <div class="footer-column">
-                <h4>Resources</h4>
-                <ul>
-                    <li><a href="#">Blog</a></li>
-                    <li><a href="#">Tutorials</a></li>
-                    <li><a href="#">Support</a></li>
-                    <li><a href="#">Documentation</a></li>
-                </ul>
-            </div>
-            <div class="footer-column">
-                <h4>Company</h4>
-                <ul>
-                    <li><a href="#">About Us</a></li>
-                    <li><a href="#">Careers</a></li>
-                    <li><a href="#">Contact</a></li>
-                    <li><a href="#">Privacy Policy</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2025 BGRemover. All rights reserved.</p>
+    <!-- Simple Footer -->
+    <footer class="py-6 border-t border-gray-200">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-sm text-gray-500">&copy; 2024 BGRemover. All rights reserved.</p>
         </div>
     </footer>
 
-    <script >
+    <!-- JavaScript -->
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
-    // Upload box functionality
-    const uploadBox = document.querySelector('.upload-container');
-    const fileInput = document.getElementById('image-upload');
-    
-    if (uploadBox && fileInput) {
-        uploadBox.addEventListener('click', function() {
-            fileInput.click();
-        });
-        
-        uploadBox.addEventListener('dragover', function(e) {
-            e.preventDefault();
-            uploadBox.classList.add('drag-over');
-        });
-        
-        uploadBox.addEventListener('dragleave', function() {
-            uploadBox.classList.remove('drag-over');
-        });
-        
-        uploadBox.addEventListener('drop', function(e) {
-            e.preventDefault();
-            uploadBox.classList.remove('drag-over');
+            // Handle file input
+            const fileUpload = document.getElementById('file-upload');
+            const uploadZone = document.querySelector('.upload-zone');
             
-            if (e.dataTransfer.files.length) {
-                fileInput.files = e.dataTransfer.files;
-                handleFileUpload(e.dataTransfer.files[0]);
-            }
-        });
-        
-        fileInput.addEventListener('change', function() {
-            if (fileInput.files.length) {
-                handleFileUpload(fileInput.files[0]);
-            }
-        });
-    }
-    
-    function handleFileUpload(file) {
-        // Create a FormData object to store the file
-        const formData = new FormData();
-        formData.append('image', file);
-        
-        // Store the file in sessionStorage temporarily (as base64)
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            // Save the file to sessionStorage
-            sessionStorage.setItem('uploadedImage', e.target.result);
-            sessionStorage.setItem('uploadedImageName', file.name);
+            uploadZone.addEventListener('click', function() {
+                fileUpload.click();
+            });
             
-            // Show loading indicator
-            const loadingOverlay = document.createElement('div');
-            loadingOverlay.style.position = 'fixed';
-            loadingOverlay.style.top = '0';
-            loadingOverlay.style.left = '0';
-            loadingOverlay.style.width = '100%';
-            loadingOverlay.style.height = '100%';
-            loadingOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-            loadingOverlay.style.display = 'flex';
-            loadingOverlay.style.justifyContent = 'center';
-            loadingOverlay.style.alignItems = 'center';
-            loadingOverlay.style.zIndex = '9999';
-            
-            const spinner = document.createElement('div');
-            spinner.style.border = '4px solid rgba(255, 255, 255, 0.3)';
-            spinner.style.borderTop = '4px solid var(--primary-color)';
-            spinner.style.borderRadius = '50%';
-            spinner.style.width = '50px';
-            spinner.style.height = '50px';
-            spinner.style.animation = 'spin 1s linear infinite';
-            
-            loadingOverlay.appendChild(spinner);
-            document.body.appendChild(loadingOverlay);
-            
-            // Redirect to the bgremove.html page after a short delay
-            setTimeout(() => {
-                window.location.href = '/bgremove';
-            }, 800);
-        };
-        
-        reader.readAsDataURL(file);
-    }
-    
-    // FAQ Accordion
-    const faqItems = document.querySelectorAll('.faq-item');
-    
-    if (faqItems.length) {
-        faqItems.forEach(item => {
-            const question = item.querySelector('.faq-question');
-            
-            question.addEventListener('click', () => {
-                const isActive = item.classList.contains('active');
-                
-                // Close all items
-                faqItems.forEach(faq => {
-                    faq.classList.remove('active');
-                });
-                
-                // Open clicked item if it wasn't already active
-                if (!isActive) {
-                    item.classList.add('active');
+            fileUpload.addEventListener('change', function(e) {
+                if (e.target.files && e.target.files[0]) {
+                    const file = e.target.files[0];
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(event) {
+                        sessionStorage.setItem('uploadedImage', event.target.result);
+                        sessionStorage.setItem('uploadedImageName', file.name);
+                        window.location.href = 'bgremove';
+                    };
+                    
+                    reader.readAsDataURL(file);
                 }
             });
-        });
-    }
-    
-    // Smooth scrolling for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
-            e.preventDefault();
             
-            const targetId = this.getAttribute('href');
+            // Handle drag and drop
+            uploadZone.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('border-blue-600');
+            });
             
-            if (targetId === '#') return;
+            uploadZone.addEventListener('dragleave', function() {
+                this.classList.remove('border-blue-600');
+            });
             
-            const targetElement = document.querySelector(targetId);
+            uploadZone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('border-blue-600');
+                
+                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                    const file = e.dataTransfer.files[0];
+                    if (file.type.match('image.*')) {
+                        const reader = new FileReader();
+                        
+                        reader.onload = function(event) {
+                            sessionStorage.setItem('uploadedImage', event.target.result);
+                            sessionStorage.setItem('uploadedImageName', file.name);
+                            window.location.href = 'bgremove';
+                        };
+                        
+                        reader.readAsDataURL(file);
+                    }
+                }
+            });
             
-            if (targetElement) {
-                window.scrollTo({
-                    top: targetElement.offsetTop - 100,
-                    behavior: 'smooth'
+            // Handle sample image selection
+            const sampleImages = document.querySelectorAll('.sample-image');
+            sampleImages.forEach(img => {
+                img.addEventListener('click', function(e) {
+                    const imgSrc = this.querySelector('img').src;
+                    sessionStorage.setItem('uploadedImage', imgSrc);
+                    sessionStorage.setItem('uploadedImageName', 'sample.jpg');
+                    window.location.href = 'bgremove';
+                });
+            });
+            
+            // Handle category pills
+            const categoryPills = document.querySelectorAll('.category-pill');
+            categoryPills.forEach(pill => {
+                pill.addEventListener('click', function() {
+                    // Remove active class from all pills
+                    categoryPills.forEach(p => p.classList.remove('active'));
+                    // Add active class to clicked pill
+                    this.classList.add('active');
+                });
+            });
+            
+            // Image comparison slider
+            const sliderContainer = document.querySelector('.before-after-container');
+            const sliderHandle = document.querySelector('.slider-handle');
+            const afterDiv = document.querySelector('.before-after-container .after');
+            
+            if (sliderContainer && sliderHandle && afterDiv) {
+                let isDragging = false;
+                
+                const moveSlider = function(e) {
+                    if (!isDragging) return;
+                    
+                    const rect = sliderContainer.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const containerWidth = rect.width;
+                    
+                    // Calculate position as percentage
+                    let position = (x / containerWidth) * 100;
+                    position = Math.max(0, Math.min(100, position)); // Constrain between 0-100%
+                    
+                    // Update slider position
+                    afterDiv.style.width = `${position}%`;
+                };
+                
+                sliderHandle.addEventListener('mousedown', () => {
+                    isDragging = true;
+                });
+                
+                document.addEventListener('mouseup', () => {
+                    isDragging = false;
+                });
+                
+                document.addEventListener('mousemove', moveSlider);
+                
+                // Touch support
+                sliderHandle.addEventListener('touchstart', (e) => {
+                    isDragging = true;
+                });
+                
+                document.addEventListener('touchend', () => {
+                    isDragging = false;
+                });
+                
+                document.addEventListener('touchmove', (e) => {
+                    if (!isDragging) return;
+                    
+                    const touch = e.touches[0];
+                    const rect = sliderContainer.getBoundingClientRect();
+                    const x = touch.clientX - rect.left;
+                    const containerWidth = rect.width;
+                    
+                    let position = (x / containerWidth) * 100;
+                    position = Math.max(0, Math.min(100, position));
+                    
+                    afterDiv.style.width = `${position}%`;
                 });
             }
         });
-    });
-
-    // Before-After Slider Interaction
-    const slider = document.querySelector('.before-after-slider');
-    
-    if (slider) {
-        let isDragging = false;
-        let startX;
-        let startPercentage = 50; // Default split is 50%
-        
-        // Set initial state
-        const before = slider.querySelector('.before');
-        before.style.clipPath = `polygon(0 0, ${startPercentage}% 0, ${startPercentage}% 100%, 0 100%)`;
-        
-        // Mouse events
-        slider.addEventListener('mousedown', (e) => {
-            isDragging = true;
-            startX = e.pageX;
-            slider.style.cursor = 'grabbing';
-            e.preventDefault(); // Prevent text selection during drag
-        });
-        
-        window.addEventListener('mouseup', () => {
-            if (isDragging) {
-                isDragging = false;
-                slider.style.cursor = 'grab';
-            }
-        });
-        
-        window.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
-            
-            const rect = slider.getBoundingClientRect();
-            const x = e.pageX - rect.left;
-            const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100));
-            
-            before.style.clipPath = `polygon(0 0, ${percentage}% 0, ${percentage}% 100%, 0 100%)`;
-        });
-        
-        // Touch events for mobile
-        slider.addEventListener('touchstart', (e) => {
-            isDragging = true;
-            startX = e.touches[0].pageX;
-            e.preventDefault();
-        });
-        
-        window.addEventListener('touchend', () => {
-            isDragging = false;
-        });
-        
-        window.addEventListener('touchmove', (e) => {
-            if (!isDragging) return;
-            
-            const rect = slider.getBoundingClientRect();
-            const x = e.touches[0].pageX - rect.left;
-            const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100));
-            
-            before.style.clipPath = `polygon(0 0, ${percentage}% 0, ${percentage}% 100%, 0 100%)`;
-            e.preventDefault();
-        });
-        
-        // Add a divider line indicator to make it more clear this is draggable
-        const divider = document.createElement('div');
-        divider.className = 'slider-divider';
-        divider.innerHTML = '<div class="slider-handle"></div>';
-        slider.appendChild(divider);
-        
-        // Add some initial animation to show the slider functionality
-        setTimeout(() => {
-            before.style.clipPath = 'polygon(0 0, 65% 0, 65% 100%, 0 100%)';
-            setTimeout(() => {
-                before.style.clipPath = 'polygon(0 0, 35% 0, 35% 100%, 0 100%)';
-                setTimeout(() => {
-                    before.style.clipPath = 'polygon(0 0, 50% 0, 50% 100%, 0 100%)';
-                }, 800);
-            }, 800);
-        }, 1000);
-    }
-});
-    </script>
-    <script> 
-        document.addEventListener('DOMContentLoaded', function() {
-    // Scroll animation for elements
-    const fadeElements = document.querySelectorAll('section h2, .feature-card, .step, .pricing-card');
-    
-    // Add the fade-in-element class to all elements we want to animate
-    fadeElements.forEach(element => {
-        element.classList.add('fade-in-element');
-    });
-    
-    // Function to check if an element is in viewport
-    function isInViewport(element) {
-        const rect = element.getBoundingClientRect();
-        return (
-            rect.top <= (window.innerHeight || document.documentElement.clientHeight) * 0.8
-        );
-    }
-    
-    // Function to handle scroll and animate elements
-    function handleScroll() {
-        fadeElements.forEach(element => {
-            if (isInViewport(element)) {
-                element.classList.add('visible');
-            }
-        });
-    }
-    
-    // Call once on load
-    handleScroll();
-    
-    // Add scroll event listener
-    window.addEventListener('scroll', handleScroll);
-    
-    // Counter animation for statistics
-    function animateCounter(element, target, duration = 2000) {
-        const start = 0;
-        const increment = target / (duration / 16);
-        let current = start;
-        
-        const timer = setInterval(() => {
-            current += increment;
-            if (current >= target) {
-                element.textContent = target.toLocaleString();
-                clearInterval(timer);
-            } else {
-                element.textContent = Math.floor(current).toLocaleString();
-            }
-        }, 16);
-    }
-    
-    // Animate the hero image sequence
-    const heroImage = document.querySelector('.image-animation');
-    if (heroImage) {
-        heroImage.classList.add('animate');
-    }
-    
-    // Type writer effect for title
-    function typeWriter(element, text, speed = 50, delay = 0) {
-        let i = 0;
-        
-        setTimeout(() => {
-            const interval = setInterval(() => {
-                if (i < text.length) {
-                    element.innerHTML += text.charAt(i);
-                    i++;
-                } else {
-                    clearInterval(interval);
-                }
-            }, speed);
-        }, delay);
-    }
-    
-    // Animate the before-after slider on hover
-    const beforeAfterSlider = document.querySelector('.before-after-slider');
-    
-    if (beforeAfterSlider) {
-        beforeAfterSlider.addEventListener('mouseover', () => {
-            const before = beforeAfterSlider.querySelector('.before');
-            
-            // Create a CSS animation to move the slider back and forth
-            before.style.animation = 'sliderAnimation 3s ease-in-out forwards';
-            
-            // Remove the animation after it completes
-            setTimeout(() => {
-                before.style.animation = '';
-            }, 3000);
-        });
-    }
-    
-    // Add keyframes for the slider animation dynamically
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes sliderAnimation {
-            0% { clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%); }
-            50% { clip-path: polygon(0 0, 80% 0, 80% 100%, 0 100%); }
-            100% { clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%); }
-        }
-    `;
-    document.head.appendChild(style);
-    
-    // Parallax effect for sections
-    window.addEventListener('scroll', () => {
-        const scrollPosition = window.pageYOffset;
-        
-        document.querySelectorAll('.parallax').forEach(element => {
-            const speed = element.getAttribute('data-speed') || 0.5;
-            element.style.transform = `translateY(${scrollPosition * speed}px)`;
-        });
-    });
-    
-    // Initialize the interactive demos
-    initializeAnimatedDemos();
-});
-
-// Function to initialize the animated demos
-function initializeAnimatedDemos() {
-    // This function would set up any interactive demos
-    // In a real implementation, you might want to connect to your backend API
-    // or use a service like Cloudinary to do the actual background removal
-    
-    console.log('Animated demos initialized');
-}
-
-// Modern Before-After Slider Functionality
-function initBeforeAfterSlider() {
-    const slider = document.getElementById('before-after-slider');
-    const sliderButton = document.querySelector('.slider-button');
-    const afterImage = document.querySelector('.after-image');
-    
-    if (!slider || !sliderButton || !afterImage) return;
-    
-    // Initialize position
-    updateSliderPosition(50);
-    
-    // Handle slider input event
-    slider.addEventListener('input', function() {
-        updateSliderPosition(this.value);
-    });
-    
-    // Add touch support
-    slider.addEventListener('touchstart', function() {
-        document.body.style.overflow = 'hidden'; // Prevent page scrolling while dragging
-    });
-    
-    slider.addEventListener('touchend', function() {
-        document.body.style.overflow = ''; // Restore page scrolling
-    });
-    
-    // Add auto-animation on page load
-    setTimeout(() => {
-        animateSlider();
-    }, 1000);
-    
-    // Function to update the slider position
-    function updateSliderPosition(value) {
-        const percent = value + '%';
-        sliderButton.style.left = percent;
-        afterImage.style.clipPath = `inset(0 0 0 ${percent})`;
-    }
-    
-    // Function to animate the slider automatically
-    function animateSlider() {
-        let value = 50;
-        let direction = 1;
-        let speed = 1;
-        let animating = true;
-        
-        const animate = () => {
-            if (!animating) return;
-            
-            value += speed * direction;
-            
-            if (value >= 80) {
-                value = 80;
-                direction = -1;
-            } else if (value <= 20) {
-                value = 20;
-                direction = 1;
-            }
-            
-            updateSliderPosition(value);
-            
-            // Only run animation for a few cycles
-            if (value === 50 && direction === 1) {
-                animating = false;
-                slider.value = 50;
-            } else {
-                requestAnimationFrame(animate);
-            }
-        };
-        
-        animate();
-    }
-    
-    // Reset animation on hover
-    const container = document.querySelector('.before-after-container');
-    container.addEventListener('mouseenter', () => {
-        sliderButton.classList.add('hover-effect');
-    });
-    
-    container.addEventListener('mouseleave', () => {
-        sliderButton.classList.remove('hover-effect');
-    });
-}
-
-// Initialize when the DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    // Your existing initialization code...
-    
-    // Initialize the before-after slider
-    initBeforeAfterSlider();
-});
     </script>
 </body>
 </html>
