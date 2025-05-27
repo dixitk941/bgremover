@@ -337,22 +337,58 @@
         .dark-mode .skeleton {
             background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
         }
+        
+        /* Pixel animation overlay */
+        .pixel-animation-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            border-radius: 0.5rem;
+        }
+        
+        .pixel {
+            position: absolute;
+            background-color: #3b82f6;
+            opacity: 0.7;
+            transform: scale(0);
+            animation: pixelAnimation 0.8s forwards;
+        }
+        
+        @keyframes pixelAnimation {
+            0% { transform: scale(0); }
+            50% { transform: scale(1); }
+            100% { transform: scale(0); }
+        }
+        
+        /* Custom breakpoint for very small screens */
+        @media (min-width: 480px) {
+            .xs\:inline {
+                display: inline;
+            }
+            
+            .xs\:ml-1 {
+                margin-left: 0.25rem;
+            }
+        }
     </style>
 </head>
 
 <body class="bg-gray-50 text-gray-800 min-h-screen transition-colors duration-300">
     <!-- Header with animation -->
-    <header class="bg-white shadow-sm py-4 transition-all duration-300" data-aos="fade-down">
+    <header class="bg-white shadow-sm py-3 transition-all duration-300" data-aos="fade-down">
         <div class="container mx-auto px-4 flex justify-between items-center">
             <div class="flex items-center">
-                <div class="text-2xl font-bold text-blue-600 mr-2">
-                    <i class="fas fa-cut mr-2"></i>BGRemover Pro
+                <div class="text-xl sm:text-2xl font-bold text-blue-600 mr-1 whitespace-nowrap">
+                    <i class="fas fa-cut mr-1 sm:mr-2"></i><span>BGRemover</span>
                 </div>
-                <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Beta</span>
+                <span class="text-xs bg-blue-100 text-blue-800 px-1 sm:px-2 py-1 rounded">Beta</span>
             </div>
-            <div class="flex items-center space-x-4">
-                <a href="#" id="view-history" class="text-blue-600 hover:text-blue-800 transition-all">
-                    <i class="fas fa-history mr-1"></i> History
+            <div class="flex items-center">
+                <a href="#" id="view-history" class="text-blue-600 hover:text-blue-800 transition-all mr-3">
+                    <i class="fas fa-history"></i><span class="hidden xs:inline ml-1">History</span>
                 </a>
                 <label class="theme-switch">
                     <input type="checkbox" id="theme-toggle">
@@ -432,9 +468,6 @@
                             <p class="text-sm text-gray-600 mb-2">Processing your image...</p>
                             <div class="progress-container">
                                 <div id="progress-bar" class="progress-bar"></div>
-                            </div>
-                            <div id="spinner" class="flex justify-center mt-4">
-                                <div class="spinner"></div>
                             </div>
                         </div>
                         
@@ -591,8 +624,19 @@
                 const formData = new FormData();
                 formData.append('image', fileInput.files[0]);
                 
-                processingIndicator.classList.remove('hidden');
+                // Create pixel animation overlay
+                const pixelContainer = document.createElement('div');
+                pixelContainer.className = 'pixel-animation-container';
+                originalPreview.parentNode.style.position = 'relative';
+                originalPreview.parentNode.appendChild(pixelContainer);
+                
+                // Generate pixels
+                createPixelAnimation(pixelContainer, originalPreview.offsetWidth, originalPreview.offsetHeight);
+                
                 removeBgBtn.disabled = true;
+                
+                // Show processing indicator
+                processingIndicator.classList.remove('hidden');
                 
                 // Simulate progress for better UX
                 let progress = 0;
@@ -634,7 +678,8 @@
                         currentOriginalUrl = data.original_url;
                     }
                     
-                    // Display images
+                    // Hide original image and show only result
+                    originalPreview.parentNode.classList.add('hidden');
                     resultPreview.src = currentResultUrl;
                     resultContainer.classList.remove('hidden');
                     
@@ -646,21 +691,32 @@
                     downloadBtn.classList.remove('hidden');
                     compareBtn.classList.remove('hidden');
                     
+                    // Hide processing indicator
+                    processingIndicator.classList.add('hidden');
+                    
                     // Save to session storage with complete information and store filename for download
                     saveToHistory(currentFileName, currentOriginalUrl, currentResultUrl, data.filename);
                     
                     // Create confetti effect for successful operation
                     createConfetti();
                     
-                    // Hide processing indicator with a slight delay for smoothness
-                    setTimeout(() => {
-                        processingIndicator.classList.add('hidden');
-                    }, 500);
+                    // Remove pixel animation container
+                    if (originalPreview.parentNode.contains(pixelContainer)) {
+                        originalPreview.parentNode.removeChild(pixelContainer);
+                    }
                 })
                 .catch(error => {
                     console.error('Error:', error);
                     clearInterval(progressInterval);
                     alert('Error processing image: ' + error.message);
+                    
+                    // Remove pixel animation container on error
+                    if (originalPreview.parentNode.contains(pixelContainer)) {
+                        originalPreview.parentNode.removeChild(pixelContainer);
+                    }
+                    
+                    // Hide processing indicator
+                    processingIndicator.classList.add('hidden');
                 })
                 .finally(() => {
                     removeBgBtn.disabled = false;
@@ -778,9 +834,15 @@ if (uploadedImage && uploadedImageName) {
                     originalPreview.src = currentOriginalUrl;
                     dropText.classList.add('hidden');
                     previewContainer.classList.remove('hidden');
+                    
+                    // Make sure the original image is visible initially for preview
+                    originalPreview.parentNode.classList.remove('hidden');
+                    
+                    // Hide result container until processing is complete
                     resultContainer.classList.add('hidden');
                     downloadBtn.classList.add('hidden');
                     compareBtn.classList.add('hidden');
+                    processingIndicator.classList.add('hidden');
                     
                     // Reset comparison view if active
                     standardPreview.classList.remove('hidden');
@@ -1060,6 +1122,46 @@ if (uploadedImage && uploadedImageName) {
                 }
             }
         });
+        
+        // Function to create pixel animation
+function createPixelAnimation(container, width, height) {
+    // Calculate number of pixels based on size
+    const pixelSize = 10; // Size of each pixel in pixels
+    const columns = Math.ceil(width / pixelSize);
+    const rows = Math.ceil(height / pixelSize);
+    
+    // Color variations for pixels
+    const colors = ['#3b82f6', '#60a5fa', '#93c5fd', '#2563eb'];
+    
+    // Clear previous pixels if any
+    container.innerHTML = '';
+    
+    // Create and animate pixels
+    for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < columns; j++) {
+            const pixel = document.createElement('div');
+            pixel.className = 'pixel';
+            pixel.style.width = pixelSize + 'px';
+            pixel.style.height = pixelSize + 'px';
+            pixel.style.top = (i * pixelSize) + 'px';
+            pixel.style.left = (j * pixelSize) + 'px';
+            pixel.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            
+            // Randomize animation delay for better effect
+            const delay = Math.random() * 2; // Random delay up to 2 seconds
+            pixel.style.animationDelay = delay + 's';
+            
+            // Randomize animation duration for better effect
+            const duration = 0.5 + Math.random() * 1.5; // Between 0.5 and 2 seconds
+            pixel.style.animationDuration = duration + 's';
+            
+            // Make animation repeat
+            pixel.style.animationIterationCount = 'infinite';
+            
+            container.appendChild(pixel);
+        }
+    }
+}
     </script>
 </body>
 
