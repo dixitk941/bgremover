@@ -131,6 +131,22 @@
         .slider-handle::after {
             transform: rotate(45deg);
         }
+        #quality-slider {
+        width: 100%;
+        display: flex;
+    }
+    
+    #quality-slider img {
+        width: 100%;
+        flex: 0 0 100%;
+        object-fit: cover;
+        height: 350px;
+    }
+    
+    .slider-dot.active {
+        transform: scale(1.2);
+        opacity: 1 !important;
+    }
     </style>
 </head>
 <body class="bg-white text-gray-800">
@@ -152,16 +168,16 @@
                     <!-- Left Column - Hero Text and Demo Image -->
                     <div class="md:w-1/2 flex flex-col items-center md:items-start mb-8 md:mb-0">
                         <div class="max-w-md">
-                            <!-- Before/After Image Demo -->
-                            <div class="mb-6 rounded-lg overflow-hidden shadow-lg before-after-container">
-                                <img src="{{ url_for('static', filename='images/demo/original.jpg') }}" alt="Original image" class="before">
-                                <div class="after">
-                                    <img src="{{ url_for('static', filename='images/demo/processed.jpg') }}" alt="Processed image">
-                                </div>
-                                <div class="slider-handle">
-                                    <i class="fas fa-arrows-alt-h text-blue-600"></i>
-                                </div>
-                            </div>
+                          <!-- Before/After Image Demo -->
+<div class="mb-6 rounded-lg overflow-hidden shadow-lg before-after-container">
+    <img src="{{ url_for('static', filename='uploads/originals/original.jpg') }}" alt="Original image" class="before">
+    <div class="after">
+        <img src="{{ url_for('static', filename='uploads/processed/processed.jpg') }}" alt="Processed image">
+    </div>
+    <div class="slider-handle">
+        <i class="fas fa-arrows-alt-h text-blue-600"></i>
+    </div>
+</div>
                             
                             <!-- Main Headline -->
                             <h1 class="text-3xl md:text-4xl font-bold text-gray-800 text-center md:text-left mb-2">
@@ -203,7 +219,7 @@
                             </p>
                         </div>
                         
-                        <!-- Sample images section -->
+                        <!-- Sample images section 
                         <div class="mt-4 text-center">
                             <p class="text-sm text-gray-500">No image? Try one of these:</p>
                             <div class="flex justify-center mt-2 space-x-3">
@@ -219,14 +235,14 @@
                                 <div class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden cursor-pointer sample-image">
                                     <img src="{{ url_for('static', filename='images/samples/sample4.jpg') }}" alt="Sample 4" class="w-full h-full object-cover">
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Categories Section -->
+        <!-- Categories Section
         <section class="py-4 border-t border-gray-100">
             <div class="container mx-auto px-4">
                 <div class="flex justify-center space-x-2 overflow-x-auto pb-2">
@@ -237,46 +253,56 @@
                     <button class="category-pill">Graphics</button>
                 </div>
             </div>
-        </section>
+        </section> -->
 
         <!-- Stunning Quality Examples Section -->
-        <section class="py-8">
-            <div class="container mx-auto px-4">
-                <h2 class="text-2xl font-bold text-center text-gray-700 mb-6">
-                    Stunning quality
-                </h2>
+<section class="py-8">
+    <div class="container mx-auto px-4">
+        <h2 class="text-2xl font-bold text-center text-gray-700 mb-6">
+            Stunning quality
+        </h2>
+        
+        <div class="relative rounded-xl overflow-hidden shadow-lg mb-6">
+            <!-- Image slider container -->
+            <div class="flex transition-transform duration-500 ease-in-out" id="quality-slider">
+                <!-- First image -->
+                <img src="https://images.unsplash.com/photo-1445053023192-8d45cb66099d?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Forest example" class="w-full flex-shrink-0">
                 
-                <div class="relative rounded-xl overflow-hidden shadow-lg mb-6">
-                    <img src="{{ url_for('static', filename='images/demo/quality-example.jpg') }}" alt="Product example" class="w-full">
-                    
-                    <!-- Navigation dots -->
-                    <div class="absolute inset-x-0 bottom-4 flex justify-center space-x-2">
-                        <span class="w-2 h-2 rounded-full bg-white opacity-50"></span>
-                        <span class="w-2 h-2 rounded-full bg-white"></span>
-                        <span class="w-2 h-2 rounded-full bg-white opacity-50"></span>
-                    </div>
-                    
-                    <!-- Navigation arrows -->
-                    <div class="absolute inset-y-0 left-2 flex items-center">
-                        <button class="w-8 h-8 rounded-full bg-white bg-opacity-80 flex items-center justify-center shadow">
-                            <i class="fas fa-chevron-left text-gray-600"></i>
-                        </button>
-                    </div>
-                    <div class="absolute inset-y-0 right-2 flex items-center">
-                        <button class="w-8 h-8 rounded-full bg-white bg-opacity-80 flex items-center justify-center shadow">
-                            <i class="fas fa-chevron-right text-gray-600"></i>
-                        </button>
-                    </div>
-                </div>
+                <!-- Second image -->
+                <img src="https://images.unsplash.com/photo-1444720895098-cbd6b640c909?w=1500&auto=format&fit=crop&q=80&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fHBlcnNvbnxlbnwwfHwwfHx8MA%3D%3D" alt="Person example" class="w-full flex-shrink-0">
                 
-                <div class="text-center">
-                    <a href="#more-examples" class="inline-flex items-center text-blue-500 font-semibold">
-                        See more samples
-                        <i class="fas fa-arrow-right ml-2"></i>
-                    </a>
-                </div>
+                <!-- Third image -->
+                <img src="https://images.unsplash.com/photo-1492681290082-e932832941e6?w=1500&auto=format&fit=crop&q=80&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fHBlcnNvbnxlbnwwfHwwfHx8MA%3D%3D" alt="Portrait example" class="w-full flex-shrink-0">
             </div>
-        </section>
+            
+            <!-- Navigation dots -->
+            <div class="absolute inset-x-0 bottom-4 flex justify-center space-x-2">
+                <span class="w-2 h-2 rounded-full bg-white cursor-pointer slider-dot active" data-index="0"></span>
+                <span class="w-2 h-2 rounded-full bg-white opacity-50 cursor-pointer slider-dot" data-index="1"></span>
+                <span class="w-2 h-2 rounded-full bg-white opacity-50 cursor-pointer slider-dot" data-index="2"></span>
+            </div>
+            
+            <!-- Navigation arrows -->
+            <div class="absolute inset-y-0 left-2 flex items-center">
+                <button class="w-8 h-8 rounded-full bg-white bg-opacity-80 flex items-center justify-center shadow" id="prev-slide">
+                    <i class="fas fa-chevron-left text-gray-600"></i>
+                </button>
+            </div>
+            <div class="absolute inset-y-0 right-2 flex items-center">
+                <button class="w-8 h-8 rounded-full bg-white bg-opacity-80 flex items-center justify-center shadow" id="next-slide">
+                    <i class="fas fa-chevron-right text-gray-600"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- <div class="text-center">
+            <a href="#more-examples" class="inline-flex items-center text-blue-500 font-semibold">
+                See more samples
+                <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+        </div> -->
+    </div>
+</section>
         
         <!-- How It Works Section -->
         <section class="py-10 bg-gray-50">
@@ -326,7 +352,7 @@
                 
                 <div class="flex flex-col md:flex-row items-center justify-center">
                     <div class="md:w-1/2 mb-6 md:mb-0 md:pr-8">
-                        <img src="{{ url_for('static', filename='images/features-demo.png') }}" alt="BGRemover features" class="max-w-full mx-auto md:max-w-md rounded-lg shadow-lg">
+                        <img src="https://sb.kaleidousercontent.com/67418/658x756/361846cee7/all-pages-2.png" alt="BGRemover features" class="max-w-full mx-auto md:max-w-md rounded-lg shadow-lg">
 
                     </div>
                     <div class="md:w-1/2 max-w-md">
@@ -529,6 +555,53 @@
                     afterDiv.style.width = `${position}%`;
                 });
             }
+            
+            // Image slider for quality examples
+            const slider = document.getElementById('quality-slider');
+            const dots = document.querySelectorAll('.slider-dot');
+            const prevBtn = document.getElementById('prev-slide');
+            const nextBtn = document.getElementById('next-slide');
+            let currentSlide = 0;
+            const totalSlides = dots.length;
+            
+            function goToSlide(index) {
+                if (index < 0) index = totalSlides - 1;
+                if (index >= totalSlides) index = 0;
+                
+                currentSlide = index;
+                slider.style.transform = `translateX(-${currentSlide * 100}%)`;
+                
+                // Update dots
+                dots.forEach((dot, i) => {
+                    if (i === currentSlide) {
+                        dot.classList.add('active');
+                        dot.classList.remove('opacity-50');
+                    } else {
+                        dot.classList.remove('active');
+                        dot.classList.add('opacity-50');
+                    }
+                });
+            }
+            
+            // Set up dot navigation
+            dots.forEach((dot, index) => {
+                dot.addEventListener('click', () => goToSlide(index));
+            });
+            
+            // Set up arrow navigation
+            prevBtn.addEventListener('click', () => goToSlide(currentSlide - 1));
+            nextBtn.addEventListener('click', () => goToSlide(currentSlide + 1));
+            
+            // Auto-advance slides
+            let slideInterval = setInterval(() => goToSlide(currentSlide + 1), 5000);
+            
+            // Pause auto-advance when hovering over slider
+            const sliderContainer = slider.parentElement;
+            sliderContainer.addEventListener('mouseenter', () => clearInterval(slideInterval));
+            sliderContainer.addEventListener('mouseleave', () => {
+                clearInterval(slideInterval);
+                slideInterval = setInterval(() => goToSlide(currentSlide + 1), 5000);
+            });
         });
     </script>
 </body>
