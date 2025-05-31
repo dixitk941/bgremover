@@ -423,17 +423,46 @@
 
             <!-- Upload Section with enhanced animations -->
             <section class="mb-12" data-aos="fade-up" data-aos-delay="200">
-                <div id="upload-container" class="drop-zone rounded-lg p-10 text-center bg-white shadow-md transition-all duration-300">
+                <!-- Upload Button -->
+                <div class="mb-6 text-center">
+                    <label for="image" class="btn bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-md cursor-pointer transition-all">
+                        <i class="fas fa-upload mr-2"></i> Upload Image
+                    </label>
+                    <input type="file" id="image" name="image" accept="image/*" class="hidden">
+                </div>
+                
+                <!-- Advertisement Space - Under Upload Button -->
+                <div class="ad-container mb-6">
+                    <div class="bg-gray-100 border border-gray-200 rounded-lg p-4 min-h-[120px] flex items-center justify-center">
+                        <div class="text-gray-500">
+                            <i class="fas fa-ad text-2xl mb-2"></i>
+                            <p class="text-sm">Advertisement</p>
+                            <p class="text-xs mt-1">300x250 Banner Ad</p>
+                        </div>
+                    </div>
+                    <!-- Google AdSense Script -->
+                    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+                            crossorigin="anonymous"></script>
+                    <!-- Top Ad Unit -->
+                    <ins class="adsbygoogle"
+                         style="display:block"
+                         data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                         data-ad-slot="1111111111"
+                         data-ad-format="rectangle"
+                         data-full-width-responsive="true"></ins>
+                    <script>
+                         (adsbygoogle = window.adsbygoogle || []).push({});
+                    </script>
+                </div>
+                
+                <!-- Upload Container - Drag & Drop Area -->
+                <div id="upload-container" class="drop-zone rounded-lg p-10 text-center bg-white shadow-md transition-all duration-300 mb-6">
                     <div id="drop-text" class="transition-all duration-300">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400 mb-4 pulse-effect" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                         <p class="text-lg mb-2">Drag and drop an image here</p>
-                        <p class="text-gray-500 mb-4">or</p>
-                        <label for="image" class="btn bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-md cursor-pointer transition-all">
-                            <i class="fas fa-upload mr-2"></i> Upload Image
-                        </label>
-                        <input type="file" id="image" name="image" accept="image/*" class="hidden">
+                        <p class="text-gray-500">Or use the upload button above</p>
                     </div>
                     
                     <div id="preview-container" class="hidden transition-all duration-300">
@@ -476,9 +505,33 @@
                             <button id="remove-bg-btn" class="btn bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-md transition-all">
                                 <i class="fas fa-magic mr-2"></i> Remove Background
                             </button>
-                            <button id="download-btn" class="btn hidden bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-md transition-all">
-                                <i class="fas fa-download mr-2"></i> Download Options
-                            </button>
+                            
+                            <!-- Download Button with Dropdown -->
+                            <div class="relative hidden" id="download-container">
+                                <button id="download-btn" class="btn bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-md transition-all flex items-center">
+                                    <i class="fas fa-download mr-2"></i> Download Options
+                                    <i class="fas fa-chevron-down ml-2 text-xs"></i>
+                                </button>
+                                
+                                <!-- Dropdown Menu -->
+                                <div id="download-dropdown" class="hidden absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-10 min-w-full">
+                                    <button id="download-preview-btn" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors flex items-center">
+                                        <i class="fas fa-image mr-2 text-blue-600"></i>
+                                        <div>
+                                            <div class="font-medium">Download Preview</div>
+                                            <div class="text-xs text-gray-500">Compressed for quick download</div>
+                                        </div>
+                                    </button>
+                                    <button id="download-original-btn" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors flex items-center border-t border-gray-100">
+                                        <i class="fas fa-hdd mr-2 text-green-600"></i>
+                                        <div>
+                                            <div class="font-medium">Download Original Quality</div>
+                                            <div class="text-xs text-gray-500">Full resolution, larger file</div>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+                            
                             <button id="compare-btn" class="btn hidden bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-6 rounded-md transition-all">
                                 <i class="fas fa-exchange-alt mr-2"></i> Compare
                             </button>
@@ -488,7 +541,55 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Paste Button -->
+                <div class="mb-6 text-center">
+                    <div class="flex justify-center gap-4">
+                        <button id="paste-image-btn" class="btn bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-6 rounded-md transition-all">
+                            <i class="fas fa-paste mr-2"></i> Paste Image
+                        </button>
+                        <button id="url-image-btn" class="btn bg-orange-600 hover:bg-orange-700 text-white font-medium py-2 px-6 rounded-md transition-all">
+                            <i class="fas fa-link mr-2"></i> Insert Image URL
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Advertisement Space - Under Paste Button -->
+                <div class="ad-container">
+                    <div class="bg-gray-100 border border-gray-200 rounded-lg p-4 min-h-[120px] flex items-center justify-center">
+                        <div class="text-gray-500">
+                            <i class="fas fa-ad text-2xl mb-2"></i>
+                            <p class="text-sm">Advertisement</p>
+                            <p class="text-xs mt-1">300x250 Banner Ad</p>
+                        </div>
+                    </div>
+                    <!-- Google AdSense Script -->
+                    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+                            crossorigin="anonymous"></script>
+                    <!-- Bottom Ad Unit -->
+                    <ins class="adsbygoogle"
+                         style="display:block"
+                         data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                         data-ad-slot="2222222222"
+                         data-ad-format="rectangle"
+                         data-full-width-responsive="true"></ins>
+                    <script>
+                         (adsbygoogle = window.adsbygoogle || []).push({});
+                    </script>
+                </div>
             </section>
+
+            <!-- URL Input Modal (hidden by default) -->
+            <div id="url-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                    <h3 class="text-lg font-semibold mb-4">Insert Image URL</h3>
+                    <input type="url" id="image-url-input" placeholder="https://example.com/image.jpg" class="w-full p-3 border border-gray-300 rounded-md mb-4">
+                    <div class="flex justify-end gap-3">
+                        <button id="cancel-url-btn" class="px-4 py-2 text-gray-600 hover:text-gray-800">Cancel</button>
+                        <button id="load-url-btn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md">Load Image</button>
+                    </div>
+                </div>
+            </div>
 
             <!-- Recent Images Section with animations -->
             <section id="history-section" class="hidden transition-all duration-300" data-aos="fade-up">
@@ -552,7 +653,11 @@
             const progressBar = document.getElementById('progress-bar');
             const spinner = document.getElementById('spinner');
             const removeBgBtn = document.getElementById('remove-bg-btn');
+            const downloadContainer = document.getElementById('download-container');
             const downloadBtn = document.getElementById('download-btn');
+            const downloadDropdown = document.getElementById('download-dropdown');
+            const downloadPreviewBtn = document.getElementById('download-preview-btn');
+            const downloadOriginalBtn = document.getElementById('download-original-btn');
             const compareBtn = document.getElementById('compare-btn');
             const uploadNewBtn = document.getElementById('upload-new-btn');
             const viewHistoryBtn = document.getElementById('view-history');
@@ -566,6 +671,16 @@
             const compareResult = document.getElementById('compare-result');
             const themeToggle = document.getElementById('theme-toggle');
             
+            // URL Modal Elements
+            const urlImageBtn = document.getElementById('url-image-btn');
+            const urlModal = document.getElementById('url-modal');
+            const imageUrlInput = document.getElementById('image-url-input');
+            const loadUrlBtn = document.getElementById('load-url-btn');
+            const cancelUrlBtn = document.getElementById('cancel-url-btn');
+            
+            // Paste Button Element
+            const pasteImageBtn = document.getElementById('paste-image-btn');
+            
             // Comparison slider elements
             const slider = document.querySelector('.img-compare-slider');
             const afterContainer = document.querySelector('.img-compare-after');
@@ -573,6 +688,7 @@
             let currentFileName = '';
             let currentOriginalUrl = '';
             let currentResultUrl = '';
+            let currentOriginalQualityUrl = ''; // Store original quality download URL
             let isSliderActive = false;
             
             // Initialize from session storage
@@ -688,8 +804,13 @@
                     compareResult.src = currentResultUrl;
                     
                     // Show the compare and download buttons
-                    downloadBtn.classList.remove('hidden');
+                    downloadContainer.classList.remove('hidden');
                     compareBtn.classList.remove('hidden');
+                    
+                    // Store the original quality URL if provided
+                    if (data.original_quality_url) {
+                        currentOriginalQualityUrl = data.original_quality_url;
+                    }
                     
                     // Hide processing indicator
                     processingIndicator.classList.add('hidden');
@@ -723,36 +844,86 @@
                 });
             });
 
-            // Update Download Button
-            downloadBtn.addEventListener('click', function() {
+            // Download Button Dropdown Toggle
+            downloadBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                downloadDropdown.classList.toggle('hidden');
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!downloadContainer.contains(e.target)) {
+                    downloadDropdown.classList.add('hidden');
+                }
+            });
+
+            // Download Preview Button
+            downloadPreviewBtn.addEventListener('click', function() {
+                downloadDropdown.classList.add('hidden');
+                
                 if (currentResultUrl) {
                     if (currentResultUrl.startsWith('data:')) {
                         // For base64 data
                         const link = document.createElement('a');
                         link.href = currentResultUrl;
-                        link.download = 'bg_removed_' + currentFileName;
+                        link.download = 'bg_removed_preview_' + currentFileName;
                         document.body.appendChild(link);
                         link.click();
                         document.body.removeChild(link);
                     } else {
                         // For URL path
-                        // Extract filename from URL
                         const filename = currentResultUrl.split('/').pop();
                         const downloadUrl = `/download/${filename}`;
                         
                         const link = document.createElement('a');
                         link.href = downloadUrl;
-                        link.download = 'bg_removed_' + currentFileName;
+                        link.download = 'bg_removed_preview_' + currentFileName;
                         document.body.appendChild(link);
                         link.click();
                         document.body.removeChild(link);
                     }
                     
-                    // Add bounce animation to button for feedback
-                    downloadBtn.classList.add('animate-bounce');
+                    // Visual feedback
+                    downloadPreviewBtn.innerHTML = '<i class="fas fa-check mr-2 text-blue-600"></i><div><div class="font-medium">Downloaded!</div><div class="text-xs text-gray-500">Preview version</div></div>';
                     setTimeout(() => {
-                        downloadBtn.classList.remove('animate-bounce');
-                    }, 1000);
+                        downloadPreviewBtn.innerHTML = '<i class="fas fa-image mr-2 text-blue-600"></i><div><div class="font-medium">Download Preview</div><div class="text-xs text-gray-500">Compressed for quick download</div></div>';
+                    }, 2000);
+                }
+            });
+
+            // Download Original Quality Button
+            downloadOriginalBtn.addEventListener('click', function() {
+                downloadDropdown.classList.add('hidden');
+                
+                if (currentOriginalQualityUrl || currentResultUrl) {
+                    const downloadUrl = currentOriginalQualityUrl || currentResultUrl;
+                    
+                    if (downloadUrl.startsWith('data:')) {
+                        // For base64 data
+                        const link = document.createElement('a');
+                        link.href = downloadUrl;
+                        link.download = 'bg_removed_original_' + currentFileName;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    } else {
+                        // For URL path - request original quality
+                        const filename = downloadUrl.split('/').pop();
+                        const originalDownloadUrl = `/download/original/${filename}`;
+                        
+                        const link = document.createElement('a');
+                        link.href = originalDownloadUrl;
+                        link.download = 'bg_removed_original_' + currentFileName;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    }
+                    
+                    // Visual feedback
+                    downloadOriginalBtn.innerHTML = '<i class="fas fa-check mr-2 text-green-600"></i><div><div class="font-medium">Downloaded!</div><div class="text-xs text-gray-500">Original quality</div></div>';
+                    setTimeout(() => {
+                        downloadOriginalBtn.innerHTML = '<i class="fas fa-hdd mr-2 text-green-600"></i><div><div class="font-medium">Download Original Quality</div><div class="text-xs text-gray-500">Full resolution, larger file</div></div>';
+                    }, 2000);
                 }
             });
             
@@ -840,7 +1011,7 @@ if (uploadedImage && uploadedImageName) {
                     
                     // Hide result container until processing is complete
                     resultContainer.classList.add('hidden');
-                    downloadBtn.classList.add('hidden');
+                    downloadContainer.classList.add('hidden'); // This line should be downloadBtn -> downloadContainer
                     compareBtn.classList.add('hidden');
                     processingIndicator.classList.add('hidden');
                     
@@ -864,10 +1035,28 @@ if (uploadedImage && uploadedImageName) {
                 currentFileName = '';
                 currentOriginalUrl = '';
                 currentResultUrl = '';
+                currentOriginalQualityUrl = '';
+                
+                // Hide download container and close dropdown
+                downloadContainer.classList.add('hidden');
+                downloadDropdown.classList.add('hidden');
                 
                 // Reset comparison view
                 standardPreview.classList.remove('hidden');
                 comparisonPreview.classList.add('hidden');
+                
+                // Close URL modal if open
+                urlModal.classList.add('hidden');
+                imageUrlInput.value = '';
+                
+                // Reset button states
+                if (loadUrlBtn) {
+                    loadUrlBtn.innerHTML = '<i class="fas fa-link mr-2"></i> Load Image';
+                    loadUrlBtn.disabled = false;
+                }
+                if (pasteImageBtn) {
+                    pasteImageBtn.innerHTML = '<i class="fas fa-paste mr-2"></i> Paste Image';
+                }
             }
 
             // Session Storage Functions
@@ -1004,7 +1193,7 @@ if (uploadedImage && uploadedImageName) {
                         dropText.classList.add('hidden');
                         previewContainer.classList.remove('hidden');
                         resultContainer.classList.remove('hidden');
-                        downloadBtn.classList.remove('hidden');
+                        downloadContainer.classList.remove('hidden'); // Fixed: was downloadBtn
                         compareBtn.classList.remove('hidden');
                         
                         // Reset to standard view
@@ -1101,67 +1290,214 @@ if (uploadedImage && uploadedImageName) {
                 });
             }
             
-            // Create confetti effect
-            function createConfetti() {
-                const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
-                
-                for (let i = 0; i < 100; i++) {
-                    const confetti = document.createElement('div');
-                    confetti.className = 'confetti';
-                    confetti.style.left = Math.random() * 100 + 'vw';
-                    confetti.style.animationDelay = Math.random() * 5 + 's';
-                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                    confetti.style.width = Math.random() * 10 + 5 + 'px';
-                    confetti.style.height = Math.random() * 10 + 5 + 'px';
-                    document.body.appendChild(confetti);
-                    
-                    // Remove after animation completes
-                    setTimeout(() => {
-                        document.body.removeChild(confetti);
-                    }, 6000);
+            // URL Image Button
+            urlImageBtn.addEventListener('click', function() {
+                urlModal.classList.remove('hidden');
+                imageUrlInput.focus();
+            });
+
+            // Cancel URL Button
+            cancelUrlBtn.addEventListener('click', function() {
+                urlModal.classList.add('hidden');
+                imageUrlInput.value = '';
+            });
+
+            // Load URL Button
+            loadUrlBtn.addEventListener('click', function() {
+                const imageUrl = imageUrlInput.value.trim();
+                if (!imageUrl) {
+                    alert('Please enter a valid image URL');
+                    return;
                 }
-            }
+
+                // Show loading state
+                loadUrlBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Loading...';
+                loadUrlBtn.disabled = true;
+
+                // Create a new image to test if URL is valid
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                
+                img.onload = function() {
+                    // Create canvas to convert to base64
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                    
+                    // Get base64 data
+                    const dataURL = canvas.toDataURL('image/png');
+                    
+                    // Extract filename from URL or create one
+                    const urlParts = imageUrl.split('/');
+                    const filename = urlParts[urlParts.length - 1] || 'image-from-url.png';
+                    
+                    // Set current values
+                    currentFileName = filename;
+                    currentOriginalUrl = dataURL;
+                    
+                    // Display preview
+                    originalPreview.src = dataURL;
+                    dropText.classList.add('hidden');
+                    previewContainer.classList.remove('hidden');
+                    originalPreview.parentNode.classList.remove('hidden');
+                    
+                    // Hide result container until processing
+                    resultContainer.classList.add('hidden');
+                    downloadContainer.classList.add('hidden');
+                    compareBtn.classList.add('hidden');
+                    processingIndicator.classList.add('hidden');
+                    
+                    // Reset comparison view
+                    standardPreview.classList.remove('hidden');
+                    comparisonPreview.classList.add('hidden');
+                    compareBtn.innerHTML = '<i class="fas fa-exchange-alt mr-2"></i> Compare';
+                    
+                    // Close modal
+                    urlModal.classList.add('hidden');
+                    imageUrlInput.value = '';
+                    
+                    // Create fake file for form submission
+                    fetch(dataURL)
+                        .then(res => res.blob())
+                        .then(blob => {
+                            const file = new File([blob], filename, { type: 'image/png' });
+                            const dataTransfer = new DataTransfer();
+                            dataTransfer.items.add(file);
+                            fileInput.files = dataTransfer.files;
+                        });
+                };
+                
+                img.onerror = function() {
+                    alert('Failed to load image from URL. Please check the URL and try again.');
+                    loadUrlBtn.innerHTML = '<i class="fas fa-link mr-2"></i> Load Image';
+                    loadUrlBtn.disabled = false;
+                };
+                
+                img.src = imageUrl;
+            });
+
+            // Close modal when clicking outside
+            urlModal.addEventListener('click', function(e) {
+                if (e.target === urlModal) {
+                    urlModal.classList.add('hidden');
+                    imageUrlInput.value = '';
+                }
+            });
+
+            // Enter key in URL input
+            imageUrlInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    loadUrlBtn.click();
+                }
+            });
+
+            // Paste Image Button
+            pasteImageBtn.addEventListener('click', async function() {
+                try {
+                    const clipboardItems = await navigator.clipboard.read();
+                    
+                    for (const clipboardItem of clipboardItems) {
+                        for (const type of clipboardItem.types) {
+                            if (type.startsWith('image/')) {
+                                const blob = await clipboardItem.getType(type);
+                                
+                                // Create file from blob
+                                const filename = 'pasted-image.' + type.split('/')[1];
+                                const file = new File([blob], filename, { type: type });
+                                
+                                // Set up file input
+                                const dataTransfer = new DataTransfer();
+                                dataTransfer.items.add(file);
+                                fileInput.files = dataTransfer.files;
+                                
+                                // Handle the file
+                                handleFileSelection(file);
+                                
+                                // Visual feedback
+                                pasteImageBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Image Pasted!';
+                                setTimeout(() => {
+                                    pasteImageBtn.innerHTML = '<i class="fas fa-paste mr-2"></i> Paste Image';
+                                }, 2000);
+                                
+                                return;
+                            }
+                        }
+                    }
+                    
+                    alert('No image found in clipboard. Please copy an image first.');
+                    
+                } catch (error) {
+                    console.error('Failed to read clipboard:', error);
+                    alert('Failed to paste image. Please make sure you have copied an image to your clipboard and try again.');
+                }
+            });
         });
         
-        // Function to create pixel animation
-function createPixelAnimation(container, width, height) {
-    // Calculate number of pixels based on size
-    const pixelSize = 10; // Size of each pixel in pixels
-    const columns = Math.ceil(width / pixelSize);
-    const rows = Math.ceil(height / pixelSize);
-    
-    // Color variations for pixels
-    const colors = ['#3b82f6', '#60a5fa', '#93c5fd', '#2563eb'];
-    
-    // Clear previous pixels if any
-    container.innerHTML = '';
-    
-    // Create and animate pixels
-    for (let i = 0; i < rows; i++) {
-        for (let j = 0; j < columns; j++) {
-            const pixel = document.createElement('div');
-            pixel.className = 'pixel';
-            pixel.style.width = pixelSize + 'px';
-            pixel.style.height = pixelSize + 'px';
-            pixel.style.top = (i * pixelSize) + 'px';
-            pixel.style.left = (j * pixelSize) + 'px';
-            pixel.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        // Function to create confetti effect
+        function createConfetti() {
+            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7', '#dda0dd', '#98d8c8'];
+            const confettiCount = 50;
             
-            // Randomize animation delay for better effect
-            const delay = Math.random() * 2; // Random delay up to 2 seconds
-            pixel.style.animationDelay = delay + 's';
-            
-            // Randomize animation duration for better effect
-            const duration = 0.5 + Math.random() * 1.5; // Between 0.5 and 2 seconds
-            pixel.style.animationDuration = duration + 's';
-            
-            // Make animation repeat
-            pixel.style.animationIterationCount = 'infinite';
-            
-            container.appendChild(pixel);
+            for (let i = 0; i < confettiCount; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDelay = Math.random() * 3 + 's';
+                confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                
+                document.body.appendChild(confetti);
+                
+                // Remove confetti element after animation
+                setTimeout(() => {
+                    if (document.body.contains(confetti)) {
+                        document.body.removeChild(confetti);
+                    }
+                }, 5000);
+            }
         }
-    }
-}
+        
+        // Function to create pixel animation
+        function createPixelAnimation(container, width, height) {
+            // Calculate number of pixels based on size
+            const pixelSize = 10; // Size of each pixel in pixels
+            const columns = Math.ceil(width / pixelSize);
+            const rows = Math.ceil(height / pixelSize);
+            
+            // Color variations for pixels
+            const colors = ['#3b82f6', '#60a5fa', '#93c5fd', '#2563eb'];
+            
+            // Clear previous pixels if any
+            container.innerHTML = '';
+            
+            // Create and animate pixels
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < columns; j++) {
+                    const pixel = document.createElement('div');
+                    pixel.className = 'pixel';
+                    pixel.style.width = pixelSize + 'px';
+                    pixel.style.height = pixelSize + 'px';
+                    pixel.style.top = (i * pixelSize) + 'px';
+                    pixel.style.left = (j * pixelSize) + 'px';
+                    pixel.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    
+                    // Randomize animation delay for better effect
+                    const delay = Math.random() * 2; // Random delay up to 2 seconds
+                    pixel.style.animationDelay = delay + 's';
+                    
+                    // Randomize animation duration for better effect
+                    const duration = 0.5 + Math.random() * 1.5; // Between 0.5 and 2 seconds
+                    pixel.style.animationDuration = duration + 's';
+                    
+                    // Make animation repeat
+                    pixel.style.animationIterationCount = 'infinite';
+                    
+                    container.appendChild(pixel);
+                }
+            }
+        }
     </script>
 </body>
 
