@@ -199,6 +199,29 @@
                         <!-- Decorative elements -->
                         <div class="wiggle"></div>
                         
+                        <!-- Advertisement Space - Above Upload -->
+                        <div class="ad-container mb-4 text-center">
+                            <div class="bg-gray-100 border border-gray-200 rounded-lg p-4 min-h-[100px] flex items-center justify-center">
+                                <div class="text-gray-500">
+                                    <i class="fas fa-ad text-2xl mb-2"></i>
+                                    <p class="text-sm">Advertisement</p>
+                                </div>
+                            </div>
+                            <!-- Demo Google AdSense Script -->
+                            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+                                    crossorigin="anonymous"></script>
+                            <!-- Top Ad Unit -->
+                            <ins class="adsbygoogle"
+                                 style="display:block"
+                                 data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                                 data-ad-slot="1234567890"
+                                 data-ad-format="auto"
+                                 data-full-width-responsive="true"></ins>
+                            <script>
+                                 (adsbygoogle = window.adsbygoogle || []).push({});
+                            </script>
+                        </div>
+                        
                         <!-- Upload zone -->
                         <div class="upload-zone bg-gray-50 rounded-xl p-6 text-center relative">
                             <input type="file" id="file-upload" class="hidden" accept="image/*">
@@ -219,23 +242,28 @@
                             </p>
                         </div>
                         
-                        <!-- Sample images section 
-                        <div class="mt-4 text-center">
-                            <p class="text-sm text-gray-500">No image? Try one of these:</p>
-                            <div class="flex justify-center mt-2 space-x-3">
-                                <div class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden cursor-pointer sample-image">
-                                    <img src="{{ url_for('static', filename='images/samples/sample1.jpg') }}" alt="Sample 1" class="w-full h-full object-cover">
+                        <!-- Advertisement Space - Below Upload Button -->
+                        <div class="ad-container mt-4 text-center">
+                            <div class="bg-gray-100 border border-gray-200 rounded-lg p-4 min-h-[120px] flex items-center justify-center">
+                                <div class="text-gray-500">
+                                    <i class="fas fa-bullhorn text-2xl mb-2"></i>
+                                    <p class="text-sm">Sponsored Content</p>
+                                    <p class="text-xs mt-1">Your ad could be here!</p>
                                 </div>
-                                <div class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden cursor-pointer sample-image">
-                                    <img src="{{ url_for('static', filename='images/samples/sample2.jpg') }}" alt="Sample 2" class="w-full h-full object-cover">
-                                </div>
-                                <div class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden cursor-pointer sample-image">
-                                    <img src="{{ url_for('static', filename='images/samples/sample3.jpg') }}" alt="Sample 3" class="w-full h-full object-cover">
-                                </div>
-                                <div class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden cursor-pointer sample-image">
-                                    <img src="{{ url_for('static', filename='images/samples/sample4.jpg') }}" alt="Sample 4" class="w-full h-full object-cover">
-                                </div>
-                            </div> -->
+                            </div>
+                            <!-- Demo Banner Ad Script -->
+                            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+                                    crossorigin="anonymous"></script>
+                            <!-- Bottom Ad Unit -->
+                            <ins class="adsbygoogle"
+                                 style="display:block"
+                                 data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                                 data-ad-slot="0987654321"
+                                 data-ad-format="rectangle"
+                                 data-full-width-responsive="true"></ins>
+                            <script>
+                                 (adsbygoogle = window.adsbygoogle || []).push({});
+                            </script>
                         </div>
                     </div>
                 </div>
