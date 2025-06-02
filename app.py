@@ -206,6 +206,16 @@ def download_file(filename):
     response.headers["Expires"] = "0"
     return response
 
+@app.route('/taskpage1.html')
+def taskpage1():
+    """Render the download preview page"""
+    return render_template('taskpage1.html')
+
+@app.route('/taskpage2.html')
+def taskpage2():
+    """Render the original quality download page"""
+    return render_template('taskpage2.html')
+
 @app.errorhandler(413)
 def request_entity_too_large(error):
     """Handle file size too large errors"""
