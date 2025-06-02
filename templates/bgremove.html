@@ -112,6 +112,8 @@
             position: relative;
             overflow: hidden;
             transition: all 0.3s ease;
+            z-index: 20;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
         }
         
         .btn::after {
@@ -373,6 +375,43 @@
                 margin-left: 0.25rem;
             }
         }
+        
+        /* Ensure buttons stand out against ads */
+        .btn {
+            position: relative;
+            z-index: 20;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+        
+        .btn:hover {
+            box-shadow: 0 7px 14px rgba(0, 0, 0, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
+            transform: translateY(-1px);
+        }
+        
+        /* Make upload container stand out */
+        .drop-zone {
+            position: relative;
+            z-index: 15;
+            background-color: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(5px);
+        }
+        
+        /* Add space at the bottom to accommodate the second ad */
+        section.mb-12 {
+            padding-bottom: 150px;
+            margin-bottom: 3rem;
+        }
+        
+        /* Ensure ad containers don't interfere with interaction */
+        .ad-container {
+            pointer-events: none;
+            z-index: 5;
+        }
+        
+        .ad-container ins,
+        .ad-container script {
+            pointer-events: auto;
+        }
     </style>
 </head>
 
@@ -421,41 +460,43 @@
                 </div>
             </section>
 
-            <!-- Upload Section with enhanced animations -->
-            <section class="mb-12" data-aos="fade-up" data-aos-delay="200">
-                <!-- Upload Button -->
-                <div class="mb-6 text-center">
-                    <label for="image" class="btn bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-md cursor-pointer transition-all">
-                        <i class="fas fa-upload mr-2"></i> Upload Image
-                    </label>
-                    <input type="file" id="image" name="image" accept="image/*" class="hidden">
-                </div>
-                
-                <!-- Advertisement Space - Under Upload Button -->
-                <div class="ad-container mb-6">
-                    <div class="bg-gray-100 border border-gray-200 rounded-lg p-4 min-h-[120px] flex items-center justify-center">
-                        <div class="text-gray-500">
-                            <i class="fas fa-ad text-2xl mb-2"></i>
-                            <p class="text-sm">Advertisement</p>
-                            <p class="text-xs mt-1">300x250 Banner Ad</p>
+            <!-- Update the Upload Section -->
+            <section class="mb-12 relative" data-aos="fade-up" data-aos-delay="200">
+                <!-- Button Container with Ad Background -->
+                <div class="relative mb-6">
+                    <!-- Advertisement Space - Behind Upload Button -->
+                    <div class="ad-container absolute inset-0 w-full h-full">
+                        <div class="bg-gray-100 border border-gray-200 rounded-lg p-4 h-full flex items-center justify-center">
+                            <div class="text-gray-500 text-center">
+                                <i class="fas fa-ad text-3xl mb-2"></i>
+                                <p class="text-sm">Advertisement</p>
+                                <p class="text-xs mt-1">Button Background Ad</p>
+                            </div>
                         </div>
+                        <!-- Google AdSense Script -->
+                        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+                                crossorigin="anonymous"></script>
+                        <ins class="adsbygoogle"
+                             style="display:block;position:absolute;top:0;left:0;width:100%;height:100%;"
+                             data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                             data-ad-slot="1111111111"
+                             data-ad-format="auto"
+                             data-full-width-responsive="true"></ins>
+                        <script>
+                             (adsbygoogle = window.adsbygoogle || []).push({});
+                        </script>
                     </div>
-                    <!-- Google AdSense Script -->
-                    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
-                            crossorigin="anonymous"></script>
-                    <!-- Top Ad Unit -->
-                    <ins class="adsbygoogle"
-                         style="display:block"
-                         data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-                         data-ad-slot="1111111111"
-                         data-ad-format="rectangle"
-                         data-full-width-responsive="true"></ins>
-                    <script>
-                         (adsbygoogle = window.adsbygoogle || []).push({});
-                    </script>
+                    
+                    <!-- Upload Button - On top of ad -->
+                    <div class="text-center relative z-20 py-8">
+                        <label for="image" class="btn bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-md cursor-pointer transition-all shadow-lg">
+                            <i class="fas fa-upload mr-2"></i> Upload Image
+                        </label>
+                        <input type="file" id="image" name="image" accept="image/*" class="hidden">
+                    </div>
                 </div>
                 
-                <!-- Upload Container - Drag & Drop Area -->
+                <!-- Upload Container - Drag & Drop Area (NO AD BACKGROUND) -->
                 <div id="upload-container" class="drop-zone rounded-lg p-10 text-center bg-white shadow-md transition-all duration-300 mb-6">
                     <div id="drop-text" class="transition-all duration-300">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400 mb-4 pulse-effect" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -513,8 +554,8 @@
                                     <i class="fas fa-chevron-down ml-2 text-xs"></i>
                                 </button>
                                 
-                                <!-- Dropdown Menu -->
-                                <div id="download-dropdown" class="hidden absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-10 min-w-full">
+                                <!-- Dropdown Menu - Increased z-index -->
+                                <div id="download-dropdown" class="hidden absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-50 min-w-full">
                                     <button id="download-preview-btn" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors flex items-center">
                                         <i class="fas fa-image mr-2 text-blue-600"></i>
                                         <div>
@@ -542,40 +583,42 @@
                     </div>
                 </div>
 
-                <!-- Paste Button -->
-                <div class="mb-6 text-center">
-                    <div class="flex justify-center gap-4">
-                        <button id="paste-image-btn" class="btn bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-6 rounded-md transition-all">
-                            <i class="fas fa-paste mr-2"></i> Paste Image
-                        </button>
-                        <button id="url-image-btn" class="btn bg-orange-600 hover:bg-orange-700 text-white font-medium py-2 px-6 rounded-md transition-all">
-                            <i class="fas fa-link mr-2"></i> Insert Image URL
-                        </button>
+                <!-- Paste Button Container with Ad Background -->
+                <div class="relative mb-6">
+                    <!-- Advertisement Space - Behind Paste Button -->
+                    <div class="ad-container absolute inset-0 w-full h-full">
+                        <div class="bg-gray-100 border border-gray-200 rounded-lg p-4 h-full flex items-center justify-center">
+                            <div class="text-gray-500 text-center">
+                                <i class="fas fa-ad text-3xl mb-2"></i>
+                                <p class="text-sm">Advertisement</p>
+                                <p class="text-xs mt-1">Button Background Ad</p>
+                            </div>
+                        </div>
+                        <!-- Google AdSense Script -->
+                        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+                                crossorigin="anonymous"></script>
+                        <ins class="adsbygoogle"
+                             style="display:block;position:absolute;top:0;left:0;width:100%;height:100%;"
+                             data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                             data-ad-slot="2222222222"
+                             data-ad-format="auto"
+                             data-full-width-responsive="true"></ins>
+                        <script>
+                             (adsbygoogle = window.adsbygoogle || []).push({});
+                        </script>
                     </div>
-                </div>
-                
-                <!-- Advertisement Space - Under Paste Button -->
-                <div class="ad-container">
-                    <div class="bg-gray-100 border border-gray-200 rounded-lg p-4 min-h-[120px] flex items-center justify-center">
-                        <div class="text-gray-500">
-                            <i class="fas fa-ad text-2xl mb-2"></i>
-                            <p class="text-sm">Advertisement</p>
-                            <p class="text-xs mt-1">300x250 Banner Ad</p>
+                    
+                    <!-- Paste Buttons - On top of ad -->
+                    <div class="text-center relative z-20 py-8">
+                        <div class="flex justify-center gap-4">
+                            <button id="paste-image-btn" class="btn bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-6 rounded-md transition-all shadow-lg">
+                                <i class="fas fa-paste mr-2"></i> Paste Image
+                            </button>
+                            <button id="url-image-btn" class="btn bg-orange-600 hover:bg-orange-700 text-white font-medium py-2 px-6 rounded-md transition-all shadow-lg">
+                                <i class="fas fa-link mr-2"></i> Insert Image URL
+                            </button>
                         </div>
                     </div>
-                    <!-- Google AdSense Script -->
-                    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
-                            crossorigin="anonymous"></script>
-                    <!-- Bottom Ad Unit -->
-                    <ins class="adsbygoogle"
-                         style="display:block"
-                         data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-                         data-ad-slot="2222222222"
-                         data-ad-format="rectangle"
-                         data-full-width-responsive="true"></ins>
-                    <script>
-                         (adsbygoogle = window.adsbygoogle || []).push({});
-                    </script>
                 </div>
             </section>
 
@@ -862,32 +905,13 @@
                 downloadDropdown.classList.add('hidden');
                 
                 if (currentResultUrl) {
-                    if (currentResultUrl.startsWith('data:')) {
-                        // For base64 data
-                        const link = document.createElement('a');
-                        link.href = currentResultUrl;
-                        link.download = 'bg_removed_preview_' + currentFileName;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                    } else {
-                        // For URL path
-                        const filename = currentResultUrl.split('/').pop();
-                        const downloadUrl = `/download/${filename}`;
-                        
-                        const link = document.createElement('a');
-                        link.href = downloadUrl;
-                        link.download = 'bg_removed_preview_' + currentFileName;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                    }
+                    // Store in localStorage instead of URL parameters
+                    localStorage.setItem('downloadImageData', currentResultUrl);
+                    localStorage.setItem('downloadFilename', 'bg_removed_preview_' + currentFileName);
+                    localStorage.setItem('downloadType', 'preview');
                     
-                    // Visual feedback
-                    downloadPreviewBtn.innerHTML = '<i class="fas fa-check mr-2 text-blue-600"></i><div><div class="font-medium">Downloaded!</div><div class="text-xs text-gray-500">Preview version</div></div>';
-                    setTimeout(() => {
-                        downloadPreviewBtn.innerHTML = '<i class="fas fa-image mr-2 text-blue-600"></i><div><div class="font-medium">Download Preview</div><div class="text-xs text-gray-500">Compressed for quick download</div></div>';
-                    }, 2000);
+                    // Navigate without the long parameters
+                    window.location.href = `/taskpage1.html`;
                 }
             });
 
@@ -896,34 +920,14 @@
                 downloadDropdown.classList.add('hidden');
                 
                 if (currentOriginalQualityUrl || currentResultUrl) {
+                    // Store in localStorage instead of URL parameters
                     const downloadUrl = currentOriginalQualityUrl || currentResultUrl;
+                    localStorage.setItem('downloadImageData', downloadUrl);
+                    localStorage.setItem('downloadFilename', 'bg_removed_original_' + currentFileName);
+                    localStorage.setItem('downloadType', 'original');
                     
-                    if (downloadUrl.startsWith('data:')) {
-                        // For base64 data
-                        const link = document.createElement('a');
-                        link.href = downloadUrl;
-                        link.download = 'bg_removed_original_' + currentFileName;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                    } else {
-                        // For URL path - request original quality
-                        const filename = downloadUrl.split('/').pop();
-                        const originalDownloadUrl = `/download/original/${filename}`;
-                        
-                        const link = document.createElement('a');
-                        link.href = originalDownloadUrl;
-                        link.download = 'bg_removed_original_' + currentFileName;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                    }
-                    
-                    // Visual feedback
-                    downloadOriginalBtn.innerHTML = '<i class="fas fa-check mr-2 text-green-600"></i><div><div class="font-medium">Downloaded!</div><div class="text-xs text-gray-500">Original quality</div></div>';
-                    setTimeout(() => {
-                        downloadOriginalBtn.innerHTML = '<i class="fas fa-hdd mr-2 text-green-600"></i><div><div class="font-medium">Download Original Quality</div><div class="text-xs text-gray-500">Full resolution, larger file</div></div>';
-                    }, 2000);
+                    // Navigate without the long parameters
+                    window.location.href = `/taskpage2.html`;  // Add this line that was missing
                 }
             });
             
