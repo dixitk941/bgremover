@@ -112,8 +112,8 @@
             position: relative;
             overflow: hidden;
             transition: all 0.3s ease;
-            z-index: 20;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+            z-index: 30;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2), 0 2px 5px rgba(0, 0, 0, 0.1);
         }
         
         .btn::after {
@@ -379,13 +379,8 @@
         /* Ensure buttons stand out against ads */
         .btn {
             position: relative;
-            z-index: 20;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
-        }
-        
-        .btn:hover {
-            box-shadow: 0 7px 14px rgba(0, 0, 0, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
-            transform: translateY(-1px);
+            z-index: 30;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2), 0 2px 5px rgba(0, 0, 0, 0.1);
         }
         
         /* Make upload container stand out */
@@ -412,6 +407,20 @@
         .ad-container script {
             pointer-events: auto;
         }
+        
+        .history-container::-webkit-scrollbar {
+            height: 4px;
+        }
+        .history-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .history-container::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        .history-container::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
     </style>
 </head>
 
@@ -436,6 +445,11 @@
             </div>
         </div>
     </header>
+
+    <!-- Add History Bar Container -->
+    <div class="history-container hidden flex overflow-x-auto py-4 gap-3 mb-4 container mx-auto px-4" style="scrollbar-width: thin;">
+        <!-- History thumbnails will be added here by JavaScript -->
+    </div>
 
     <!-- Main Content -->
     <main class="container mx-auto px-4 py-8">
@@ -614,9 +628,9 @@
                             <button id="paste-image-btn" class="btn bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-6 rounded-md transition-all shadow-lg">
                                 <i class="fas fa-paste mr-2"></i> Paste Image
                             </button>
-                            <button id="url-image-btn" class="btn bg-orange-600 hover:bg-orange-700 text-white font-medium py-2 px-6 rounded-md transition-all shadow-lg">
-                                <i class="fas fa-link mr-2"></i> Insert Image URL
-                            </button>
+                           <button id="url-image-btn" class="btn bg-orange-600 hover:bg-orange-700 text-white font-medium py-2 px-6 rounded-md transition-all shadow-lg relative z-30">
+    <i class="fas fa-link mr-2"></i> Insert Image URL
+</button>
                         </div>
                     </div>
                 </div>
@@ -734,9 +748,21 @@
             let currentOriginalQualityUrl = ''; // Store original quality download URL
             let isSliderActive = false;
             
+            // Define these variables properly
+            const heroSection = document.querySelector('section.text-center.mb-10');
+            const historyContainer = document.querySelector('.history-container');
+            
             // Initialize from session storage
             loadHistory();
             initializeTheme();
+            
+            // Initialize history bar on page load if there's history
+            const history = JSON.parse(sessionStorage.getItem('bgRemoverHistory') || '[]');
+            if (history.length > 0) {
+                if (heroSection) heroSection.classList.add('hidden');
+                if (historyContainer) historyContainer.classList.remove('hidden');
+                updateHistoryBar(history);
+            }
             
             // Theme toggle
             themeToggle.addEventListener('change', function() {
@@ -997,7 +1023,7 @@ if (uploadedImage && uploadedImageName) {
         });
 }
 
-            // Handle file selection
+            // Update the handleFileSelection function
             function handleFileSelection(file) {
                 if (!file || !file.type.match('image.*')) return;
                 
@@ -1005,6 +1031,17 @@ if (uploadedImage && uploadedImageName) {
                 const reader = new FileReader();
                 
                 reader.onload = function(e) {
+                    const heroSection = document.querySelector('section.text-center.mb-10');
+                    const historyContainer = document.querySelector('.history-container');
+                    
+                    // Hide hero section and show history bar
+                    if (heroSection) {
+                        heroSection.classList.add('hidden');
+                    }
+                    if (historyContainer) {
+                        historyContainer.classList.remove('hidden');
+                    }
+                    
                     currentOriginalUrl = e.target.result;
                     originalPreview.src = currentOriginalUrl;
                     dropText.classList.add('hidden');
@@ -1015,7 +1052,7 @@ if (uploadedImage && uploadedImageName) {
                     
                     // Hide result container until processing is complete
                     resultContainer.classList.add('hidden');
-                    downloadContainer.classList.add('hidden'); // This line should be downloadBtn -> downloadContainer
+                    downloadContainer.classList.add('hidden');
                     compareBtn.classList.add('hidden');
                     processingIndicator.classList.add('hidden');
                     
@@ -1040,6 +1077,13 @@ if (uploadedImage && uploadedImageName) {
                 currentOriginalUrl = '';
                 currentResultUrl = '';
                 currentOriginalQualityUrl = '';
+                
+                // Show hero section if no history
+                const history = JSON.parse(sessionStorage.getItem('bgRemoverHistory') || '[]');
+                if (history.length === 0 && heroSection) {
+                    heroSection.classList.remove('hidden');
+                    historyContainer.classList.add('hidden');
+                }
                 
                 // Hide download container and close dropdown
                 downloadContainer.classList.add('hidden');
@@ -1066,6 +1110,8 @@ if (uploadedImage && uploadedImageName) {
             // Session Storage Functions
             function saveToHistory(filename, originalUrl, resultUrl, downloadFilename) {
                 const history = JSON.parse(sessionStorage.getItem('bgRemoverHistory') || '[]');
+                const historyContainer = document.querySelector('.history-container');
+                const heroSection = document.querySelector('section.text-center.mb-10');
                 
                 // Check if already exists and remove it
                 const filtered = history.filter(item => item.filename !== filename);
@@ -1085,9 +1131,86 @@ if (uploadedImage && uploadedImageName) {
                 sessionStorage.setItem('bgRemoverHistory', JSON.stringify(limitedHistory));
                 
                 // Update history display if visible
-                if (!historySection.classList.contains('hidden')) {
+                if (document.getElementById('history-section') && 
+                    !document.getElementById('history-section').classList.contains('hidden')) {
                     loadHistory();
                 }
+                
+                // Update the horizontal history bar if it exists
+                if (historyContainer) {
+                    updateHistoryBar(limitedHistory);
+                    
+                    // Show the history bar and hide the hero text after first upload
+                    if (heroSection && limitedHistory.length > 0) {
+                        heroSection.classList.add('hidden');
+                        historyContainer.classList.remove('hidden');
+                    }
+                }
+            }
+
+            // Function to update the horizontal history bar
+            function updateHistoryBar(history) {
+                historyContainer.innerHTML = '';
+                
+                history.forEach((item, index) => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = `history-thumbnail ${index === 0 ? 'border-2 border-blue-500' : 'border border-gray-300'} rounded-lg overflow-hidden cursor-pointer relative w-16 h-16 flex-shrink-0 transition-all hover:scale-110`;
+                    historyItem.title = item.filename;
+                    
+                    // Create the thumbnail
+                    const thumbnail = document.createElement('img');
+                    thumbnail.src = item.resultUrl;
+                    thumbnail.className = 'w-full h-full object-cover';
+                    thumbnail.alt = item.filename;
+                    
+                    historyItem.appendChild(thumbnail);
+                    historyContainer.appendChild(historyItem);
+                    
+                    // Add click event to switch to this image
+                    historyItem.addEventListener('click', function() {
+                        // Highlight the selected thumbnail
+                        document.querySelectorAll('.history-thumbnail').forEach(el => {
+                            el.classList.remove('border-2', 'border-blue-500');
+                            el.classList.add('border', 'border-gray-300');
+                        });
+                        this.classList.remove('border', 'border-gray-300');
+                        this.classList.add('border-2', 'border-blue-500');
+                        
+                        // Set the current image
+                        originalPreview.src = item.originalUrl;
+                        resultPreview.src = item.resultUrl;
+                        currentFileName = item.filename;
+                        currentOriginalUrl = item.originalUrl;
+                        currentResultUrl = item.resultUrl;
+                        
+                        // Setup comparison view
+                        compareOriginal.src = currentOriginalUrl;
+                        compareResult.src = currentResultUrl;
+                        
+                        // Update UI
+                        dropText.classList.add('hidden');
+                        previewContainer.classList.remove('hidden');
+                        resultContainer.classList.remove('hidden');
+                        downloadContainer.classList.remove('hidden');
+                        compareBtn.classList.remove('hidden');
+                        
+                        // Reset to standard view
+                        standardPreview.classList.remove('hidden');
+                        comparisonPreview.classList.add('hidden');
+                    });
+                });
+                
+                // Add "Upload New" button at the end
+                const uploadNewButton = document.createElement('div');
+                uploadNewButton.className = 'history-thumbnail border border-dashed border-blue-400 rounded-lg overflow-hidden cursor-pointer relative w-16 h-16 flex-shrink-0 transition-all hover:scale-110 bg-blue-50 flex items-center justify-center';
+                uploadNewButton.title = 'Upload New Image';
+                uploadNewButton.innerHTML = '<i class="fas fa-plus text-blue-500 text-xl"></i>';
+                historyContainer.appendChild(uploadNewButton);
+                
+                uploadNewButton.addEventListener('click', function() {
+                    resetUI();
+                    fileInput.click();
+                });
             }
 
             function loadHistory() {

@@ -6,6 +6,8 @@
     <title>Processing High Quality Download - BGRemover Pro</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Ad provider script (demo) -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-REPLACE-WITH-YOUR-ID" crossorigin="anonymous"></script>
     <style>
         @keyframes pulse {
             0% { transform: scale(1); }
@@ -89,6 +91,31 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+        
+        /* Ad container styles */
+        .ad-container {
+            width: 100%;
+            margin: 20px 0;
+            min-height: 90px;
+            background-color: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .ad-container.rectangle {
+            min-height: 250px;
+        }
+        
+        .ad-placeholder {
+            padding: 10px;
+            text-align: center;
+            color: #888;
+            font-size: 12px;
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col">
@@ -101,6 +128,20 @@
             <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Beta</span>
         </div>
     </header>
+
+    <!-- Top Banner Ad -->
+    <div class="ad-container">
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-REPLACE-WITH-YOUR-ID"
+             data-ad-slot="TOP-BANNER-SLOT"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+        <div class="ad-placeholder">Advertisement</div>
+    </div>
 
     <!-- Main Content -->
     <main class="container mx-auto px-4 py-12 flex-grow flex flex-col items-center justify-center">
@@ -120,6 +161,20 @@
                 <div class="mt-6 text-gray-500">
                     <p id="status-message">Processing high resolution version...</p>
                 </div>
+                
+                <!-- Mid-process Ad (Initially Hidden) -->
+                <div id="mid-process-ad" class="ad-container hidden mt-8">
+                    <ins class="adsbygoogle"
+                         style="display:block"
+                         data-ad-client="ca-pub-REPLACE-WITH-YOUR-ID"
+                         data-ad-slot="MID-PROCESS-SLOT"
+                         data-ad-format="auto"
+                         data-full-width-responsive="true"></ins>
+                    <script>
+                         (adsbygoogle = window.adsbygoogle || []).push({});
+                    </script>
+                    <div class="ad-placeholder">Advertisement</div>
+                </div>
             </div>
             
             <!-- Verification Section (Shown after initial processing) -->
@@ -133,6 +188,20 @@
                     
                     <div class="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
                         <p class="text-sm text-blue-700">Full resolution images retain all details and are perfect for professional use.</p>
+                    </div>
+                    
+                    <!-- Rectangle Verification Ad -->
+                    <div class="ad-container rectangle mb-6">
+                        <ins class="adsbygoogle"
+                             style="display:block"
+                             data-ad-client="ca-pub-REPLACE-WITH-YOUR-ID"
+                             data-ad-slot="VERIFICATION-SLOT"
+                             data-ad-format="rectangle"
+                             data-full-width-responsive="true"></ins>
+                        <script>
+                             (adsbygoogle = window.adsbygoogle || []).push({});
+                        </script>
+                        <div class="ad-placeholder">Advertisement</div>
                     </div>
                     
                     <button id="verify-btn" class="btn bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-8 rounded-md transition-all shadow-lg w-full flex justify-center items-center">
@@ -154,6 +223,20 @@
                         <!-- Image preview will be inserted here -->
                     </div>
                     
+                    <!-- Rectangle Download Ad -->
+                    <div class="ad-container rectangle mb-6">
+                        <ins class="adsbygoogle"
+                             style="display:block"
+                             data-ad-client="ca-pub-REPLACE-WITH-YOUR-ID"
+                             data-ad-slot="BEFORE-DOWNLOAD-SLOT"
+                             data-ad-format="rectangle"
+                             data-full-width-responsive="true"></ins>
+                        <script>
+                             (adsbygoogle = window.adsbygoogle || []).push({});
+                        </script>
+                        <div class="ad-placeholder">Advertisement</div>
+                    </div>
+                    
                     <button id="download-btn" class="btn bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-8 rounded-md transition-all shadow-lg w-full flex justify-center items-center">
                         <i class="fas fa-download mr-2"></i> Download Original Quality
                     </button>
@@ -161,6 +244,20 @@
                     <div class="mt-6 text-sm text-gray-500">
                         <p><i class="fas fa-info-circle mr-1"></i> Original quality for professional use</p>
                     </div>
+                </div>
+                
+                <!-- After Download Ad (Initially Hidden) -->
+                <div id="after-download-ad" class="ad-container rectangle mb-8 hidden">
+                    <ins class="adsbygoogle"
+                         style="display:block"
+                         data-ad-client="ca-pub-REPLACE-WITH-YOUR-ID"
+                         data-ad-slot="AFTER-DOWNLOAD-SLOT"
+                         data-ad-format="rectangle"
+                         data-full-width-responsive="true"></ins>
+                    <script>
+                         (adsbygoogle = window.adsbygoogle || []).push({});
+                    </script>
+                    <div class="ad-placeholder">Advertisement</div>
                 </div>
                 
                 <div class="mt-4">
@@ -172,6 +269,20 @@
         </div>
     </main>
 
+    <!-- Footer Ad -->
+    <div class="ad-container">
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-REPLACE-WITH-YOUR-ID"
+             data-ad-slot="FOOTER-SLOT"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+        <div class="ad-placeholder">Advertisement</div>
+    </div>
+
     <!-- Footer -->
     <footer class="py-6 bg-white border-t border-gray-200">
         <div class="container mx-auto px-4 text-center text-gray-500">
@@ -181,6 +292,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            console.log("DOM Content Loaded. Starting download flow...");
             // Get elements
             const progressBar = document.getElementById('progress-bar');
             const statusMessage = document.getElementById('status-message');
@@ -190,158 +302,407 @@
             const verifyBtn = document.getElementById('verify-btn');
             const downloadBtn = document.getElementById('download-btn');
             const imagePreviewContainer = document.getElementById('image-preview-container');
+            const midProcessAd = document.getElementById('mid-process-ad');
+            const afterDownloadAd = document.getElementById('after-download-ad');
             
-            // Get URL parameters
-            const urlParams = new URLSearchParams(window.location.search);
-            const imageUrl = urlParams.get('image');
-            const filename = urlParams.get('filename');
+            // Get the current step from sessionStorage - adding more steps
+            let currentStep = sessionStorage.getItem('downloadStep') || 'processing-start';
+            console.log("Current step:", currentStep);
             
-            if (!imageUrl) {
+            // Retrieve data from localStorage
+            const imageData = localStorage.getItem('downloadImageData');
+            const storedFilename = localStorage.getItem('downloadFilename');
+            const storedType = localStorage.getItem('downloadType');
+            
+            if (!imageData) {
+                console.log("No image data found, redirecting to /bgremove");
                 window.location.href = '/bgremove';
                 return;
             }
             
-            // First progress phase - up to 70%
-            let progress = 0;
-            const progressInterval = setInterval(() => {
-                progress += 3;
-                progressBar.style.width = progress + '%';
+            // Safety check - clear any stuck state
+            if (currentStep === 'processing-start' && sessionStorage.getItem('processingStartTime')) {
+                const startTime = parseInt(sessionStorage.getItem('processingStartTime'));
+                const currentTime = new Date().getTime();
                 
-                // Update status message based on progress
-                if (progress < 20) {
-                    statusMessage.textContent = "Processing high resolution version...";
-                } else if (progress < 40) {
-                    statusMessage.textContent = "Enhancing image details...";
-                } else if (progress < 60) {
-                    statusMessage.textContent = "Preserving transparency...";
+                // If stuck for more than 2 minutes, reset to start
+                if (currentTime - startTime > 120000) {
+                    console.log("Detected stuck state, resetting process");
+                    sessionStorage.removeItem('processingStartTime');
+                    sessionStorage.removeItem('downloadStep');
+                    window.location.reload();
+                    return;
                 }
-                
-                if (progress >= 70) {
-                    clearInterval(progressInterval);
-                    
-                    // Show verification section
-                    setTimeout(() => {
-                        processingSection.classList.add('hidden');
-                        verificationSection.classList.remove('hidden');
-                    }, 500);
-                }
-            }, 100);
+            }
             
-            // Verification button
-            verifyBtn.addEventListener('click', function() {
-                // Show loading state
-                verifyBtn.disabled = true;
-                verifyBtn.innerHTML = '<div class="loading-spinner mr-2"></div> Verifying...';
+            // Record start time for processing-start step
+            if (currentStep === 'processing-start') {
+                if (!sessionStorage.getItem('processingStartTime')) {
+                    sessionStorage.setItem('processingStartTime', new Date().getTime());
+                }
+            }
+            
+            // Handle different steps based on current state - breaking down into more steps
+            switch(currentStep) {
+                case 'processing-start':
+                    console.log("Starting initial processing phase");
+                    startInitialProcessing();
+                    break;
+                case 'processing-mid':
+                    console.log("Starting mid processing phase");
+                    startMidProcessing();
+                    break;
+                case 'processing-final':
+                    console.log("Starting final processing phase");
+                    startFinalProcessing();
+                    break;
+                case 'verify':
+                    console.log("Showing verification state");
+                    skipToVerificationState();
+                    break;
+                case 'verify-waiting':
+                    console.log("Showing verification waiting state");
+                    showVerificationWaiting();
+                    break;
+                case 'download-prepare':
+                    console.log("Showing download prepare state");
+                    showDownloadPrepare();
+                    break;
+                case 'download-activate':
+                    console.log("Showing download activation state");
+                    showDownloadActivate();
+                    break;
+                case 'download-ready':
+                    console.log("Showing download ready state");
+                    showDownloadReady();
+                    break;
+                case 'download-complete':
+                    console.log("Showing download complete state");
+                    showDownloadComplete();
+                    break;
+                default:
+                    console.log("Unknown state, resetting to processing-start");
+                    sessionStorage.setItem('downloadStep', 'processing-start');
+                    window.location.reload();
+                    break;
+            }
+            
+            function startInitialProcessing() {
+                // First progress phase - up to 35%
+                let progress = 0;
+                progressBar.style.width = progress + '%'; // Ensure initial value is set
                 
-                // Second progress phase - 70 to 100%
-                let secondProgress = 70;
-                const secondProgressInterval = setInterval(() => {
-                    secondProgress += 5;
-                    progressBar.style.width = secondProgress + '%';
+                const progressInterval = setInterval(() => {
+                    progress += 1; // Even slower progress for more ad exposure
+                    progressBar.style.width = progress + '%';
                     
-                    if (secondProgress >= 100) {
-                        clearInterval(secondProgressInterval);
-                        
-                        // Show download section
-                        setTimeout(() => {
-                            verificationSection.classList.add('hidden');
-                            downloadContainer.classList.remove('hidden');
-                            downloadContainer.classList.add('show');
-                            
-                            // Create confetti effect
-                            createConfetti();
-                            
-                            // Display image preview
-                            const img = document.createElement('img');
-                            img.src = decodeURIComponent(imageUrl);
-                            img.alt = 'High Quality Processed Image';
-                            img.className = 'max-h-64 mx-auto rounded border border-gray-200 shadow-sm';
-                            imagePreviewContainer.appendChild(img);
-                            
-                            // Scroll to the download button with animation
-                            setTimeout(() => {
-                                downloadBtn.scrollIntoView({ behavior: 'smooth' });
-                                
-                                // Add bounce animation to draw attention
-                                downloadBtn.classList.add('bounce-animation');
-                                setTimeout(() => {
-                                    downloadBtn.classList.remove('bounce-animation');
-                                }, 3000);
-                            }, 500);
-                        }, 500);
+                    // Update status message based on progress
+                    if (progress < 30) {
+                        statusMessage.textContent = "Processing high resolution version...";
+                    } else if (progress < 35) {
+                        statusMessage.textContent = "Initializing quality enhancement...";
                     }
-                }, 100);
-            });
+                    
+                    // When progress reaches 35%, reload to next phase
+                    if (progress >= 35) {
+                        console.log("Initial processing completed, moving to mid processing");
+                        clearInterval(progressInterval);
+                        sessionStorage.setItem('downloadStep', 'processing-mid');
+                        
+                        // Force reload for ad refreshes
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    }
+                }, 200);
+            }
             
-            // Download button
-            downloadBtn.addEventListener('click', function() {
-                // Create and trigger download
-                const link = document.createElement('a');
-                link.href = decodeURIComponent(imageUrl);
-                link.download = filename || 'bg_removed_original_quality.png';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+            function startMidProcessing() {
+                // Mid progress phase - 35% to 70%
+                let progress = 35;
+                progressBar.style.width = progress + '%'; // Ensure starting value is set
                 
-                // Visual feedback
-                downloadBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Downloaded Successfully!';
-                downloadBtn.classList.add('bg-green-700');
+                const progressInterval = setInterval(() => {
+                    progress += 1;
+                    progressBar.style.width = progress + '%';
+                    
+                    // Update status message based on progress
+                    if (progress < 50) {
+                        statusMessage.textContent = "Optimizing image quality...";
+                        // Show mid-process ad at this point
+                        midProcessAd.classList.remove('hidden');
+                    } else if (progress < 70) {
+                        statusMessage.textContent = "Finalizing your download...";
+                    }
+                    
+                    // When progress reaches 70%, reload to final processing phase
+                    if (progress >= 70) {
+                        console.log("Mid processing completed, moving to final processing");
+                        clearInterval(progressInterval);
+                        sessionStorage.setItem('downloadStep', 'processing-final');
+                        
+                        // Force reload for ad refreshes
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    }
+                }, 250);
+            }
+            
+            function startFinalProcessing() {
+                // Final progress phase - 70% to 100%
+                let progress = 70;
+                progressBar.style.width = progress + '%'; // Ensure starting value is set
                 
-                // Reset after delay
+                const progressInterval = setInterval(() => {
+                    progress += 1;
+                    progressBar.style.width = progress + '%';
+                    
+                    statusMessage.textContent = "Preparing original quality download...";
+                    
+                    // When progress reaches 100%, move to verification section
+                    if (progress >= 100) {
+                        console.log("Final processing completed, moving to verification");
+                        clearInterval(progressInterval);
+                        setTimeout(() => {
+                            // Move to verification step
+                            sessionStorage.setItem('downloadStep', 'verify');
+                            
+                            // Force reload for ad refreshes
+                            window.location.reload();
+                        }, 1000);
+                    }
+                }, 300);
+            }
+
+            function skipToVerificationState() {
+                // Hide processing, show verification
+                processingSection.classList.add('hidden');
+                verificationSection.classList.remove('hidden');
+            }
+            
+            function showVerificationWaiting() {
+                // Hide processing, show verification with waiting state
+                processingSection.classList.add('hidden');
+                verificationSection.classList.remove('hidden');
+                
+                // Disable button and show waiting
+                verifyBtn.disabled = true;
+                verifyBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Verifying...';
+                
+                // After 3 seconds, move to download prepare step (new step)
                 setTimeout(() => {
-                    downloadBtn.innerHTML = '<i class="fas fa-download mr-2"></i> Download Again';
-                    downloadBtn.classList.remove('bg-green-700');
-                }, 2000);
-            });
-        });
-        
-        // Function to create confetti effect
-        function createConfetti() {
-            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7', '#dda0dd', '#98d8c8'];
-            const confettiCount = 50;
+                    sessionStorage.setItem('downloadStep', 'download-prepare');
+                    window.location.reload();
+                }, 3000);
+            }
             
-            for (let i = 0; i < confettiCount; i++) {
+            function showDownloadPrepare() {
+                // Hide processing and verification
+                processingSection.classList.add('hidden');
+                verificationSection.classList.add('hidden');
+                
+                // Show download container with activation message
+                downloadContainer.classList.remove('hidden');
+                
+                // Replace normal download button with activation button
+                downloadBtn.innerHTML = '<i class="fas fa-lock mr-2"></i> Activate Download';
+                downloadBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                downloadBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                
+                // Modify the message
+                const titleElement = downloadContainer.querySelector('h2');
+                if (titleElement) {
+                    titleElement.textContent = "Premium Download Ready to Activate";
+                }
+                
+                // Change button behavior for this stage
+                downloadBtn.onclick = function() {
+                    // Move to activate stage
+                    sessionStorage.setItem('downloadStep', 'download-activate');
+                    window.location.reload();
+                };
+                
+                setTimeout(() => {
+                    downloadContainer.classList.add('show');
+                }, 100);
+            }
+            
+            function showDownloadActivate() {
+                // Hide processing and verification
+                processingSection.classList.add('hidden');
+                verificationSection.classList.add('hidden');
+                
+                // Show download container
+                downloadContainer.classList.remove('hidden');
+                
+                // Create activation loading state
+                const titleElement = downloadContainer.querySelector('h2');
+                if (titleElement) {
+                    titleElement.textContent = "Activating Your Download...";
+                }
+                
+                downloadBtn.disabled = true;
+                downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Activating...';
+                
+                // After 3 seconds, move to download ready
+                setTimeout(() => {
+                    sessionStorage.setItem('downloadStep', 'download-ready');
+                    window.location.reload();
+                }, 3000);
+                
+                setTimeout(() => {
+                    downloadContainer.classList.add('show');
+                }, 100);
+            }
+            
+            function showDownloadReady() {
+                // Hide processing and verification
+                processingSection.classList.add('hidden');
+                verificationSection.classList.add('hidden');
+                
+                // Show download container with final message
+                downloadContainer.classList.remove('hidden');
+                
+                // Restore normal download button style
+                downloadBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                downloadBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+                downloadBtn.innerHTML = '<i class="fas fa-download mr-2"></i> Download Original Quality';
+                downloadBtn.disabled = false;
+                
+                // Restore title
+                const titleElement = downloadContainer.querySelector('h2');
+                if (titleElement) {
+                    titleElement.textContent = "Premium Quality Download Ready!";
+                }
+                
+                // Add image preview
+                if (imageData) {
+                    const img = document.createElement('img');
+                    img.src = imageData;
+                    img.className = 'max-w-full h-auto rounded-lg shadow';
+                    imagePreviewContainer.innerHTML = '';
+                    imagePreviewContainer.appendChild(img);
+                }
+                
+                // Create confetti effect
+                createConfetti();
+                
+                // Change button behavior for final download
+                downloadBtn.onclick = function() {
+                    // Move to download complete
+                    sessionStorage.setItem('downloadStep', 'download-complete');
+                    
+                    // Create temporary link and trigger download
+                    const link = document.createElement('a');
+                    link.href = imageData;
+                    link.download = storedFilename || 'bgremover-image.' + (storedType || 'png');
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    // Show after-download ad
+                    afterDownloadAd.classList.remove('hidden');
+                    
+                    // Update button state
+                    downloadBtn.disabled = true;
+                    downloadBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Downloaded!';
+                    
+                    // Reload after short delay for final ad view
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                };
+                
+                setTimeout(() => {
+                    downloadContainer.classList.add('show');
+                    
+                    // Auto-scroll to bottom after a delay
+                    setTimeout(() => {
+                        window.scrollTo({
+                            top: document.body.scrollHeight,
+                            behavior: 'smooth'
+                        });
+                    }, 1500);
+                }, 100);
+            }
+            
+            function showDownloadComplete() {
+                // Hide processing and verification
+                processingSection.classList.add('hidden');
+                verificationSection.classList.add('hidden');
+                
+                // Show download container
+                downloadContainer.classList.remove('hidden');
+                downloadContainer.classList.add('show');
+                
+                // Show downloaded state
+                downloadBtn.innerHTML = '<i class="fas fa-download mr-2"></i> Download Again';
+                downloadBtn.disabled = false;
+                
+                // Add image preview if not already there
+                if (imageData && imagePreviewContainer.innerHTML === '') {
+                    const img = document.createElement('img');
+                    img.src = imageData;
+                    img.className = 'max-w-full h-auto rounded-lg shadow';
+                    imagePreviewContainer.appendChild(img);
+                }
+                
+                // Show after-download ad
+                afterDownloadAd.classList.remove('hidden');
+                
+                // Reset button to allow downloading again
+                downloadBtn.onclick = function() {
+                    // Create temporary link and trigger download
+                    const link = document.createElement('a');
+                    link.href = imageData;
+                    link.download = storedFilename || 'bgremover-image.' + (storedType || 'png');
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    // Briefly show downloading state
+                    downloadBtn.disabled = true;
+                    downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Downloading...';
+                    setTimeout(() => {
+                        downloadBtn.disabled = false;
+                        downloadBtn.innerHTML = '<i class="fas fa-download mr-2"></i> Download Again';
+                    }, 1500);
+                };
+            }
+
+        // Verification button click
+        verifyBtn.addEventListener('click', function() {
+            verifyBtn.disabled = true;
+            verifyBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Verifying...';
+            
+            // Set to verification-waiting state and reload for ad refresh
+            sessionStorage.setItem('downloadStep', 'verify-waiting');
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        });
+
+        // Confetti effect function
+        function createConfetti() {
+            const colors = ['#3b82f6', '#60a5fa', '#10b981', '#f59e0b', '#ef4444'];
+            
+            for (let i = 0; i < 100; i++) {
                 const confetti = document.createElement('div');
                 confetti.className = 'confetti';
                 confetti.style.left = Math.random() * 100 + 'vw';
                 confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                confetti.style.animationDelay = Math.random() * 3 + 's';
-                confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
-                
+                confetti.style.width = Math.random() * 10 + 5 + 'px';
+                confetti.style.height = Math.random() * 10 + 5 + 'px';
                 document.body.appendChild(confetti);
                 
-                // Remove confetti element after animation
+                // Remove confetti after animation completes
                 setTimeout(() => {
-                    if (document.body.contains(confetti)) {
-                        document.body.removeChild(confetti);
-                    }
+                    confetti.remove();
                 }, 5000);
             }
         }
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            // Retrieve data from localStorage
-            const imageData = localStorage.getItem('downloadImageData');
-            const filename = localStorage.getItem('downloadFilename');
-            const type = localStorage.getItem('downloadType');
-            
-            if (imageData && filename) {
-                // Use the data for displaying or downloading the image
-                // For example:
-                document.getElementById('image-preview').src = imageData;
-                document.getElementById('download-link').href = imageData;
-                document.getElementById('download-link').download = filename;
-                
-                // Clear localStorage after retrieving
-                localStorage.removeItem('downloadImageData');
-                localStorage.removeItem('downloadFilename');
-                localStorage.removeItem('downloadType');
-            } else {
-                // Handle case when no data is found
-                alert('No image data found. Please try again.');
-                window.location.href = '/';
-            }
-        });
-    </script>
+    });
+</script>
 </body>
 </html>
