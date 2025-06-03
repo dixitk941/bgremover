@@ -3,46 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BGRemover - Remove Image Backgrounds Instantly</title>
-    <meta name="description" content="Remove backgrounds from images in seconds with our powerful AI tool. Free, fast, and no signup required.">
+    <title>BGRemover Pro - Remove Image Backgrounds with AI Precision</title>
+    <meta name="description" content="Remove backgrounds from images with professional-grade AI. Get pixel-perfect results in seconds. No signup required.">
+    <!-- SEO Meta Tags -->
+    <meta name="keywords" content="background remover, AI background removal, transparent background, image editing, photo background removal">
+    <meta property="og:title" content="BGRemover Pro - Remove Image Backgrounds with AI Precision">
+    <meta property="og:description" content="Remove backgrounds from images with professional-grade AI. Get pixel-perfect results in seconds.">
+    <meta property="og:image" content="https://example.com/og-image.jpg">
+    <meta property="og:url" content="https://example.com">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+    
+    <!-- Preload Critical Resources -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    
+    <!-- Stylesheets -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Modern CSS Variables -->
     <style>
+        :root {
+            --primary-color: #1877F2;
+            --primary-hover: #0f60cf;
+            --accent-color: #FFD34E;
+            --text-primary: #1f2937;
+            --text-secondary: #4b5563;
+            --background-light: #f9fafb;
+            --background-dark: #f3f4f6;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition-standard: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --border-radius-sm: 0.375rem;
+            --border-radius-md: 0.5rem;
+            --border-radius-lg: 1rem;
+            --max-width-content: 1200px;
+        }
+        
         body {
             font-family: 'Inter', sans-serif;
+            color: var(--text-primary);
+            scroll-behavior: smooth;
+            overflow-x: hidden;
         }
-        .yellow-accent {
-            background-color: #FFD34E;
+        
+        /* Advanced Animation System */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
         }
-        .yellow-text {
-            color: #FFD34E;
+        
+        .fade-in.active {
+            opacity: 1;
+            transform: translateY(0);
         }
+        
+        .stagger-fade-in > * {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        
+        .stagger-fade-in.active > *:nth-child(1) { transition-delay: 0.1s; }
+        .stagger-fade-in.active > *:nth-child(2) { transition-delay: 0.2s; }
+        .stagger-fade-in.active > *:nth-child(3) { transition-delay: 0.3s; }
+        .stagger-fade-in.active > *:nth-child(4) { transition-delay: 0.4s; }
+        .stagger-fade-in.active > *:nth-child(5) { transition-delay: 0.5s; }
+        
+        .stagger-fade-in.active > * {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Enhanced Visual Elements */
         .btn-primary {
-            background-color: #1877F2;
-            transition: all 0.3s ease;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius-md);
+            font-weight: 600;
+            transition: var(--transition-standard);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            box-shadow: var(--shadow-md);
         }
+        
         .btn-primary:hover {
-            background-color: #0f60cf;
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
         }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%, -50%);
+            transform-origin: 50% 50%;
+            z-index: -1;
+        }
+        
+        .btn-primary:hover::after {
+            animation: ripple 1s ease-out;
+        }
+        
+        @keyframes ripple {
+            0% {
+                transform: scale(0, 0);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(20, 20);
+                opacity: 0;
+            }
+        }
+        
+        .yellow-accent {
+            background-color: var(--accent-color);
+        }
+        
+        .yellow-text {
+            color: var(--accent-color);
+        }
+        
         .category-pill {
             border-radius: 9999px;
             padding: 0.5rem 1.5rem;
             font-weight: 500;
-            transition: all 0.3s ease;
+            transition: var(--transition-standard);
+            cursor: pointer;
         }
+        
         .category-pill.active {
-            background-color: #f3f4f6;
-            color: #4b5563;
+            background-color: var(--background-dark);
+            color: var(--text-secondary);
+            font-weight: 600;
         }
+        
         .category-pill:hover:not(.active) {
-            background-color: #f9fafb;
+            background-color: var(--background-light);
+            transform: translateY(-2px);
         }
+        
         .image-container {
             position: relative;
             overflow: hidden;
-            border-radius: 1rem;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            transition: var(--transition-standard);
         }
+        
+        .image-container:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+        
         .image-container::after {
             content: '';
             position: absolute;
@@ -52,25 +187,36 @@
             width: 50%;
             background: repeating-linear-gradient(45deg, rgba(255,255,255,0.1) 0px, rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.3) 10px, rgba(255,255,255,0.3) 20px);
         }
+        
         .upload-zone {
             border: 2px dashed #e5e7eb;
-            transition: all 0.3s ease;
+            border-radius: var(--border-radius-lg);
+            transition: var(--transition-standard);
             cursor: pointer;
+            background-color: white;
+            box-shadow: var(--shadow-sm);
         }
+        
         .upload-zone:hover {
-            border-color: #1877F2;
+            border-color: var(--primary-color);
             background-color: rgba(24, 119, 242, 0.05);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
         }
+        
         .bg-brush {
             background-image: url("data:image/svg+xml,%3Csvg width='100' height='40' viewBox='0 0 100 40' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7.87109 30.5391C14.4141 27.9844 20.3906 26.7266 26.0859 24.7188C37.9219 20.5078 48.5547 13.375 60.0781 8.57031C68.0312 5.17969 77.3281 3.35938 85.8906 2.80469C87.5 2.69531 89.6094 2.55469 91.0938 3.14844C92.7734 3.82031 92.7734 5.71875 92.1797 7.01953C90.4219 10.5859 88.0859 13.8672 85.5 16.875C71.6719 32.625 50.9688 39.8906 29.2734 39.9844C24.0625 40.0078 18.6719 39.7812 13.7109 38.0859C12.5234 37.6562 11.3203 37.1172 10.3359 36.3516C8.78906 35.1328 8.67969 33.8203 10.125 32.5859C11.0859 31.7734 12.3281 31.3438 13.4531 30.9844C17.9297 29.5156 22.6875 29.4219 27.3828 28.8672' stroke='%23FFD34E' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
         }
+        
         @keyframes bounce {
             0%, 100% { transform: translateY(-5%); }
             50% { transform: translateY(0); }
         }
+        
         .bounce {
             animation: bounce 2s infinite ease-in-out;
         }
+        
         .wiggle {
             position: absolute;
             width: 150px;
@@ -82,16 +228,25 @@
             background-repeat: no-repeat;
             z-index: -1;
         }
+        
+        /* Advanced Before/After Slider */
         .before-after-container {
             position: relative;
             overflow: hidden;
-            border-radius: 1rem;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-lg);
+            cursor: ew-resize;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
+        
         .before-after-container .before,
         .before-after-container .after {
             display: block;
             width: 100%;
+            pointer-events: none;
         }
+        
         .before-after-container .after {
             position: absolute;
             top: 0;
@@ -101,6 +256,7 @@
             border-right: 2px solid white;
             overflow: hidden;
         }
+        
         .slider-handle {
             position: absolute;
             top: 50%;
@@ -110,51 +266,234 @@
             height: 40px;
             background: white;
             border-radius: 50%;
-            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            box-shadow: 0 0 15px rgba(0,0,0,0.3);
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: ew-resize;
             z-index: 10;
+            transition: transform 0.15s ease;
         }
+        
+        .slider-handle:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+        
         .slider-handle::before,
         .slider-handle::after {
             content: '';
             position: absolute;
             width: 2px;
             height: 15px;
-            background-color: #1877F2;
+            background-color: var(--primary-color);
         }
+        
         .slider-handle::before {
             transform: rotate(-45deg);
         }
+        
         .slider-handle::after {
             transform: rotate(45deg);
         }
+        
+        /* Image Quality Slider */
         #quality-slider {
-        width: 100%;
-        display: flex;
-    }
-    
-    #quality-slider img {
-        width: 100%;
-        flex: 0 0 100%;
-        object-fit: cover;
-        height: 350px;
-    }
-    
-    .slider-dot.active {
-        transform: scale(1.2);
-        opacity: 1 !important;
-    }
+            width: 100%;
+            display: flex;
+            transition: transform 0.6s cubic-bezier(0.215, 0.61, 0.355, 1);
+        }
+        
+        #quality-slider img {
+            width: 100%;
+            flex: 0 0 100%;
+            object-fit: cover;
+            height: 350px;
+            transition: transform 0.5s ease;
+        }
+        
+        #quality-slider img:hover {
+            transform: scale(1.03);
+        }
+        
+        .slider-dot {
+            transition: all 0.3s ease;
+            opacity: 0.5;
+        }
+        
+        .slider-dot.active {
+            transform: scale(1.5);
+            opacity: 1 !important;
+        }
+        
+        /* Floating Elements */
+        .floating-element {
+            position: absolute;
+            pointer-events: none;
+            opacity: 0.8;
+            z-index: 1;
+        }
+        
+        .floating-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(24, 119, 242, 0.2), rgba(59, 130, 246, 0.1));
+            animation: float-slow 8s infinite ease-in-out;
+        }
+        
+        .floating-square {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(255, 211, 78, 0.2), rgba(249, 215, 28, 0.1));
+            animation: float-slow 10s infinite ease-in-out;
+            animation-delay: 2s;
+        }
+        
+        @keyframes float-slow {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(15px, -15px) rotate(5deg); }
+            50% { transform: translate(0, -20px) rotate(0deg); }
+            75% { transform: translate(-15px, -15px) rotate(-5deg); }
+        }
+        
+        /* Ad Container Styling */
+        .ad-container {
+            transition: var(--transition-standard);
+            overflow: hidden;
+            border-radius: var(--border-radius-md);
+        }
+        
+        .ad-container:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            .floating-element {
+                display: none;
+            }
+            
+            .before-after-container {
+                max-height: 300px;
+            }
+        }
+        
+        /* Dark Mode Support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --text-primary: #f9fafb;
+                --text-secondary: #e5e7eb;
+                --background-light: #374151;
+                --background-dark: #1f2937;
+            }
+            
+            .dark-mode-support {
+                background-color: #111827;
+                color: #f9fafb;
+            }
+            
+            .dark-mode-card {
+                background-color: #1f2937;
+                border-color: #374151;
+            }
+        }
+        
+        /* Loading & Skeleton Screens */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+        }
+        
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        /* Modern Tooltip */
+        .tooltip {
+            position: relative;
+        }
+        
+        .tooltip:hover::before {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 120%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0.5rem 1rem;
+            background-color: #333;
+            color: white;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            white-space: nowrap;
+            z-index: 100;
+            opacity: 0;
+            animation: fade-in 0.3s forwards;
+        }
+        
+        .tooltip:hover::after {
+            content: '';
+            position: absolute;
+            bottom: 120%;
+            left: 50%;
+            margin-bottom: -5px;
+            border-width: 5px;
+            border-style: solid;
+            opacity: 0;
+            animation: fade-in 0.3s forwards;
+            border-color: #333 transparent transparent transparent;
+            transform: translateX(-50%);
+        }
+        
+        @keyframes fade-in {
+            to { opacity: 1; }
+        }
     </style>
 </head>
 <body class="bg-white text-gray-800">
-    <!-- Header - Simple and Clean -->
-    <header class="py-4 shadow-sm">
-        <div class="container mx-auto px-4">
-            <div class="text-xl md:text-2xl font-bold text-gray-700">
-                <i class="fas fa-cut mr-2 text-blue-600"></i>BGRemover
+    <!-- Floating decorative elements -->
+    <div class="floating-element floating-circle" style="top: 15%; left: 5%;"></div>
+    <div class="floating-element floating-square" style="top: 30%; right: 8%;"></div>
+    <div class="floating-element floating-circle" style="bottom: 20%; right: 15%; width: 80px; height: 80px;"></div>
+
+    <!-- Modern Sticky Header with Navigation -->
+    <header class="py-4 shadow-sm sticky top-0 bg-white z-50 transition-all duration-300" id="main-header">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <div class="flex items-center">
+                <div class="text-xl md:text-2xl font-bold text-gray-700">
+                    <i class="fas fa-cut mr-2 text-blue-600"></i>BGRemover
+                    <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded ml-2">Pro</span>
+                </div>
+            </div>
+            
+            <!-- Desktop Navigation -->
+            <nav class="hidden md:flex items-center space-x-6">
+                <a href="#features" class="text-gray-600 hover:text-blue-600 transition-colors">Features</a>
+                <a href="#how-it-works" class="text-gray-600 hover:text-blue-600 transition-colors">How It Works</a>
+                <a href="#examples" class="text-gray-600 hover:text-blue-600 transition-colors">Examples</a>
+                <a href="bgremove" class="btn-primary rounded-full text-white px-6 py-2">
+                    <i class="fas fa-cloud-upload-alt mr-2"></i> Start Now
+                </a>
+            </nav>
+            
+            <!-- Mobile Menu Button -->
+            <button class="md:hidden text-gray-500 focus:outline-none" id="mobile-menu-button">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+        </div>
+        
+        <!-- Mobile Navigation Menu (Hidden by default) -->
+        <div class="md:hidden hidden bg-white shadow-md absolute left-0 right-0 top-full z-50" id="mobile-menu">
+            <div class="container mx-auto px-4 py-3 flex flex-col space-y-3">
+                <a href="#features" class="text-gray-600 hover:text-blue-600 py-2 transition-colors">Features</a>
+                <a href="#how-it-works" class="text-gray-600 hover:text-blue-600 py-2 transition-colors">How It Works</a>
+                <a href="#examples" class="text-gray-600 hover:text-blue-600 py-2 transition-colors">Examples</a>
+                <a href="bgremove" class="btn-primary text-center rounded-full text-white py-2">
+                    <i class="fas fa-cloud-upload-alt mr-2"></i> Start Now
+                </a>
             </div>
         </div>
     </header>
@@ -162,40 +501,56 @@
     <!-- Main Content Area -->
     <main class="min-h-screen">
         <!-- Hero Section with Upload -->
-        <section class="py-8 md:py-16">
+        <section class="py-8 md:py-16 relative overflow-hidden">
             <div class="container mx-auto px-4">
                 <div class="flex flex-col md:flex-row items-center justify-center md:space-x-8">
                     <!-- Left Column - Hero Text and Demo Image -->
-                    <div class="md:w-1/2 flex flex-col items-center md:items-start mb-8 md:mb-0">
+                    <div class="md:w-1/2 flex flex-col items-center md:items-start mb-8 md:mb-0 fade-in">
                         <div class="max-w-md">
-                          <!-- Before/After Image Demo -->
-<div class="mb-6 rounded-lg overflow-hidden shadow-lg before-after-container">
-    <img src="https://firebasestorage.googleapis.com/v0/b/yogocab-ainor.firebasestorage.app/o/photos%2Foriginal.jpg?alt=media&token=fe185ee3-5173-46f4-8126-cc43fe11b036" alt="Original image" class="before">
-    <div class="after">
-        <img src="https://firebasestorage.googleapis.com/v0/b/yogocab-ainor.firebasestorage.app/o/photos%2Fprocessed.jpg?alt=media&token=a7add7d2-3ba7-4fb3-8db6-824f1f9b5c6f" alt="Processed image">
-    </div>
-    <div class="slider-handle">
-        <i class="fas fa-arrows-alt-h text-blue-600"></i>
-    </div>
-</div>
+                            <!-- Before/After Image Demo -->
+                            <div class="mb-6 rounded-lg overflow-hidden shadow-lg before-after-container">
+                                <img src="https://firebasestorage.googleapis.com/v0/b/yogocab-ainor.firebasestorage.app/o/photos%2Foriginal.jpg?alt=media&token=fe185ee3-5173-46f4-8126-cc43fe11b036" alt="Original image" class="before">
+                                <div class="after">
+                                    <img src="https://firebasestorage.googleapis.com/v0/b/yogocab-ainor.firebasestorage.app/o/photos%2Fprocessed.jpg?alt=media&token=a7add7d2-3ba7-4fb3-8db6-824f1f9b5c6f" alt="Processed image">
+                                </div>
+                                <div class="slider-handle">
+                                    <i class="fas fa-arrows-alt-h text-blue-600"></i>
+                                </div>
+                            </div>
                             
                             <!-- Main Headline -->
-                            <h1 class="text-3xl md:text-4xl font-bold text-gray-800 text-center md:text-left mb-2">
-                                Remove Image Background
+                            <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-800 text-center md:text-left mb-4">
+                                Professional Background Removal in <span class="text-blue-600">Seconds</span>
                             </h1>
                             
                             <!-- Subtitle with Free highlight -->
-                            <p class="text-lg text-center md:text-left mb-4">
+                            <p class="text-lg text-center md:text-left mb-6">
                                 100% Automatically and <span class="relative px-2 py-1">
                                     <span class="relative z-10 yellow-text font-semibold">Free</span>
                                     <span class="absolute inset-0 bg-brush bg-no-repeat bg-cover bg-center z-0"></span>
                                 </span>
                             </p>
+                            
+                            <!-- Trust Badges -->
+                            <div class="flex flex-wrap justify-center md:justify-start gap-4 mt-6">
+                                <div class="flex items-center bg-gray-50 px-3 py-2 rounded-full shadow-sm">
+                                    <i class="fas fa-bolt text-amber-500 mr-2"></i>
+                                    <span class="text-sm font-medium">Ultra Fast</span>
+                                </div>
+                                <div class="flex items-center bg-gray-50 px-3 py-2 rounded-full shadow-sm">
+                                    <i class="fas fa-shield-alt text-blue-500 mr-2"></i>
+                                    <span class="text-sm font-medium">100% Secure</span>
+                                </div>
+                                <div class="flex items-center bg-gray-50 px-3 py-2 rounded-full shadow-sm">
+                                    <i class="fas fa-thumbs-up text-green-500 mr-2"></i>
+                                    <span class="text-sm font-medium">5000+ Happy Users</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
                     <!-- Right Column - Upload Widget -->
-                    <div class="md:w-1/2 max-w-md w-full relative">
+                    <div class="md:w-1/2 max-w-md w-full relative fade-in" style="transition-delay: 0.2s">
                         <!-- Decorative elements -->
                         <div class="wiggle"></div>
                         
@@ -226,7 +581,7 @@
                         <div class="upload-zone bg-gray-50 rounded-xl p-6 text-center relative">
                             <input type="file" id="file-upload" class="hidden" accept="image/*">
                             
-                            <div class="text-blue-600 text-5xl mb-4">
+                            <div class="text-blue-600 text-5xl mb-4 bounce">
                                 <i class="fas fa-cloud-upload-alt"></i>
                             </div>
                             
@@ -237,8 +592,16 @@
                                 Upload Image
                             </a>
                             
-                            <p class="mt-5 text-sm text-gray-500">
-                                By uploading an image you agree to our <a href="#" class="text-blue-600">Terms of Service</a>
+                            <!-- File Format Badges -->
+                            <div class="flex flex-wrap justify-center gap-2 mt-6 mb-4">
+                                <span class="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">JPG</span>
+                                <span class="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">PNG</span>
+                                <span class="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">WEBP</span>
+                                <span class="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">HEIC</span>
+                            </div>
+                            
+                            <p class="mt-3 text-sm text-gray-500">
+                                By uploading an image you agree to our <a href="#" class="text-blue-600 hover:underline">Terms of Service</a>
                             </p>
                         </div>
                         
@@ -268,11 +631,19 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- Scroll Indicator -->
+            <div class="absolute bottom-5 left-1/2 transform -translate-x-1/2 text-center">
+                <div class="text-gray-400 animate-bounce">
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
         </section>
 
-        <!-- Categories Section
-        <section class="py-4 border-t border-gray-100">
+        <!-- Categories/Use Cases Section -->
+        <section class="py-6 border-t border-gray-100">
             <div class="container mx-auto px-4">
+                <h3 class="text-center text-gray-600 mb-4 text-sm font-medium">POPULAR USE CASES</h3>
                 <div class="flex justify-center space-x-2 overflow-x-auto pb-2">
                     <button class="category-pill active">Products</button>
                     <button class="category-pill">People</button>
@@ -281,157 +652,175 @@
                     <button class="category-pill">Graphics</button>
                 </div>
             </div>
-        </section> -->
+        </section>
 
         <!-- Stunning Quality Examples Section -->
-<section class="py-8">
-    <div class="container mx-auto px-4">
-        <h2 class="text-2xl font-bold text-center text-gray-700 mb-6">
-            Stunning quality
-        </h2>
-        
-        <div class="relative rounded-xl overflow-hidden shadow-lg mb-6">
-            <!-- Image slider container -->
-            <div class="flex transition-transform duration-500 ease-in-out" id="quality-slider">
-                <!-- First image -->
-                <img src="https://images.unsplash.com/photo-1445053023192-8d45cb66099d?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Forest example" class="w-full flex-shrink-0">
+        <section class="py-12 bg-gray-50" id="examples">
+            <div class="container mx-auto px-4">
+                <h2 class="text-2xl md:text-3xl font-bold text-center text-gray-700 mb-3 fade-in">
+                    Stunning Professional Quality
+                </h2>
+                <p class="text-center text-gray-600 max-w-2xl mx-auto mb-10 fade-in">
+                    Our AI delivers pixel-perfect results even with complex edges, hair, and transparency
+                </p>
                 
-                <!-- Second image -->
-                <img src="https://images.unsplash.com/photo-1444720895098-cbd6b640c909?w=1500&auto=format&fit=crop&q=80&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fHBlcnNvbnxlbnwwfHwwfHx8MA%3D%3D" alt="Person example" class="w-full flex-shrink-0">
+                <div class="relative rounded-xl overflow-hidden shadow-lg mb-6 fade-in">
+                    <!-- Image slider container -->
+                    <div class="flex transition-transform duration-500 ease-in-out" id="quality-slider">
+                        <!-- First image -->
+                        <img src="https://images.unsplash.com/photo-1445053023192-8d45cb66099d?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Forest example" class="w-full flex-shrink-0">
+                        
+                        <!-- Second image -->
+                        <img src="https://images.unsplash.com/photo-1444720895098-cbd6b640c909?w=1500&auto=format&fit=crop&q=80&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fHBlcnNvbnxlbnwwfHwwfHx8MA%3D%3D" alt="Person example" class="w-full flex-shrink-0">
+                        
+                        <!-- Third image -->
+                        <img src="https://images.unsplash.com/photo-1492681290082-e932832941e6?w=1500&auto=format&fit=crop&q=80&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fHBlcnNvbnxlbnwwfHwwfHx8MA%3D%3D" alt="Portrait example" class="w-full flex-shrink-0">
+                    </div>
+                    
+                    <!-- Navigation dots -->
+                    <div class="absolute inset-x-0 bottom-4 flex justify-center space-x-2">
+                        <span class="w-3 h-3 rounded-full bg-white shadow-md cursor-pointer slider-dot active" data-index="0"></span>
+                        <span class="w-3 h-3 rounded-full bg-white shadow-md opacity-50 cursor-pointer slider-dot" data-index="1"></span>
+                        <span class="w-3 h-3 rounded-full bg-white shadow-md opacity-50 cursor-pointer slider-dot" data-index="2"></span>
+                    </div>
+                    
+                    <!-- Navigation arrows -->
+                    <div class="absolute inset-y-0 left-2 flex items-center">
+                        <button class="w-10 h-10 rounded-full bg-white bg-opacity-80 flex items-center justify-center shadow hover:bg-opacity-100 transition-all" id="prev-slide">
+                            <i class="fas fa-chevron-left text-gray-600"></i>
+                        </button>
+                    </div>
+                    <div class="absolute inset-y-0 right-2 flex items-center">
+                        <button class="w-10 h-10 rounded-full bg-white bg-opacity-80 flex items-center justify-center shadow hover:bg-opacity-100 transition-all" id="next-slide">
+                            <i class="fas fa-chevron-right text-gray-600"></i>
+                        </button>
+                    </div>
+                </div>
                 
-                <!-- Third image -->
-                <img src="https://images.unsplash.com/photo-1492681290082-e932832941e6?w=1500&auto=format&fit=crop&q=80&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fHBlcnNvbnxlbnwwfHwwfHx8MA%3D%3D" alt="Portrait example" class="w-full flex-shrink-0">
+                <div class="text-center fade-in">
+                    <a href="#more-examples" class="inline-flex items-center text-blue-500 font-semibold hover:underline">
+                        See more samples
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
             </div>
-            
-            <!-- Navigation dots -->
-            <div class="absolute inset-x-0 bottom-4 flex justify-center space-x-2">
-                <span class="w-2 h-2 rounded-full bg-white cursor-pointer slider-dot active" data-index="0"></span>
-                <span class="w-2 h-2 rounded-full bg-white opacity-50 cursor-pointer slider-dot" data-index="1"></span>
-                <span class="w-2 h-2 rounded-full bg-white opacity-50 cursor-pointer slider-dot" data-index="2"></span>
-            </div>
-            
-            <!-- Navigation arrows -->
-            <div class="absolute inset-y-0 left-2 flex items-center">
-                <button class="w-8 h-8 rounded-full bg-white bg-opacity-80 flex items-center justify-center shadow" id="prev-slide">
-                    <i class="fas fa-chevron-left text-gray-600"></i>
-                </button>
-            </div>
-            <div class="absolute inset-y-0 right-2 flex items-center">
-                <button class="w-8 h-8 rounded-full bg-white bg-opacity-80 flex items-center justify-center shadow" id="next-slide">
-                    <i class="fas fa-chevron-right text-gray-600"></i>
-                </button>
-            </div>
-        </div>
-        
-        <!-- <div class="text-center">
-            <a href="#more-examples" class="inline-flex items-center text-blue-500 font-semibold">
-                See more samples
-                <i class="fas fa-arrow-right ml-2"></i>
-            </a>
-        </div> -->
-    </div>
-</section>
+        </section>
         
         <!-- How It Works Section -->
-        <section class="py-10 bg-gray-50">
+        <section class="py-16" id="how-it-works">
             <div class="container mx-auto px-4">
-                <h2 class="text-2xl font-bold text-center text-gray-700 mb-8">How It Works</h2>
+                <h2 class="text-2xl md:text-3xl font-bold text-center text-gray-700 mb-4 fade-in">How It Works</h2>
+                <p class="text-center text-gray-600 max-w-2xl mx-auto mb-12 fade-in">
+                    Our advanced AI makes background removal simple, fast, and incredibly accurate
+                </p>
                 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 stagger-fade-in">
                     <!-- Step 1 -->
-                    <div class="bg-white p-5 rounded-lg shadow-sm text-center">
-                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <i class="fas fa-upload text-blue-600"></i>
+                    <div class="bg-white p-6 rounded-xl shadow-md text-center relative transform transition-all duration-300 hover:-translate-y-2 hover:shadow-lg">
+                        <div class="absolute -top-4 -left-4 w-8 h-8 bg-blue-600 rounded-full text-white flex items-center justify-center font-bold">1</div>
+                        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-upload text-blue-600 text-2xl"></i>
                         </div>
-                        <h3 class="font-semibold mb-2">1. Upload Image</h3>
-                        <p class="text-sm text-gray-600">Select any image with a background</p>
+                        <h3 class="text-xl font-semibold mb-3">Upload Image</h3>
+                        <p class="text-gray-600 mb-4">Upload any image with a background you want to remove</p>
+                        <div class="h-1 w-24 bg-blue-600 mx-auto rounded-full"></div>
                     </div>
                     
                     <!-- Step 2 -->
-                    <div class="bg-white p-5 rounded-lg shadow-sm text-center">
-                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <i class="fas fa-magic text-blue-600"></i>
+                    <div class="bg-white p-6 rounded-xl shadow-md text-center relative transform transition-all duration-300 hover:-translate-y-2 hover:shadow-lg">
+                        <div class="absolute -top-4 -left-4 w-8 h-8 bg-blue-600 rounded-full text-white flex items-center justify-center font-bold">2</div>
+                        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-magic text-blue-600 text-2xl"></i>
                         </div>
-                        <h3 class="font-semibold mb-2">2. Auto Remove</h3>
-                        <p class="text-sm text-gray-600">Our AI removes the background instantly</p>
+                        <h3 class="text-xl font-semibold mb-3">Auto Processing</h3>
+                        <p class="text-gray-600 mb-4">Our AI removes the background with pixel-perfect precision</p>
+                        <div class="h-1 w-24 bg-blue-600 mx-auto rounded-full"></div>
                     </div>
                     
                     <!-- Step 3 -->
-                    <div class="bg-white p-5 rounded-lg shadow-sm text-center">
-                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <i class="fas fa-download text-blue-600"></i>
+                    <div class="bg-white p-6 rounded-xl shadow-md text-center relative transform transition-all duration-300 hover:-translate-y-2 hover:shadow-lg">
+                        <div class="absolute -top-4 -left-4 w-8 h-8 bg-blue-600 rounded-full text-white flex items-center justify-center font-bold">3</div>
+                        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-download text-blue-600 text-2xl"></i>
                         </div>
-                        <h3 class="font-semibold mb-2">3. Download</h3>
-                        <p class="text-sm text-gray-600">Get your transparent image immediately</p>
+                        <h3 class="text-xl font-semibold mb-3">Download Result</h3>
+                        <p class="text-gray-600 mb-4">Get your transparent PNG image ready to use anywhere</p>
+                        <div class="h-1 w-24 bg-blue-600 mx-auto rounded-full"></div>
                     </div>
+                </div>
+                
+                <!-- Quick Action Button -->
+                <div class="text-center mt-12 fade-in" style="transition-delay: 0.4s">
+                    <a href="bgremove" class="btn-primary text-white font-semibold py-3 px-10 rounded-full text-center inline-block shadow-lg">
+                        Try It Now <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
                 </div>
             </div>
         </section>
         
         <!-- Features Section -->
-        <section class="py-10">
+        <section class="py-16 bg-gray-50" id="features">
             <div class="container mx-auto px-4">
-                <h2 class="text-2xl font-bold text-center text-gray-700 mb-6">
+                <h2 class="text-2xl md:text-3xl font-bold text-center text-gray-700 mb-3 fade-in">
                     Remove backgrounds 100% automatically in 5 seconds
                 </h2>
-                <p class="text-center text-gray-600 max-w-2xl mx-auto mb-10">
+                <p class="text-center text-gray-600 max-w-2xl mx-auto mb-12 fade-in">
                     Thanks to our clever AI, you can slash editing time - and have more fun! No matter if you want to make a background transparent, add a white background, extract the subject, or get a cutout.
                 </p>
                 
                 <div class="flex flex-col md:flex-row items-center justify-center">
-                    <div class="md:w-1/2 mb-6 md:mb-0 md:pr-8">
-                        <img src="https://sb.kaleidousercontent.com/67418/658x756/361846cee7/all-pages-2.png" alt="BGRemover features" class="max-w-full mx-auto md:max-w-md rounded-lg shadow-lg">
-
+                    <div class="md:w-1/2 mb-6 md:mb-0 md:pr-8 fade-in">
+                        <img src="https://sb.kaleidousercontent.com/67418/658x756/361846cee7/all-pages-2.png" alt="BGRemover features" class="max-w-full mx-auto md:max-w-md rounded-lg shadow-lg transform transition-all duration-500 hover:scale-105">
                     </div>
-                    <div class="md:w-1/2 max-w-md">
-                        <ul class="space-y-4">
-                            <li class="flex items-start">
+                    <div class="md:w-1/2 max-w-md stagger-fade-in">
+                        <ul class="space-y-6">
+                            <li class="flex items-start bg-white p-4 rounded-lg shadow-sm transform transition-all duration-300 hover:-translate-x-2">
                                 <div class="flex-shrink-0 mt-1">
-                                    <div class="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center">
-                                        <i class="fas fa-check text-blue-600 text-xs"></i>
+                                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-bolt text-blue-600"></i>
                                     </div>
                                 </div>
-                                <div class="ml-3">
-                                    <h3 class="font-medium">Lightning Fast</h3>
-                                    <p class="text-gray-600 text-sm">Remove backgrounds in seconds, not minutes</p>
+                                <div class="ml-4">
+                                    <h3 class="font-semibold text-lg">Lightning Fast</h3>
+                                    <p class="text-gray-600">Remove backgrounds in seconds, not minutes. Our advanced AI processes images instantly.</p>
                                 </div>
                             </li>
-                            <li class="flex items-start">
+                            <li class="flex items-start bg-white p-4 rounded-lg shadow-sm transform transition-all duration-300 hover:-translate-x-2">
                                 <div class="flex-shrink-0 mt-1">
-                                    <div class="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center">
-                                        <i class="fas fa-check text-blue-600 text-xs"></i>
+                                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-robot text-blue-600"></i>
                                     </div>
                                 </div>
-                                <div class="ml-3">
-                                    <h3 class="font-medium">100% Automatically</h3>
-                                    <p class="text-gray-600 text-sm">No manual editing required</p>
+                                <div class="ml-4">
+                                    <h3 class="font-semibold text-lg">100% Automatically</h3>
+                                    <p class="text-gray-600">No manual editing required. Our AI does all the hard work for you with stunning precision.</p>
                                 </div>
                             </li>
-                            <li class="flex items-start">
+                            <li class="flex items-start bg-white p-4 rounded-lg shadow-sm transform transition-all duration-300 hover:-translate-x-2">
                                 <div class="flex-shrink-0 mt-1">
-                                    <div class="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center">
-                                        <i class="fas fa-check text-blue-600 text-xs"></i>
+                                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-crown text-blue-600"></i>
                                     </div>
                                 </div>
-                                <div class="ml-3">
-                                    <h3 class="font-medium">High Quality Results</h3>
-                                    <p class="text-gray-600 text-sm">Perfect edges, even with hair and complex details</p>
+                                <div class="ml-4">
+                                    <h3 class="font-semibold text-lg">High Quality Results</h3>
+                                    <p class="text-gray-600">Perfect edges, even with hair and complex details. Professional-grade results every time.</p>
                                 </div>
                             </li>
-                            <li class="flex items-start">
+                            <li class="flex items-start bg-white p-4 rounded-lg shadow-sm transform transition-all duration-300 hover:-translate-x-2">
                                 <div class="flex-shrink-0 mt-1">
-                                    <div class="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center">
-                                        <i class="fas fa-check text-blue-600 text-xs"></i>
+                                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-gift text-blue-600"></i>
                                     </div>
                                 </div>
-                                <div class="ml-3">
-                                    <h3 class="font-medium">Free to Use</h3>
-                                    <p class="text-gray-600 text-sm">No registration required for basic usage</p>
+                                <div class="ml-4">
+                                    <h3 class="font-semibold text-lg">Free to Use</h3>
+                                    <p class="text-gray-600">No registration required for basic usage. Start removing backgrounds right away!</p>
                                 </div>
                             </li>
                         </ul>
                         
-                        <div class="mt-6">
+                        <div class="mt-8">
                             <a href="bgremove" class="btn-primary text-white font-semibold py-3 px-8 rounded-lg inline-block shadow-md">
                                 Try BGRemover Now
                             </a>
@@ -440,18 +829,278 @@
                 </div>
             </div>
         </section>
+        
+        <!-- Testimonials Section -->
+        <section class="py-16 bg-white">
+            <div class="container mx-auto px-4">
+                <h2 class="text-2xl md:text-3xl font-bold text-center text-gray-700 mb-3 fade-in">
+                    What Our Users Say
+                </h2>
+                <p class="text-center text-gray-600 max-w-2xl mx-auto mb-12 fade-in">
+                    Join thousands of satisfied users who use BGRemover every day
+                </p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 stagger-fade-in">
+                    <!-- Testimonial 1 -->
+                    <div class="bg-white border border-gray-200 p-6 rounded-xl shadow-sm hover:shadow-md transition-all">
+                        <div class="flex items-center mb-4">
+                            <div class="text-amber-400 flex">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                        <p class="text-gray-700 mb-4">
+                            "This is by far the best background remover I've used. The quality is amazing and it's so fast!"
+                        </p>
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold">S</div>
+                            <div class="ml-3">
+                                <p class="font-medium">Sarah M.</p>
+                                <p class="text-sm text-gray-500">Photographer</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Testimonial 2 -->
+                    <div class="bg-white border border-gray-200 p-6 rounded-xl shadow-sm hover:shadow-md transition-all">
+                        <div class="flex items-center mb-4">
+                            <div class="text-amber-400 flex">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                        <p class="text-gray-700 mb-4">
+                            "I use BGRemover for all my product photos. Saves me hours of Photoshop work every week!"
+                        </p>
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold">J</div>
+                            <div class="ml-3">
+                                <p class="font-medium">James T.</p>
+                                <p class="text-sm text-gray-500">E-commerce Owner</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Testimonial 3 -->
+                    <div class="bg-white border border-gray-200 p-6 rounded-xl shadow-sm hover:shadow-md transition-all">
+                        <div class="flex items-center mb-4">
+                            <div class="text-amber-400 flex">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                        </div>
+                        <p class="text-gray-700 mb-4">
+                            "So easy to use and the results are professional quality. Can't believe it's free!"
+                        </p>
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold">A</div>
+                            <div class="ml-3">
+                                <p class="font-medium">Alex K.</p>
+                                <p class="text-sm text-gray-500">Graphic Designer</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- CTA Section -->
+        <section class="py-20 bg-gradient-to-r from-blue-600 to-blue-800 text-white">
+            <div class="container mx-auto px-4 text-center">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 fade-in">Ready to remove backgrounds?</h2>
+                <p class="text-xl text-blue-100 mb-8 max-w-2xl mx-auto fade-in">
+                    Join thousands of users who trust BGRemover for professional-quality results
+                </p>
+                <a href="bgremove" class="bg-white text-blue-600 font-bold py-4 px-10 rounded-full inline-block shadow-lg hover:bg-blue-50 transition-all transform hover:scale-105 fade-in">
+                    Start Removing Backgrounds Now
+                </a>
+                
+                <!-- Trust badges -->
+                <div class="flex justify-center mt-12 space-x-8 opacity-80 fade-in">
+                    <div class="flex items-center">
+                        <i class="fas fa-shield-alt text-2xl mr-2"></i>
+                        <span>Secure Processing</span>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-bolt text-2xl mr-2"></i>
+                        <span>Lightning Fast</span>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-check-circle text-2xl mr-2"></i>
+                        <span>Professional Results</span>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 
-    <!-- Simple Footer -->
-    <footer class="py-6 border-t border-gray-200">
-        <div class="container mx-auto px-4 text-center">
-            <p class="text-sm text-gray-500">&copy; 2024 BGRemover. All rights reserved.</p>
+    <!-- Enhanced Footer -->
+    <footer class="py-12 bg-gray-800 text-white">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <div class="text-xl font-bold mb-4">
+                        <i class="fas fa-cut mr-2 text-blue-400"></i>BGRemover
+                    </div>
+                    <p class="text-gray-400 mb-4">
+                        Professional background removal powered by advanced AI technology.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Product</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Features</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Pricing</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">API</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Integrations</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Resources</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Documentation</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Tutorials</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Blog</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Support</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Company</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">About Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Careers</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 pt-8 mt-8 text-center">
+                <p class="text-gray-500">&copy; 2024 BGRemover. All rights reserved.</p>
+            </div>
         </div>
     </footer>
 
-    <!-- JavaScript -->
+    <!-- Sticky bottom CTA for mobile (initially hidden) -->
+    <div class="fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t border-gray-200 p-4 flex justify-center md:hidden transform translate-y-full transition-transform duration-300" id="mobile-cta">
+        <a href="bgremove" class="btn-primary text-white font-semibold py-3 px-8 rounded-full text-center inline-block w-full">
+            Try BGRemover Now
+        </a>
+    </div>
+
+    <!-- JavaScript with Advanced Features -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Intersection Observer for animations
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                    }
+                });
+            }, {
+                threshold: 0.1
+            });
+            
+            // Observe all fade-in and stagger-fade-in elements
+            document.querySelectorAll('.fade-in, .stagger-fade-in').forEach(el => {
+                observer.observe(el);
+            });
+            
+            // Sticky header handling
+            const header = document.getElementById('main-header');
+            let lastScrollY = window.scrollY;
+            
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    header.classList.add('py-2', 'shadow-md');
+                } else {
+                    header.classList.remove('py-2', 'shadow-md');
+                }
+                
+                // Show/hide mobile CTA
+                const mobileCta = document.getElementById('mobile-cta');
+                if (window.scrollY > 300) {
+                    mobileCta.style.transform = 'translateY(0)';
+                } else {
+                    mobileCta.style.transform = 'translateY(100%)';
+                }
+                
+                // Hide header on scroll down, show on scroll up (mobile only)
+                if (window.innerWidth < 768) {
+                    if (window.scrollY > lastScrollY && window.scrollY > 200) {
+                        header.style.transform = 'translateY(-100%)';
+                    } else {
+                        header.style.transform = 'translateY(0)';
+                    }
+                    lastScrollY = window.scrollY;
+                }
+            });
+            
+            // Mobile menu toggle
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+                if (!mobileMenu.classList.contains('hidden')) {
+                    mobileMenuButton.innerHTML = '<i class="fas fa-times text-xl"></i>';
+                } else {
+                    mobileMenuButton.innerHTML = '<i class="fas fa-bars text-xl"></i>';
+                }
+            });
+            
+            // Smooth scroll for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        // Close mobile menu if open
+                        if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                            mobileMenu.classList.add('hidden');
+                            mobileMenuButton.innerHTML = '<i class="fas fa-bars text-xl"></i>';
+                        }
+                        
+                        // Scroll to element
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80, // Account for header
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+            
             // Handle file input
             const fileUpload = document.getElementById('file-upload');
             const uploadZone = document.querySelector('.upload-zone');
@@ -465,6 +1114,15 @@
                     const file = e.target.files[0];
                     const reader = new FileReader();
                     
+                    // Add loading state
+                    uploadZone.classList.add('opacity-75');
+                    uploadZone.innerHTML = `
+                        <div class="text-center">
+                            <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                            <p>Processing your image...</p>
+                        </div>
+                    `;
+                    
                     reader.onload = function(event) {
                         sessionStorage.setItem('uploadedImage', event.target.result);
                         sessionStorage.setItem('uploadedImageName', file.name);
@@ -475,23 +1133,32 @@
                 }
             });
             
-            // Handle drag and drop
+            // Handle drag and drop with enhanced UI feedback
             uploadZone.addEventListener('dragover', function(e) {
                 e.preventDefault();
-                this.classList.add('border-blue-600');
+                this.classList.add('border-blue-600', 'bg-blue-50', 'scale-105');
             });
             
             uploadZone.addEventListener('dragleave', function() {
-                this.classList.remove('border-blue-600');
+                this.classList.remove('border-blue-600', 'bg-blue-50', 'scale-105');
             });
             
             uploadZone.addEventListener('drop', function(e) {
                 e.preventDefault();
-                this.classList.remove('border-blue-600');
+                this.classList.remove('border-blue-600', 'bg-blue-50', 'scale-105');
                 
                 if (e.dataTransfer.files && e.dataTransfer.files[0]) {
                     const file = e.dataTransfer.files[0];
                     if (file.type.match('image.*')) {
+                        // Add loading state
+                        uploadZone.classList.add('opacity-75');
+                        uploadZone.innerHTML = `
+                            <div class="text-center">
+                                <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                                <p>Processing your image...</p>
+                            </div>
+                        `;
+                        
                         const reader = new FileReader();
                         
                         reader.onload = function(event) {
@@ -501,19 +1168,11 @@
                         };
                         
                         reader.readAsDataURL(file);
+                    } else {
+                        // Show error for non-image files
+                        alert('Please upload an image file (JPG, PNG, etc.)');
                     }
                 }
-            });
-            
-            // Handle sample image selection
-            const sampleImages = document.querySelectorAll('.sample-image');
-            sampleImages.forEach(img => {
-                img.addEventListener('click', function(e) {
-                    const imgSrc = this.querySelector('img').src;
-                    sessionStorage.setItem('uploadedImage', imgSrc);
-                    sessionStorage.setItem('uploadedImageName', 'sample.jpg');
-                    window.location.href = 'bgremove';
-                });
             });
             
             // Handle category pills
