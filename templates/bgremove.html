@@ -564,25 +564,16 @@
                             <!-- Download Button with Dropdown -->
                             <div class="relative hidden" id="download-container">
                                 <button id="download-btn" class="btn bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-md transition-all flex items-center">
-                                    <i class="fas fa-download mr-2"></i> Download Options
-                                    <i class="fas fa-chevron-down ml-2 text-xs"></i>
+                                    <i class="fas fa-download mr-2"></i> Download
                                 </button>
                                 
                                 <!-- Dropdown Menu - Increased z-index -->
                                 <div id="download-dropdown" class="hidden absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-50 min-w-full">
-                                    <button id="download-preview-btn" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors flex items-center">
-                                        <i class="fas fa-image mr-2 text-blue-600"></i>
-                                        <div>
-                                            <div class="font-medium">Download Preview</div>
-                                            <div class="text-xs text-gray-500">Compressed for quick download</div>
-                                        </div>
+                                    <button id="download-preview-btn" class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center">
+                                        <i class="fas fa-eye mr-2 text-blue-500"></i> Preview Quality
                                     </button>
-                                    <button id="download-original-btn" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors flex items-center border-t border-gray-100">
-                                        <i class="fas fa-hdd mr-2 text-green-600"></i>
-                                        <div>
-                                            <div class="font-medium">Download Original Quality</div>
-                                            <div class="text-xs text-gray-500">Full resolution, larger file</div>
-                                        </div>
+                                    <button id="download-original-btn" class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center">
+                                        <i class="fas fa-star mr-2 text-yellow-500"></i> Original Quality
                                     </button>
                                 </div>
                             </div>
@@ -842,16 +833,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             console.log('Upload response:', data);
             if (data.success) {
-                currentJobId = data.job_id;
-                currentFileName = data.filename;
-                currentOriginalUrl = data.original_url;
-                
-                console.log('STEP 1 SUCCESS: Upload successful:', data);
-                showNotification('Image uploaded successfully! Ready for processing.', 'success');
-                
-                // Update URL to initiate-process route
-                updateUrl('/initiate-process', { job_id: currentJobId });
-                
+                handleUploadSuccess(data);
             } else {
                 throw new Error(data.error || 'Upload failed');
             }
@@ -861,6 +843,21 @@ document.addEventListener('DOMContentLoaded', function() {
             showNotification('Upload failed: ' + error.message, 'error');
             resetUI();
         });
+    }
+    
+    // Handle upload success
+    function handleUploadSuccess(data) {
+        if (data.success) {
+            currentJobId = data.job_id;
+            currentFileName = data.filename;
+            currentOriginalUrl = data.original_url;
+            
+            console.log('STEP 1 SUCCESS: Upload successful:', data);
+            showNotification('Image uploaded successfully! Ready for processing.', 'success');
+            
+            // Update URL without refresh
+            updateUrl('/initiate-process', { job_id: currentJobId });
+        }
     }
     
     // Handle successful completion
@@ -891,8 +888,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // Show controls
         downloadContainer.classList.remove('hidden');
         compareBtn.classList.remove('hidden');
-        
-        // Hide processing indicator
         processingIndicator.classList.add('hidden');
         
         // Save to history
@@ -911,6 +906,12 @@ document.addEventListener('DOMContentLoaded', function() {
         removeBgBtn.disabled = false;
         
         showNotification('Background removed successfully!', 'success');
+        
+        // Update URL to show completion
+        updateUrl('/background-removed', { 
+            job_id: currentJobId, 
+            completed: 'true' 
+        });
     }
 
     // Reset processing UI
@@ -1156,35 +1157,60 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to load job from URL
     function loadJobFromUrl(jobId) {
+        console.log('Loading job from URL:', jobId);
+        
         fetch(`/check-status/${jobId}`)
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     currentJobId = jobId;
                     
+                    console.log('Job status:', data.status, data);
+                    
                     // Set up UI based on job status
                     if (data.status === 'uploaded') {
-                        // Show upload complete state
                         if (data.data && data.data.original_url) {
                             currentOriginalUrl = data.data.original_url;
+                            currentFileName = data.data.user_filename || 'image';
+                            originalPreview.src = currentOriginalUrl;
+                            showUploadComplete();
+                            console.log('Restored uploaded image state');
+                        }
+                    } else if (data.status === 'processing') {
+                        if (data.data && data.data.original_url) {
+                            currentOriginalUrl = data.data.original_url;
+                            currentFileName = data.data.user_filename || 'image';
                             originalPreview.src = currentOriginalUrl;
                             showUploadComplete();
                         }
-                    } else if (data.status === 'processing') {
-                        // Show processing state
                         showProcessingState();
+                        console.log('Restored processing state');
                     } else if (data.status === 'completed') {
-                        // Show completed state
-                        showCompletedState(data.data);
+                        if (data.data) {
+                            currentOriginalUrl = data.data.original_url;
+                            currentResultUrl = data.data.processed_url;
+                            currentFileName = data.data.user_filename || 'image';
+                            currentOriginalQualityUrl = data.data.processed_url;
+                            
+                            originalPreview.src = currentOriginalUrl;
+                            resultPreview.src = currentResultUrl;
+                            compareOriginal.src = currentOriginalUrl;
+                            compareResult.src = currentResultUrl;
+                            
+                            showCompletedState(data.data);
+                            console.log('Restored completed state');
+                        }
                     }
                 } else {
-                    // Job not found, redirect to upload
-                    window.location.href = '/upload';
+                    console.log('Job not found');
+                    if (window.location.pathname !== '/upload') {
+                        window.location.href = '/upload';
+                    }
                 }
             })
             .catch(error => {
                 console.error('Error loading job:', error);
-                window.location.href = '/upload';
+                showNotification('Failed to load job status', 'error');
             });
     }
     
@@ -1242,14 +1268,7 @@ document.addEventListener('DOMContentLoaded', function() {
     fileInput.addEventListener('change', function(e) {
         console.log('File input changed!', e.target.files);
         if (e.target.files.length > 0) {
-            console.log('File details:', {
-                name: e.target.files[0].name,
-                size: e.target.files[0].size,
-                type: e.target.files[0].type
-            });
             handleFileSelection(e.target.files[0]);
-        } else {
-            console.log('No file selected');
         }
     });
 
@@ -1312,11 +1331,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             if (data.success) {
                 console.log('STEP 2 SUCCESS: Processing initiated:', data);
-                
-                // Update progress
                 progressBar.style.width = '50%';
-                
-                // Update URL to background-removed route
                 updateUrl('/background-removed', { job_id: currentJobId });
                 
                 // Small delay before step 3
@@ -1338,13 +1353,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         
                         if (finalData.success && finalData.status === 'completed') {
                             console.log('STEP 3 SUCCESS: Background removal completed:', finalData);
-                            
-                            // Update URL to show completion
-                            updateUrl('/background-removed', { 
-                                job_id: currentJobId, 
-                                completed: 'true' 
-                            });
-                            
                             handleProcessingComplete(finalData);
                         } else {
                             throw new Error(finalData.error || 'Background removal failed');
@@ -1378,12 +1386,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Compare Button
     compareBtn.addEventListener('click', function() {
         if (standardPreview.classList.contains('hidden')) {
-            // Switch to standard view
             comparisonPreview.classList.add('hidden');
             standardPreview.classList.remove('hidden');
             compareBtn.innerHTML = '<i class="fas fa-exchange-alt mr-2"></i> Compare';
         } else {
-            // Switch to comparison view
             standardPreview.classList.add('hidden');
             comparisonPreview.classList.remove('hidden');
             compareBtn.innerHTML = '<i class="fas fa-eye mr-2"></i> Standard View';
@@ -1397,20 +1403,32 @@ document.addEventListener('DOMContentLoaded', function() {
     
     downloadPreviewBtn.addEventListener('click', function() {
         if (currentResultUrl) {
-            const link = document.createElement('a');
-            link.href = currentResultUrl;
-            link.download = `bg_removed_${currentFileName || 'image'}.png`;
-            link.click();
+            // Store image data for taskpage1
+            localStorage.setItem('downloadImageData', currentResultUrl);
+            localStorage.setItem('downloadFilename', `bg_removed_${currentFileName || 'image'}.png`);
+            localStorage.setItem('downloadType', 'png');
+            
+            // Clear any existing session steps
+            sessionStorage.removeItem('downloadStep');
+            
+            // Navigate to taskpage1 for preview quality download
+            window.location.href = '/taskpage1.html';
         }
         downloadDropdown.classList.add('hidden');
     });
     
     downloadOriginalBtn.addEventListener('click', function() {
         if (currentOriginalQualityUrl) {
-            const link = document.createElement('a');
-            link.href = currentOriginalQualityUrl;
-            link.download = `bg_removed_original_${currentFileName || 'image'}.png`;
-            link.click();
+            // Store image data for taskpage2
+            localStorage.setItem('downloadImageData', currentOriginalQualityUrl);
+            localStorage.setItem('downloadFilename', `bg_removed_original_${currentFileName || 'image'}.png`);
+            localStorage.setItem('downloadType', 'png');
+            
+            // Clear any existing session steps
+            sessionStorage.removeItem('downloadStep');
+            
+            // Navigate to taskpage2 for original quality download
+            window.location.href = '/taskpage2.html';
         }
         downloadDropdown.classList.add('hidden');
     });
@@ -1428,11 +1446,9 @@ document.addEventListener('DOMContentLoaded', function() {
     loadUrlBtn.addEventListener('click', function() {
         const imageUrl = imageUrlInput.value.trim();
         if (imageUrl) {
-            // Create a temporary image to load the URL
             const img = new Image();
             img.crossOrigin = 'anonymous';
             img.onload = function() {
-                // Convert to blob and handle as file
                 const canvas = document.createElement('canvas');
                 canvas.width = img.width;
                 canvas.height = img.height;
@@ -1527,8 +1543,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Get URL parameters and handle job loading
     const urlParams = new URLSearchParams(window.location.search);
     const urlJobId = urlParams.get('job_id');
-    const urlStep = urlParams.get('step');
-    const isCompleted = urlParams.get('completed');
     
     // If there's a job_id in URL, load that job
     if (urlJobId) {
@@ -1539,6 +1553,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Make functions globally accessible for onclick handlers
     window.loadFromHistory = loadFromHistory;
 });
-</script>
+    </script>
 </body>
 </html>
