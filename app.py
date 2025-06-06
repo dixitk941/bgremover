@@ -5,7 +5,7 @@ import uuid
 import datetime
 import tempfile
 import json
-from flask import Flask, render_template, request, redirect, url_for, send_from_directory, jsonify
+from flask import Flask, render_template, request, redirect, url_for, send_from_directory, jsonify, make_response
 from rembg import remove
 from PIL import Image, UnidentifiedImageError
 import io
@@ -109,8 +109,12 @@ def index():
 def upload():
     """STEP 1: Handle file upload and validation ONLY"""
     if request.method == 'GET':
-        # Render the upload page
-        return render_template('bgremove.html')
+        # Render the upload page with refresh headers
+        response = make_response(render_template('bgremove.html'))
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+        return response
     
     elif request.method == 'POST':
         try:
@@ -206,7 +210,8 @@ def upload():
                 'step': 'upload_complete',
                 'message': 'Image uploaded successfully',
                 'next_step': '/initiate-process',
-                'redirect_url': f'/initiate-process?job_id={job_id}'
+                'redirect_url': f'/initiate-process?job_id={job_id}',
+                'auto_refresh': True  # Add this flag
             })
             
         except Exception as e:
@@ -222,7 +227,7 @@ def upload():
 def initiate_process():
     """STEP 2: Start the background removal processing"""
     if request.method == 'GET':
-        # Handle GET request for URL navigation
+        # Handle GET request with refresh
         job_id = request.args.get('job_id')
         if not job_id:
             return redirect(url_for('upload'))
@@ -232,8 +237,12 @@ def initiate_process():
         if not job_info:
             return redirect(url_for('upload'))
         
-        # Return the processing page with job info
-        return render_template('bgremove.html', job_id=job_id, step='initiate_process')
+        # Return the processing page with refresh headers
+        response = make_response(render_template('bgremove.html', job_id=job_id, step='initiate_process'))
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+        return response
     
     elif request.method == 'POST':
         try:
@@ -294,7 +303,8 @@ def initiate_process():
                 'step': 'processing_initiated',
                 'message': 'Background removal processing initiated successfully',
                 'next_step': '/background-removed',
-                'redirect_url': f'/background-removed?job_id={job_id}'
+                'redirect_url': f'/background-removed?job_id={job_id}',
+                'auto_refresh': True  # Add this flag
             })
                 
         except Exception as e:
@@ -310,7 +320,7 @@ def initiate_process():
 def background_removed():
     """STEP 3: Perform actual background removal and return results"""
     if request.method == 'GET':
-        # Handle GET request for URL navigation
+        # Handle GET request with refresh
         job_id = request.args.get('job_id')
         if not job_id:
             return redirect(url_for('upload'))
@@ -320,8 +330,12 @@ def background_removed():
         if not job_info:
             return redirect(url_for('upload'))
         
-        # Return the results page with job info
-        return render_template('bgremove.html', job_id=job_id, step='background_removed')
+        # Return the results page with refresh headers
+        response = make_response(render_template('bgremove.html', job_id=job_id, step='background_removed'))
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+        return response
     
     elif request.method == 'POST':
         try:
@@ -374,7 +388,8 @@ def background_removed():
                             'processed_data': f"data:{processed_mime};base64,{processed_base64}",
                             'user_filename': job_info['user_filename']
                         },
-                        'redirect_url': f'/background-removed?job_id={job_id}&completed=true'
+                        'redirect_url': f'/background-removed?job_id={job_id}&completed=true',
+                        'auto_refresh': True  # Add this flag
                     })
                 except Exception as e:
                     logger.error(f"Error generating base64 data for completed job {job_id}: {str(e)}")
@@ -457,7 +472,8 @@ def background_removed():
                             'processed_data': f"data:{processed_mime};base64,{processed_base64}",
                             'user_filename': job_info['user_filename']
                         },
-                        'redirect_url': f'/background-removed?job_id={job_id}&completed=true'
+                        'redirect_url': f'/background-removed?job_id={job_id}&completed=true',
+                        'auto_refresh': True  # Add this flag
                     })
                 except Exception as e:
                     logger.error(f"Error generating base64 data: {str(e)}")
@@ -555,13 +571,21 @@ def download_file(filename):
     response.headers["Expires"] = "0"
     return response
 
+# ==================== TASK PAGE ROUTES ====================
 @app.route('/taskpage1.html')
 def taskpage1():
+    """Route to task page 1 - Preview Quality Download"""
     return render_template('taskpage1.html')
 
-@app.route('/taskpage2.html')
+@app.route('/taskpage2.html') 
 def taskpage2():
+    """Route to task page 2 - Original Quality Download"""
     return render_template('taskpage2.html')
+
+@app.route('/bgremove')
+def bgremove():
+    """Alternative route to main background remover"""
+    return redirect(url_for('upload'))
 
 # ==================== ERROR HANDLERS ====================
 @app.errorhandler(413)
