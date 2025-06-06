@@ -474,7 +474,7 @@
                 <a href="#features" class="text-gray-600 hover:text-blue-600 transition-colors">Features</a>
                 <a href="#how-it-works" class="text-gray-600 hover:text-blue-600 transition-colors">How It Works</a>
                 <a href="#examples" class="text-gray-600 hover:text-blue-600 transition-colors">Examples</a>
-                <a href="bgremove" class="btn-primary rounded-full text-white px-6 py-2">
+                <a href="/upload" class="btn-primary rounded-full text-white px-6 py-2">
                     <i class="fas fa-cloud-upload-alt mr-2"></i> Start Now
                 </a>
             </nav>
@@ -491,7 +491,7 @@
                 <a href="#features" class="text-gray-600 hover:text-blue-600 py-2 transition-colors">Features</a>
                 <a href="#how-it-works" class="text-gray-600 hover:text-blue-600 py-2 transition-colors">How It Works</a>
                 <a href="#examples" class="text-gray-600 hover:text-blue-600 py-2 transition-colors">Examples</a>
-                <a href="bgremove" class="btn-primary text-center rounded-full text-white py-2">
+                <a href="/upload" class="btn-primary text-center rounded-full text-white py-2">
                     <i class="fas fa-cloud-upload-alt mr-2"></i> Start Now
                 </a>
             </div>
@@ -588,7 +588,7 @@
                             <h3 class="text-xl font-semibold mb-2">Upload Image</h3>
                             <p class="text-gray-600 mb-6">or drop a file, paste an image or URL</p>
                             
-                            <a href="bgremove" class="btn-primary text-white font-semibold py-3 px-8 rounded-full text-center inline-block shadow-lg">
+                            <a href="/upload" class="btn-primary text-white font-semibold py-3 px-8 rounded-full text-center inline-block shadow-lg">
                                 Upload Image
                             </a>
                             
@@ -751,7 +751,7 @@
                 
                 <!-- Quick Action Button -->
                 <div class="text-center mt-12 fade-in" style="transition-delay: 0.4s">
-                    <a href="bgremove" class="btn-primary text-white font-semibold py-3 px-10 rounded-full text-center inline-block shadow-lg">
+                    <a href="/upload" class="btn-primary text-white font-semibold py-3 px-10 rounded-full text-center inline-block shadow-lg">
                         Try It Now <i class="fas fa-arrow-right ml-2"></i>
                     </a>
                 </div>
@@ -821,7 +821,7 @@
                         </ul>
                         
                         <div class="mt-8">
-                            <a href="bgremove" class="btn-primary text-white font-semibold py-3 px-8 rounded-lg inline-block shadow-md">
+                            <a href="/upload" class="btn-primary text-white font-semibold py-3 px-8 rounded-lg inline-block shadow-md">
                                 Try BGRemover Now
                             </a>
                         </div>
@@ -920,7 +920,7 @@
                 <p class="text-xl text-blue-100 mb-8 max-w-2xl mx-auto fade-in">
                     Join thousands of users who trust BGRemover for professional-quality results
                 </p>
-                <a href="bgremove" class="bg-white text-blue-600 font-bold py-4 px-10 rounded-full inline-block shadow-lg hover:bg-blue-50 transition-all transform hover:scale-105 fade-in">
+                <a href="/upload" class="bg-white text-blue-600 font-bold py-4 px-10 rounded-full inline-block shadow-lg hover:bg-blue-50 transition-all transform hover:scale-105 fade-in">
                     Start Removing Backgrounds Now
                 </a>
                 
@@ -1009,7 +1009,7 @@
 
     <!-- Sticky bottom CTA for mobile (initially hidden) -->
     <div class="fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t border-gray-200 p-4 flex justify-center md:hidden transform translate-y-full transition-transform duration-300" id="mobile-cta">
-        <a href="bgremove" class="btn-primary text-white font-semibold py-3 px-8 rounded-full text-center inline-block w-full">
+        <a href="/upload" class="btn-primary text-white font-semibold py-3 px-8 rounded-full text-center inline-block w-full">
             Try BGRemover Now
         </a>
     </div>
@@ -1126,7 +1126,7 @@
                     reader.onload = function(event) {
                         sessionStorage.setItem('uploadedImage', event.target.result);
                         sessionStorage.setItem('uploadedImageName', file.name);
-                        window.location.href = 'bgremove';
+                        window.location.href = '/upload';
                     };
                     
                     reader.readAsDataURL(file);
@@ -1164,7 +1164,7 @@
                         reader.onload = function(event) {
                             sessionStorage.setItem('uploadedImage', event.target.result);
                             sessionStorage.setItem('uploadedImageName', file.name);
-                            window.location.href = 'bgremove';
+                            window.location.href = '/upload';
                         };
                         
                         reader.readAsDataURL(file);

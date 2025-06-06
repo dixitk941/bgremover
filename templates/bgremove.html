@@ -691,941 +691,854 @@
     <!-- Scripts -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize AOS animations
-            AOS.init({
-                duration: 800,
-                once: true
-            });
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize AOS animations
+    AOS.init({
+        duration: 800,
+        once: true
+    });
+    
+    // DOM Elements
+    const fileInput = document.getElementById('image');
+    const uploadContainer = document.getElementById('upload-container');
+    const dropText = document.getElementById('drop-text');
+    const previewContainer = document.getElementById('preview-container');
+    const originalPreview = document.getElementById('original-preview');
+    const resultContainer = document.getElementById('result-container');
+    const resultPreview = document.getElementById('result-preview');
+    const processingIndicator = document.getElementById('processing-indicator');
+    const progressBar = document.getElementById('progress-bar');
+    const spinner = document.getElementById('spinner');
+    const removeBgBtn = document.getElementById('remove-bg-btn');
+    const downloadContainer = document.getElementById('download-container');
+    const downloadBtn = document.getElementById('download-btn');
+    const downloadDropdown = document.getElementById('download-dropdown');
+    const downloadPreviewBtn = document.getElementById('download-preview-btn');
+    const downloadOriginalBtn = document.getElementById('download-original-btn');
+    const compareBtn = document.getElementById('compare-btn');
+    const uploadNewBtn = document.getElementById('upload-new-btn');
+    const viewHistoryBtn = document.getElementById('view-history');
+    const clearHistoryBtn = document.getElementById('clear-history-btn');
+    const historySection = document.getElementById('history-section');
+    const recentImagesContainer = document.getElementById('recent-images');
+    const noHistoryMessage = document.getElementById('no-history-message');
+    const standardPreview = document.getElementById('standard-preview');
+    const comparisonPreview = document.getElementById('comparison-preview');
+    const compareOriginal = document.getElementById('compare-original');
+    const compareResult = document.getElementById('compare-result');
+    const themeToggle = document.getElementById('theme-toggle');
+    
+    // URL Modal Elements
+    const urlImageBtn = document.getElementById('url-image-btn');
+    const urlModal = document.getElementById('url-modal');
+    const imageUrlInput = document.getElementById('image-url-input');
+    const loadUrlBtn = document.getElementById('load-url-btn');
+    const cancelUrlBtn = document.getElementById('cancel-url-btn');
+    
+    // Paste Button Element
+    const pasteImageBtn = document.getElementById('paste-image-btn');
+    
+    // Comparison slider elements
+    const slider = document.querySelector('.img-compare-slider');
+    const afterContainer = document.querySelector('.img-compare-after');
+    
+    let currentFileName = '';
+    let currentOriginalUrl = '';
+    let currentResultUrl = '';
+    let currentOriginalQualityUrl = '';
+    let isSliderActive = false;
+    let currentJobId = null;
+    let processingInterval = null;
+    
+    // Define these variables properly
+    const heroSection = document.querySelector('section.text-center.mb-10');
+    const historyContainer = document.querySelector('.history-container');
+    
+    // Initialize from session storage
+    loadHistory();
+    initializeTheme();
+    
+    // Initialize history bar on page load if there's history
+    const history = JSON.parse(sessionStorage.getItem('bgRemoverHistory') || '[]');
+    if (history.length > 0) {
+        if (heroSection) heroSection.classList.add('hidden');
+        if (historyContainer) historyContainer.classList.remove('hidden');
+        updateHistoryBar(history);
+    }
+    
+    // Function to update URL without reload
+    function updateUrl(path, params = {}) {
+        const url = new URL(path, window.location.origin);
+        Object.keys(params).forEach(key => {
+            url.searchParams.set(key, params[key]);
+        });
+        window.history.pushState({}, '', url);
+    }
+    
+    // Initialize theme based on localStorage
+    function initializeTheme() {
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+            themeToggle.checked = true;
+        }
+    }
+    
+    // STEP 1: File Upload Handler (Complete Implementation)
+    function handleFileSelection(file) {
+        if (!file || !file.type.match('image.*')) {
+            showNotification('Please select a valid image file', 'error');
+            return;
+        }
+        
+        // Check file size (16MB limit)
+        if (file.size > 16 * 1024 * 1024) {
+            showNotification('File too large. Maximum size is 16MB', 'error');
+            return;
+        }
+        
+        console.log('File selected:', file.name, file.size, file.type);
+        
+        const formData = new FormData();
+        formData.append('image', file);
+        
+        // Show initial preview
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            originalPreview.src = e.target.result;
+            dropText.classList.add('hidden');
+            previewContainer.classList.remove('hidden');
+            originalPreview.parentNode.classList.remove('hidden');
+            resultContainer.classList.add('hidden');
             
-            // DOM Elements
-            const fileInput = document.getElementById('image');
-            const uploadContainer = document.getElementById('upload-container');
-            const dropText = document.getElementById('drop-text');
-            const previewContainer = document.getElementById('preview-container');
-            const originalPreview = document.getElementById('original-preview');
-            const resultContainer = document.getElementById('result-container');
-            const resultPreview = document.getElementById('result-preview');
-            const processingIndicator = document.getElementById('processing-indicator');
-            const progressBar = document.getElementById('progress-bar');
-            const spinner = document.getElementById('spinner');
-            const removeBgBtn = document.getElementById('remove-bg-btn');
-            const downloadContainer = document.getElementById('download-container');
-            const downloadBtn = document.getElementById('download-btn');
-            const downloadDropdown = document.getElementById('download-dropdown');
-            const downloadPreviewBtn = document.getElementById('download-preview-btn');
-            const downloadOriginalBtn = document.getElementById('download-original-btn');
-            const compareBtn = document.getElementById('compare-btn');
-            const uploadNewBtn = document.getElementById('upload-new-btn');
-            const viewHistoryBtn = document.getElementById('view-history');
-            const clearHistoryBtn = document.getElementById('clear-history-btn');
-            const historySection = document.getElementById('history-section');
-            const recentImagesContainer = document.getElementById('recent-images');
-            const noHistoryMessage = document.getElementById('no-history-message');
-            const standardPreview = document.getElementById('standard-preview');
-            const comparisonPreview = document.getElementById('comparison-preview');
-            const compareOriginal = document.getElementById('compare-original');
-            const compareResult = document.getElementById('compare-result');
-            const themeToggle = document.getElementById('theme-toggle');
+            // Reset any previous results
+            downloadContainer.classList.add('hidden');
+            compareBtn.classList.add('hidden');
+            processingIndicator.classList.add('hidden');
+            progressBar.style.width = '0%';
             
-            // URL Modal Elements
-            const urlImageBtn = document.getElementById('url-image-btn');
-            const urlModal = document.getElementById('url-modal');
-            const imageUrlInput = document.getElementById('image-url-input');
-            const loadUrlBtn = document.getElementById('load-url-btn');
-            const cancelUrlBtn = document.getElementById('cancel-url-btn');
+            // Hide hero section and show history bar
+            if (heroSection) heroSection.classList.add('hidden');
+            if (historyContainer) historyContainer.classList.remove('hidden');
             
-            // Paste Button Element
-            const pasteImageBtn = document.getElementById('paste-image-btn');
-            
-            // Comparison slider elements
-            const slider = document.querySelector('.img-compare-slider');
-            const afterContainer = document.querySelector('.img-compare-after');
-            
-            let currentFileName = '';
-            let currentOriginalUrl = '';
-            let currentResultUrl = '';
-            let currentOriginalQualityUrl = ''; // Store original quality download URL
-            let isSliderActive = false;
-            
-            // Define these variables properly
-            const heroSection = document.querySelector('section.text-center.mb-10');
-            const historyContainer = document.querySelector('.history-container');
-            
-            // Initialize from session storage
-            loadHistory();
-            initializeTheme();
-            
-            // Initialize history bar on page load if there's history
+            showNotification('Image preview loaded! Click "Remove Background" to start processing.', 'success');
+        };
+        reader.readAsDataURL(file);
+        
+        // STEP 1: Upload to server
+        console.log('STEP 1: Uploading file to server');
+        showNotification('Uploading image...', 'info');
+        
+        fetch('/upload', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            console.log('Upload response status:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Upload response:', data);
+            if (data.success) {
+                currentJobId = data.job_id;
+                currentFileName = data.filename;
+                currentOriginalUrl = data.original_url;
+                
+                console.log('STEP 1 SUCCESS: Upload successful:', data);
+                showNotification('Image uploaded successfully! Ready for processing.', 'success');
+                
+                // Update URL to initiate-process route
+                updateUrl('/initiate-process', { job_id: currentJobId });
+                
+            } else {
+                throw new Error(data.error || 'Upload failed');
+            }
+        })
+        .catch(error => {
+            console.error('STEP 1 ERROR:', error);
+            showNotification('Upload failed: ' + error.message, 'error');
+            resetUI();
+        });
+    }
+    
+    // Handle successful completion
+    function handleProcessingComplete(data) {
+        // Complete progress bar
+        progressBar.style.width = '100%';
+        
+        // Set result data
+        if (data.data.processed_data) {
+            currentResultUrl = data.data.processed_data;
+            currentOriginalUrl = data.data.original_data || currentOriginalUrl;
+            currentOriginalQualityUrl = data.data.processed_data;
+        } else {
+            currentResultUrl = data.data.processed_url;
+            currentOriginalUrl = data.data.original_url || currentOriginalUrl;
+            currentOriginalQualityUrl = data.data.processed_url;
+        }
+        
+        // Update UI
+        originalPreview.parentNode.classList.add('hidden');
+        resultPreview.src = currentResultUrl;
+        resultContainer.classList.remove('hidden');
+        
+        // Setup comparison view
+        compareOriginal.src = currentOriginalUrl;
+        compareResult.src = currentResultUrl;
+        
+        // Show controls
+        downloadContainer.classList.remove('hidden');
+        compareBtn.classList.remove('hidden');
+        
+        // Hide processing indicator
+        processingIndicator.classList.add('hidden');
+        
+        // Save to history
+        saveToHistory(currentFileName, currentOriginalUrl, currentResultUrl, data.data.filename);
+        
+        // Create confetti effect
+        createConfetti();
+        
+        // Remove pixel animation
+        const pixelContainer = document.querySelector('.pixel-animation-container');
+        if (pixelContainer) {
+            pixelContainer.remove();
+        }
+        
+        // Re-enable button
+        removeBgBtn.disabled = false;
+        
+        showNotification('Background removed successfully!', 'success');
+    }
+
+    // Reset processing UI
+    function resetProcessingUI() {
+        removeBgBtn.disabled = false;
+        processingIndicator.classList.add('hidden');
+        progressBar.style.width = '0%';
+        
+        const pixelContainer = document.querySelector('.pixel-animation-container');
+        if (pixelContainer) {
+            pixelContainer.remove();
+        }
+    }
+
+    // Show notification function
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg text-white max-w-sm shadow-lg transform transition-all duration-300 ${
+            type === 'success' ? 'bg-green-500' : 
+            type === 'error' ? 'bg-red-500' : 'bg-blue-500'
+        }`;
+        notification.innerHTML = `
+            <div class="flex items-center gap-2">
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Animate in
+        setTimeout(() => {
+            notification.style.transform = 'translateX(0)';
+        }, 100);
+        
+        // Remove after delay
+        setTimeout(() => {
+            notification.style.transform = 'translateX(100%)';
+            notification.style.opacity = '0';
+            setTimeout(() => {
+                if (document.body.contains(notification)) {
+                    document.body.removeChild(notification);
+                }
+            }, 300);
+        }, 4000);
+    }
+
+    // Reset UI function
+    function resetUI() {
+        currentJobId = null;
+        currentFileName = '';
+        currentOriginalUrl = '';
+        currentResultUrl = '';
+        currentOriginalQualityUrl = '';
+        
+        // Reset UI elements
+        dropText.classList.remove('hidden');
+        previewContainer.classList.add('hidden');
+        resultContainer.classList.add('hidden');
+        downloadContainer.classList.add('hidden');
+        compareBtn.classList.add('hidden');
+        processingIndicator.classList.add('hidden');
+        progressBar.style.width = '0%';
+        
+        // Show hero section and hide history bar
+        if (heroSection) heroSection.classList.remove('hidden');
+        if (historyContainer) historyContainer.classList.add('hidden');
+        
+        // Reset file input
+        fileInput.value = '';
+        
+        // Remove any pixel animations
+        const pixelContainer = document.querySelector('.pixel-animation-container');
+        if (pixelContainer) {
+            pixelContainer.remove();
+        }
+        
+        // Reset comparison view
+        standardPreview.classList.remove('hidden');
+        comparisonPreview.classList.add('hidden');
+        compareBtn.innerHTML = '<i class="fas fa-exchange-alt mr-2"></i> Compare';
+        
+        // Re-enable buttons
+        removeBgBtn.disabled = false;
+        
+        // Update URL
+        window.history.pushState({}, '', '/upload');
+    }
+
+    // Save to history function
+    function saveToHistory(filename, originalUrl, resultUrl, processedFilename) {
+        try {
             const history = JSON.parse(sessionStorage.getItem('bgRemoverHistory') || '[]');
-            if (history.length > 0) {
+            
+            const historyItem = {
+                id: Date.now(),
+                filename: filename,
+                processedFilename: processedFilename,
+                originalUrl: originalUrl,
+                resultUrl: resultUrl,
+                timestamp: new Date().toISOString(),
+                date: new Date().toLocaleDateString()
+            };
+            
+            // Add to beginning of array
+            history.unshift(historyItem);
+            
+            // Keep only last 10 items
+            if (history.length > 10) {
+                history.splice(10);
+            }
+            
+            sessionStorage.setItem('bgRemoverHistory', JSON.stringify(history));
+            updateHistoryBar(history);
+        } catch (error) {
+            console.error('Error saving to history:', error);
+        }
+    }
+
+    // Load history function
+    function loadHistory() {
+        try {
+            const history = JSON.parse(sessionStorage.getItem('bgRemoverHistory') || '[]');
+            
+            if (history.length === 0) {
+                if (recentImagesContainer) recentImagesContainer.innerHTML = '';
+                if (noHistoryMessage) noHistoryMessage.classList.remove('hidden');
+            } else {
+                if (noHistoryMessage) noHistoryMessage.classList.add('hidden');
+                
+                if (recentImagesContainer) {
+                    recentImagesContainer.innerHTML = history.map((item, index) => `
+                        <div class="recent-item bg-white rounded-lg shadow-md overflow-hidden cursor-pointer" 
+                             style="--index: ${index}" 
+                             onclick="loadFromHistory('${item.id}')">
+                            <img src="${item.resultUrl}" alt="${item.filename}" class="w-full h-32 object-cover">
+                            <div class="p-3">
+                                <p class="text-sm font-medium truncate">${item.filename}</p>
+                                <p class="text-xs text-gray-500">${item.date}</p>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            }
+            
+            updateHistoryBar(history);
+        } catch (error) {
+            console.error('Error loading history:', error);
+            sessionStorage.removeItem('bgRemoverHistory');
+        }
+    }
+
+    // Update history bar function
+    function updateHistoryBar(history) {
+        if (!historyContainer) return;
+        
+        if (history.length === 0) {
+            historyContainer.classList.add('hidden');
+            return;
+        }
+        
+        historyContainer.innerHTML = history.slice(0, 5).map(item => `
+            <div class="flex-shrink-0 cursor-pointer" onclick="loadFromHistory('${item.id}')">
+                <img src="${item.resultUrl}" alt="${item.filename}" 
+                     class="w-16 h-16 object-cover rounded border-2 border-gray-200 hover:border-blue-400 transition-colors">
+            </div>
+        `).join('');
+    }
+
+    // Load from history function
+    function loadFromHistory(itemId) {
+        try {
+            const history = JSON.parse(sessionStorage.getItem('bgRemoverHistory') || '[]');
+            const item = history.find(h => h.id.toString() === itemId.toString());
+            
+            if (item) {
+                currentFileName = item.filename;
+                currentOriginalUrl = item.originalUrl;
+                currentResultUrl = item.resultUrl;
+                currentOriginalQualityUrl = item.resultUrl;
+                
+                // Update UI
+                originalPreview.src = item.originalUrl;
+                resultPreview.src = item.resultUrl;
+                
+                dropText.classList.add('hidden');
+                previewContainer.classList.remove('hidden');
+                originalPreview.parentNode.classList.add('hidden');
+                resultContainer.classList.remove('hidden');
+                
+                // Show controls
+                downloadContainer.classList.remove('hidden');
+                compareBtn.classList.remove('hidden');
+                
+                // Setup comparison view
+                compareOriginal.src = item.originalUrl;
+                compareResult.src = item.resultUrl;
+                
+                // Hide hero section and show history bar
                 if (heroSection) heroSection.classList.add('hidden');
                 if (historyContainer) historyContainer.classList.remove('hidden');
-                updateHistoryBar(history);
+                
+                showNotification('Image loaded from history!', 'success');
             }
-            
-            // Theme toggle
-            themeToggle.addEventListener('change', function() {
-                document.body.classList.toggle('dark-mode');
-                localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
-            });
-            
-            // Initialize theme based on localStorage
-            function initializeTheme() {
-                if (localStorage.getItem('darkMode') === 'true') {
-                    document.body.classList.add('dark-mode');
-                    themeToggle.checked = true;
-                }
-            }
-            
-            // File Input Change Handler
-            fileInput.addEventListener('change', function(e) {
-                handleFileSelection(e.target.files[0]);
-            });
-
-            // Drag & Drop Handlers
-            uploadContainer.addEventListener('dragover', function(e) {
-                e.preventDefault();
-                uploadContainer.classList.add('active');
-            });
-
-            uploadContainer.addEventListener('dragleave', function() {
-                uploadContainer.classList.remove('active');
-            });
-
-            uploadContainer.addEventListener('drop', function(e) {
-                e.preventDefault();
-                uploadContainer.classList.remove('active');
-                
-                if (e.dataTransfer.files.length) {
-                    handleFileSelection(e.dataTransfer.files[0]);
-                }
-            });
-
-            // Remove Background Button
-            removeBgBtn.addEventListener('click', function() {
-                if (!currentFileName) return;
-                
-                const formData = new FormData();
-                formData.append('image', fileInput.files[0]);
-                
-                // Create pixel animation overlay
-                const pixelContainer = document.createElement('div');
-                pixelContainer.className = 'pixel-animation-container';
-                originalPreview.parentNode.style.position = 'relative';
-                originalPreview.parentNode.appendChild(pixelContainer);
-                
-                // Generate pixels
-                createPixelAnimation(pixelContainer, originalPreview.offsetWidth, originalPreview.offsetHeight);
-                
-                removeBgBtn.disabled = true;
-                
-                // Show processing indicator
-                processingIndicator.classList.remove('hidden');
-                
-                // Simulate progress for better UX
-                let progress = 0;
-                const progressInterval = setInterval(() => {
-                    progress += Math.random() * 15;
-                    if (progress > 90) progress = 90; // Leave the last 10% for actual completion
-                    progressBar.style.width = progress + '%';
-                }, 500);
-                
-                fetch('/upload', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(data => {
-                            throw new Error(data.error || 'Network response was not ok');
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Response data:', data);
-                    
-                    if (!data.success) {
-                        throw new Error('Invalid response from server');
-                    }
-                    
-                    // Complete progress bar
-                    clearInterval(progressInterval);
-                    progressBar.style.width = '100%';
-                    
-                    // Try to use base64 data if available, otherwise fall back to URLs
-                    if (data.processed_data) {
-                        currentResultUrl = data.processed_data;
-                        currentOriginalUrl = data.original_data || data.original_url;
-                    } else {
-                        currentResultUrl = data.processed_url;
-                        currentOriginalUrl = data.original_url;
-                    }
-                    
-                    // Hide original image and show only result
-                    originalPreview.parentNode.classList.add('hidden');
-                    resultPreview.src = currentResultUrl;
-                    resultContainer.classList.remove('hidden');
-                    
-                    // Set up comparison view
-                    compareOriginal.src = currentOriginalUrl;
-                    compareResult.src = currentResultUrl;
-                    
-                    // Show the compare and download buttons
-                    downloadContainer.classList.remove('hidden');
-                    compareBtn.classList.remove('hidden');
-                    
-                    // Store the original quality URL if provided
-                    if (data.original_quality_url) {
-                        currentOriginalQualityUrl = data.original_quality_url;
-                    }
-                    
-                    // Hide processing indicator
-                    processingIndicator.classList.add('hidden');
-                    
-                    // Save to session storage with complete information and store filename for download
-                    saveToHistory(currentFileName, currentOriginalUrl, currentResultUrl, data.filename);
-                    
-                    // Create confetti effect for successful operation
-                    createConfetti();
-                    
-                    // Remove pixel animation container
-                    if (originalPreview.parentNode.contains(pixelContainer)) {
-                        originalPreview.parentNode.removeChild(pixelContainer);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    clearInterval(progressInterval);
-                    alert('Error processing image: ' + error.message);
-                    
-                    // Remove pixel animation container on error
-                    if (originalPreview.parentNode.contains(pixelContainer)) {
-                        originalPreview.parentNode.removeChild(pixelContainer);
-                    }
-                    
-                    // Hide processing indicator
-                    processingIndicator.classList.add('hidden');
-                })
-                .finally(() => {
-                    removeBgBtn.disabled = false;
-                });
-            });
-
-            // Download Button Dropdown Toggle
-            downloadBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                downloadDropdown.classList.toggle('hidden');
-            });
-
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!downloadContainer.contains(e.target)) {
-                    downloadDropdown.classList.add('hidden');
-                }
-            });
-
-            // Download Preview Button
-            downloadPreviewBtn.addEventListener('click', function() {
-                downloadDropdown.classList.add('hidden');
-                
-                if (currentResultUrl) {
-                    // Store in localStorage instead of URL parameters
-                    localStorage.setItem('downloadImageData', currentResultUrl);
-                    localStorage.setItem('downloadFilename', 'bg_removed_preview_' + currentFileName);
-                    localStorage.setItem('downloadType', 'preview');
-                    
-                    // Navigate without the long parameters
-                    window.location.href = `/taskpage1.html`;
-                }
-            });
-
-            // Download Original Quality Button
-            downloadOriginalBtn.addEventListener('click', function() {
-                downloadDropdown.classList.add('hidden');
-                
-                if (currentOriginalQualityUrl || currentResultUrl) {
-                    // Store in localStorage instead of URL parameters
-                    const downloadUrl = currentOriginalQualityUrl || currentResultUrl;
-                    localStorage.setItem('downloadImageData', downloadUrl);
-                    localStorage.setItem('downloadFilename', 'bg_removed_original_' + currentFileName);
-                    localStorage.setItem('downloadType', 'original');
-                    
-                    // Navigate without the long parameters
-                    window.location.href = `/taskpage2.html`;  // Add this line that was missing
-                }
-            });
-            
-            // Compare Button
-            compareBtn.addEventListener('click', function() {
-                if (standardPreview.classList.contains('hidden')) {
-                    // Switch to standard view
-                    standardPreview.classList.remove('hidden');
-                    comparisonPreview.classList.add('hidden');
-                    compareBtn.innerHTML = '<i class="fas fa-exchange-alt mr-2"></i> Compare';
-                } else {
-                    // Switch to comparison view
-                    standardPreview.classList.add('hidden');
-                    comparisonPreview.classList.remove('hidden');
-                    compareBtn.innerHTML = '<i class="fas fa-th-large mr-2"></i> Standard View';
-                }
-            });
-
-            // Upload New Button
-            uploadNewBtn.addEventListener('click', function() {
-                resetUI();
-            });
-
-            // View History Button
-            viewHistoryBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                historySection.classList.toggle('hidden');
-                if (!historySection.classList.contains('hidden')) {
-                    loadHistory();
-                    historySection.scrollIntoView({ behavior: 'smooth' });
-                }
-            });
-            
-            // Clear History Button
-            clearHistoryBtn.addEventListener('click', function() {
-                if (confirm('Are you sure you want to clear all history?')) {
-                    sessionStorage.removeItem('bgRemoverHistory');
-                    loadHistory();
-                }
-            });
-
-            // Check if there's an image from the landing page
-const uploadedImage = sessionStorage.getItem('uploadedImage');
-const uploadedImageName = sessionStorage.getItem('uploadedImageName');
-
-if (uploadedImage && uploadedImageName) {
-    // Create a file from the data URL
-    fetch(uploadedImage)
-        .then(res => res.blob())
-        .then(blob => {
-            const file = new File([blob], uploadedImageName, { type: blob.type });
-            
-            // Create a DataTransfer object to set the file input
-            const dataTransfer = new DataTransfer();
-            dataTransfer.items.add(file);
-            fileInput.files = dataTransfer.files;
-            
-            // Display the image preview
-            handleFileSelection(file);
-            
-            // Clear the sessionStorage so it doesn't reload on refresh
-            sessionStorage.removeItem('uploadedImage');
-            sessionStorage.removeItem('uploadedImageName');
-            
-            // Optional: Automatically start processing
-            // removeBgBtn.click();
-        });
-}
-
-            // Update the handleFileSelection function
-            function handleFileSelection(file) {
-                if (!file || !file.type.match('image.*')) return;
-                
-                currentFileName = file.name;
-                const reader = new FileReader();
-                
-                reader.onload = function(e) {
-                    const heroSection = document.querySelector('section.text-center.mb-10');
-                    const historyContainer = document.querySelector('.history-container');
-                    
-                    // Hide hero section and show history bar
-                    if (heroSection) {
-                        heroSection.classList.add('hidden');
-                    }
-                    if (historyContainer) {
-                        historyContainer.classList.remove('hidden');
-                    }
-                    
-                    currentOriginalUrl = e.target.result;
-                    originalPreview.src = currentOriginalUrl;
-                    dropText.classList.add('hidden');
-                    previewContainer.classList.remove('hidden');
-                    
-                    // Make sure the original image is visible initially for preview
-                    originalPreview.parentNode.classList.remove('hidden');
-                    
-                    // Hide result container until processing is complete
-                    resultContainer.classList.add('hidden');
-                    downloadContainer.classList.add('hidden');
-                    compareBtn.classList.add('hidden');
-                    processingIndicator.classList.add('hidden');
-                    
-                    // Reset comparison view if active
-                    standardPreview.classList.remove('hidden');
-                    comparisonPreview.classList.add('hidden');
-                    compareBtn.innerHTML = '<i class="fas fa-exchange-alt mr-2"></i> Compare';
-                };
-                
-                reader.readAsDataURL(file);
-            }
-
-            // Reset UI to initial state
-            function resetUI() {
-                fileInput.value = '';
-                dropText.classList.remove('hidden');
-                previewContainer.classList.add('hidden');
-                resultContainer.classList.add('hidden');
-                processingIndicator.classList.add('hidden');
-                progressBar.style.width = '0%';
-                currentFileName = '';
-                currentOriginalUrl = '';
-                currentResultUrl = '';
-                currentOriginalQualityUrl = '';
-                
-                // Show hero section if no history
-                const history = JSON.parse(sessionStorage.getItem('bgRemoverHistory') || '[]');
-                if (history.length === 0 && heroSection) {
-                    heroSection.classList.remove('hidden');
-                    historyContainer.classList.add('hidden');
-                }
-                
-                // Hide download container and close dropdown
-                downloadContainer.classList.add('hidden');
-                downloadDropdown.classList.add('hidden');
-                
-                // Reset comparison view
-                standardPreview.classList.remove('hidden');
-                comparisonPreview.classList.add('hidden');
-                
-                // Close URL modal if open
-                urlModal.classList.add('hidden');
-                imageUrlInput.value = '';
-                
-                // Reset button states
-                if (loadUrlBtn) {
-                    loadUrlBtn.innerHTML = '<i class="fas fa-link mr-2"></i> Load Image';
-                    loadUrlBtn.disabled = false;
-                }
-                if (pasteImageBtn) {
-                    pasteImageBtn.innerHTML = '<i class="fas fa-paste mr-2"></i> Paste Image';
-                }
-            }
-
-            // Session Storage Functions
-            function saveToHistory(filename, originalUrl, resultUrl, downloadFilename) {
-                const history = JSON.parse(sessionStorage.getItem('bgRemoverHistory') || '[]');
-                const historyContainer = document.querySelector('.history-container');
-                const heroSection = document.querySelector('section.text-center.mb-10');
-                
-                // Check if already exists and remove it
-                const filtered = history.filter(item => item.filename !== filename);
-                
-                // Add current item to the beginning
-                filtered.unshift({
-                    filename: filename,
-                    originalUrl: originalUrl,
-                    resultUrl: resultUrl,
-                    downloadFilename: downloadFilename || filename,
-                    timestamp: Date.now()
-                });
-                
-                // Limit to 8 items
-                const limitedHistory = filtered.slice(0, 8);
-                
-                sessionStorage.setItem('bgRemoverHistory', JSON.stringify(limitedHistory));
-                
-                // Update history display if visible
-                if (document.getElementById('history-section') && 
-                    !document.getElementById('history-section').classList.contains('hidden')) {
-                    loadHistory();
-                }
-                
-                // Update the horizontal history bar if it exists
-                if (historyContainer) {
-                    updateHistoryBar(limitedHistory);
-                    
-                    // Show the history bar and hide the hero text after first upload
-                    if (heroSection && limitedHistory.length > 0) {
-                        heroSection.classList.add('hidden');
-                        historyContainer.classList.remove('hidden');
-                    }
-                }
-            }
-
-            // Function to update the horizontal history bar
-            function updateHistoryBar(history) {
-                historyContainer.innerHTML = '';
-                
-                history.forEach((item, index) => {
-                    const historyItem = document.createElement('div');
-                    historyItem.className = `history-thumbnail ${index === 0 ? 'border-2 border-blue-500' : 'border border-gray-300'} rounded-lg overflow-hidden cursor-pointer relative w-16 h-16 flex-shrink-0 transition-all hover:scale-110`;
-                    historyItem.title = item.filename;
-                    
-                    // Create the thumbnail
-                    const thumbnail = document.createElement('img');
-                    thumbnail.src = item.resultUrl;
-                    thumbnail.className = 'w-full h-full object-cover';
-                    thumbnail.alt = item.filename;
-                    
-                    historyItem.appendChild(thumbnail);
-                    historyContainer.appendChild(historyItem);
-                    
-                    // Add click event to switch to this image
-                    historyItem.addEventListener('click', function() {
-                        // Highlight the selected thumbnail
-                        document.querySelectorAll('.history-thumbnail').forEach(el => {
-                            el.classList.remove('border-2', 'border-blue-500');
-                            el.classList.add('border', 'border-gray-300');
-                        });
-                        this.classList.remove('border', 'border-gray-300');
-                        this.classList.add('border-2', 'border-blue-500');
-                        
-                        // Set the current image
-                        originalPreview.src = item.originalUrl;
-                        resultPreview.src = item.resultUrl;
-                        currentFileName = item.filename;
-                        currentOriginalUrl = item.originalUrl;
-                        currentResultUrl = item.resultUrl;
-                        
-                        // Setup comparison view
-                        compareOriginal.src = currentOriginalUrl;
-                        compareResult.src = currentResultUrl;
-                        
-                        // Update UI
-                        dropText.classList.add('hidden');
-                        previewContainer.classList.remove('hidden');
-                        resultContainer.classList.remove('hidden');
-                        downloadContainer.classList.remove('hidden');
-                        compareBtn.classList.remove('hidden');
-                        
-                        // Reset to standard view
-                        standardPreview.classList.remove('hidden');
-                        comparisonPreview.classList.add('hidden');
-                    });
-                });
-                
-                // Add "Upload New" button at the end
-                const uploadNewButton = document.createElement('div');
-                uploadNewButton.className = 'history-thumbnail border border-dashed border-blue-400 rounded-lg overflow-hidden cursor-pointer relative w-16 h-16 flex-shrink-0 transition-all hover:scale-110 bg-blue-50 flex items-center justify-center';
-                uploadNewButton.title = 'Upload New Image';
-                uploadNewButton.innerHTML = '<i class="fas fa-plus text-blue-500 text-xl"></i>';
-                historyContainer.appendChild(uploadNewButton);
-                
-                uploadNewButton.addEventListener('click', function() {
-                    resetUI();
-                    fileInput.click();
-                });
-            }
-
-            function loadHistory() {
-                const history = JSON.parse(sessionStorage.getItem('bgRemoverHistory') || '[]');
-                recentImagesContainer.innerHTML = '';
-                
-                if (history.length === 0) {
-                    noHistoryMessage.classList.remove('hidden');
-                    clearHistoryBtn.style.display = 'none';
-                    return;
-                }
-                
-                noHistoryMessage.classList.add('hidden');
-                clearHistoryBtn.style.display = 'block';
-                
-                history.forEach((item, index) => {
-                    const historyItem = document.createElement('div');
-                    historyItem.className = 'recent-item bg-white p-2 rounded shadow-sm border border-gray-200 transition-all';
-                    historyItem.style.setProperty('--index', index);
-                    
-                    const date = new Date(item.timestamp);
-                    const formattedDate = `${date.getMonth()+1}/${date.getDate()}/${date.getFullYear()} ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
-                    
-                    historyItem.innerHTML = `
-                        <div class="relative group">
-                            <img src="${item.resultUrl}" alt="${item.filename}" class="w-full h-32 object-contain mb-2 rounded">
-                            <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center rounded">
-                                <button class="preview-history-btn p-1 bg-white rounded-full m-1">
-                                    <i class="fas fa-eye text-blue-600"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <p class="text-xs truncate font-medium">${item.filename}</p>
-                        <p class="text-xs text-gray-500 mb-2">${formattedDate}</p>
-                        <div class="flex justify-between mt-1">
-                            <button class="reuse-btn text-xs text-blue-600 hover:text-blue-800 transition-colors">
-                                <i class="fas fa-sync-alt mr-1"></i> Reuse
-                            </button>
-                            <button class="download-history-btn text-xs text-green-600 hover:text-green-800 transition-colors">
-                                <i class="fas fa-download mr-1"></i> Download
-                            </button>
-                        </div>
-                    `;
-                    
-                    historyItem.querySelector('.preview-history-btn').addEventListener('click', function(e) {
-                        e.preventDefault();
-                        // Create a modal preview
-                        const modal = document.createElement('div');
-                        modal.className = 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 fade-in';
-                        modal.innerHTML = `
-                            <div class="bg-white rounded-lg p-4 max-w-4xl max-h-screen overflow-auto relative">
-                                <button class="absolute top-2 right-2 text-gray-600 hover:text-gray-900">
-                                    <i class="fas fa-times text-xl"></i>
-                                </button>
-                                <div class="flex flex-col md:flex-row gap-4">
-                                    <div>
-                                        <p class="text-sm text-gray-500 mb-2">Original</p>
-                                        <img src="${item.originalUrl}" alt="Original" class="max-h-80 rounded border">
-                                    </div>
-                                    <div>
-                                        <p class="text-sm text-gray-500 mb-2">Background Removed</p>
-                                        <img src="${item.resultUrl}" alt="Result" class="max-h-80 rounded border">
-                                    </div>
-                                </div>
-                                <div class="mt-4 text-center">
-                                    <button class="btn bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
-                                        <i class="fas fa-download mr-1"></i> Download
-                                    </button>
-                                </div>
-                            </div>
-                        `;
-                        
-                        document.body.appendChild(modal);
-                        
-                        // Close modal on click
-                        modal.addEventListener('click', function(e) {
-                            if (e.target === modal || e.target.closest('button')) {
-                                modal.classList.add('fade-out');
-                                setTimeout(() => {
-                                    document.body.removeChild(modal);
-                                }, 300);
-                            }
-                        });
-                        
-                        // Download from modal
-                        modal.querySelector('.btn').addEventListener('click', function() {
-                            const link = document.createElement('a');
-                            link.href = item.resultUrl;
-                            link.download = 'bg_removed_' + item.filename;
-                            document.body.appendChild(link);
-                            link.click();
-                            document.body.removeChild(link);
-                        });
-                    });
-                    
-                    historyItem.querySelector('.reuse-btn').addEventListener('click', function() {
-                        originalPreview.src = item.originalUrl;
-                        resultPreview.src = item.resultUrl;
-                        currentFileName = item.filename;
-                        currentOriginalUrl = item.originalUrl;
-                        currentResultUrl = item.resultUrl;
-                        
-                        // Setup comparison view
-                        compareOriginal.src = currentOriginalUrl;
-                        compareResult.src = currentResultUrl;
-                        
-                        dropText.classList.add('hidden');
-                        previewContainer.classList.remove('hidden');
-                        resultContainer.classList.remove('hidden');
-                        downloadContainer.classList.remove('hidden'); // Fixed: was downloadBtn
-                        compareBtn.classList.remove('hidden');
-                        
-                        // Reset to standard view
-                        standardPreview.classList.remove('hidden');
-                        comparisonPreview.classList.add('hidden');
-                        
-                        // Scroll to upload section
-                        uploadContainer.scrollIntoView({ behavior: 'smooth' });
-                    });
-                    
-                    historyItem.querySelector('.download-history-btn').addEventListener('click', function() {
-                        if (item.resultUrl.startsWith('data:')) {
-                            // For base64 data
-                            const link = document.createElement('a');
-                            link.href = item.resultUrl;
-                            link.download = 'bg_removed_' + item.filename;
-                            document.body.appendChild(link);
-                            link.click();
-                            document.body.removeChild(link);
-                        } else {
-                            // For URL path
-                            // Extract filename from URL or use the stored download filename
-                            const filename = item.downloadFilename || item.resultUrl.split('/').pop();
-                            const downloadUrl = `/download/${filename}`;
-                            
-                            const link = document.createElement('a');
-                            link.href = downloadUrl;
-                            link.download = 'bg_removed_' + item.filename;
-                            document.body.appendChild(link);
-                            link.click();
-                            document.body.removeChild(link);
-                        }
-                        
-                        // Provide visual feedback
-                        this.innerHTML = '<i class="fas fa-check mr-1"></i> Downloaded';
-                        setTimeout(() => {
-                            this.innerHTML = '<i class="fas fa-download mr-1"></i> Download';
-                        }, 2000);
-                    });
-                    
-                    recentImagesContainer.appendChild(historyItem);
-                });
-            }
-            
-            // Image comparison slider functionality
-            if (slider) {
-                slider.addEventListener('mousedown', function(e) {
-                    e.preventDefault();
-                    isSliderActive = true;
-                });
-                
-                window.addEventListener('mouseup', function() {
-                    isSliderActive = false;
-                });
-                
-                window.addEventListener('mousemove', function(e) {
-                    if (!isSliderActive) return;
-                    
-                    const container = document.querySelector('.img-compare-container');
-                    const rect = container.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    let percent = (x / rect.width) * 100;
-                    
-                    // Constrain within bounds
-                    percent = Math.max(0, Math.min(100, percent));
-                    
-                    // Update slider position
-                    afterContainer.style.width = percent + '%';
-                });
-                
-                // Touch support
-                slider.addEventListener('touchstart', function(e) {
-                    e.preventDefault();
-                    isSliderActive = true;
-                });
-                
-                window.addEventListener('touchend', function() {
-                    isSliderActive = false;
-                });
-                
-                window.addEventListener('touchmove', function(e) {
-                    if (!isSliderActive) return;
-                    
-                    const container = document.querySelector('.img-compare-container');
-                    const rect = container.getBoundingClientRect();
-                    const x = e.touches[0].clientX - rect.left;
-                    let percent = (x / rect.width) * 100;
-                    
-                    // Constrain within bounds
-                    percent = Math.max(0, Math.min(100, percent));
-                    
-                    // Update slider position
-                    afterContainer.style.width = percent + '%';
-                });
-            }
-            
-            // URL Image Button
-            urlImageBtn.addEventListener('click', function() {
-                urlModal.classList.remove('hidden');
-                imageUrlInput.focus();
-            });
-
-            // Cancel URL Button
-            cancelUrlBtn.addEventListener('click', function() {
-                urlModal.classList.add('hidden');
-                imageUrlInput.value = '';
-            });
-
-            // Load URL Button
-            loadUrlBtn.addEventListener('click', function() {
-                const imageUrl = imageUrlInput.value.trim();
-                if (!imageUrl) {
-                    alert('Please enter a valid image URL');
-                    return;
-                }
-
-                // Show loading state
-                loadUrlBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Loading...';
-                loadUrlBtn.disabled = true;
-
-                // Create a new image to test if URL is valid
-                const img = new Image();
-                img.crossOrigin = 'anonymous';
-                
-                img.onload = function() {
-                    // Create canvas to convert to base64
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    ctx.drawImage(img, 0, 0);
-                    
-                    // Get base64 data
-                    const dataURL = canvas.toDataURL('image/png');
-                    
-                    // Extract filename from URL or create one
-                    const urlParts = imageUrl.split('/');
-                    const filename = urlParts[urlParts.length - 1] || 'image-from-url.png';
-                    
-                    // Set current values
-                    currentFileName = filename;
-                    currentOriginalUrl = dataURL;
-                    
-                    // Display preview
-                    originalPreview.src = dataURL;
-                    dropText.classList.add('hidden');
-                    previewContainer.classList.remove('hidden');
-                    originalPreview.parentNode.classList.remove('hidden');
-                    
-                    // Hide result container until processing
-                    resultContainer.classList.add('hidden');
-                    downloadContainer.classList.add('hidden');
-                    compareBtn.classList.add('hidden');
-                    processingIndicator.classList.add('hidden');
-                    
-                    // Reset comparison view
-                    standardPreview.classList.remove('hidden');
-                    comparisonPreview.classList.add('hidden');
-                    compareBtn.innerHTML = '<i class="fas fa-exchange-alt mr-2"></i> Compare';
-                    
-                    // Close modal
-                    urlModal.classList.add('hidden');
-                    imageUrlInput.value = '';
-                    
-                    // Create fake file for form submission
-                    fetch(dataURL)
-                        .then(res => res.blob())
-                        .then(blob => {
-                            const file = new File([blob], filename, { type: 'image/png' });
-                            const dataTransfer = new DataTransfer();
-                            dataTransfer.items.add(file);
-                            fileInput.files = dataTransfer.files;
-                        });
-                };
-                
-                img.onerror = function() {
-                    alert('Failed to load image from URL. Please check the URL and try again.');
-                    loadUrlBtn.innerHTML = '<i class="fas fa-link mr-2"></i> Load Image';
-                    loadUrlBtn.disabled = false;
-                };
-                
-                img.src = imageUrl;
-            });
-
-            // Close modal when clicking outside
-            urlModal.addEventListener('click', function(e) {
-                if (e.target === urlModal) {
-                    urlModal.classList.add('hidden');
-                    imageUrlInput.value = '';
-                }
-            });
-
-            // Enter key in URL input
-            imageUrlInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    loadUrlBtn.click();
-                }
-            });
-
-            // Paste Image Button
-            pasteImageBtn.addEventListener('click', async function() {
-                try {
-                    const clipboardItems = await navigator.clipboard.read();
-                    
-                    for (const clipboardItem of clipboardItems) {
-                        for (const type of clipboardItem.types) {
-                            if (type.startsWith('image/')) {
-                                const blob = await clipboardItem.getType(type);
-                                
-                                // Create file from blob
-                                const filename = 'pasted-image.' + type.split('/')[1];
-                                const file = new File([blob], filename, { type: type });
-                                
-                                // Set up file input
-                                const dataTransfer = new DataTransfer();
-                                dataTransfer.items.add(file);
-                                fileInput.files = dataTransfer.files;
-                                
-                                // Handle the file
-                                handleFileSelection(file);
-                                
-                                // Visual feedback
-                                pasteImageBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Image Pasted!';
-                                setTimeout(() => {
-                                    pasteImageBtn.innerHTML = '<i class="fas fa-paste mr-2"></i> Paste Image';
-                                }, 2000);
-                                
-                                return;
-                            }
-                        }
-                    }
-                    
-                    alert('No image found in clipboard. Please copy an image first.');
-                    
-                } catch (error) {
-                    console.error('Failed to read clipboard:', error);
-                    alert('Failed to paste image. Please make sure you have copied an image to your clipboard and try again.');
-                }
-            });
-        });
+        } catch (error) {
+            console.error('Error loading from history:', error);
+            showNotification('Failed to load from history', 'error');
+        }
+    }
+    
+    // Helper functions for UI states
+    function showUploadComplete() {
+        dropText.classList.add('hidden');
+        previewContainer.classList.remove('hidden');
+        originalPreview.parentNode.classList.remove('hidden');
+        resultContainer.classList.add('hidden');
         
-        // Function to create confetti effect
-        function createConfetti() {
-            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7', '#dda0dd', '#98d8c8'];
-            const confettiCount = 50;
+        if (heroSection) heroSection.classList.add('hidden');
+        if (historyContainer) historyContainer.classList.remove('hidden');
+    }
+    
+    function showProcessingState() {
+        processingIndicator.classList.remove('hidden');
+        removeBgBtn.disabled = true;
+        progressBar.style.width = '30%';
+    }
+    
+    function showCompletedState(data) {
+        if (data && data.processed_url) {
+            currentResultUrl = data.processed_url;
+            resultPreview.src = currentResultUrl;
+            resultContainer.classList.remove('hidden');
+            originalPreview.parentNode.classList.add('hidden');
             
-            for (let i = 0; i < confettiCount; i++) {
+            downloadContainer.classList.remove('hidden');
+            compareBtn.classList.remove('hidden');
+            processingIndicator.classList.add('hidden');
+            progressBar.style.width = '100%';
+            
+            showNotification('Background removed successfully!', 'success');
+        }
+    }
+    
+    // Function to load job from URL
+    function loadJobFromUrl(jobId) {
+        fetch(`/check-status/${jobId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    currentJobId = jobId;
+                    
+                    // Set up UI based on job status
+                    if (data.status === 'uploaded') {
+                        // Show upload complete state
+                        if (data.data && data.data.original_url) {
+                            currentOriginalUrl = data.data.original_url;
+                            originalPreview.src = currentOriginalUrl;
+                            showUploadComplete();
+                        }
+                    } else if (data.status === 'processing') {
+                        // Show processing state
+                        showProcessingState();
+                    } else if (data.status === 'completed') {
+                        // Show completed state
+                        showCompletedState(data.data);
+                    }
+                } else {
+                    // Job not found, redirect to upload
+                    window.location.href = '/upload';
+                }
+            })
+            .catch(error => {
+                console.error('Error loading job:', error);
+                window.location.href = '/upload';
+            });
+    }
+    
+    // Create confetti effect
+    function createConfetti() {
+        const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+        
+        for (let i = 0; i < 50; i++) {
+            setTimeout(() => {
                 const confetti = document.createElement('div');
                 confetti.className = 'confetti';
-                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.left = Math.random() * 100 + '%';
                 confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
                 confetti.style.animationDelay = Math.random() * 3 + 's';
-                confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
-                
                 document.body.appendChild(confetti);
                 
-                // Remove confetti element after animation
                 setTimeout(() => {
-                    if (document.body.contains(confetti)) {
-                        document.body.removeChild(confetti);
-                    }
+                    confetti.remove();
                 }, 5000);
-            }
+            }, i * 100);
         }
+    }
+    
+    // Create pixel animation
+    function createPixelAnimation(container, width, height) {
+        const pixelSize = 8;
+        const pixelsX = Math.floor(width / pixelSize);
+        const pixelsY = Math.floor(height / pixelSize);
         
-        // Function to create pixel animation
-        function createPixelAnimation(container, width, height) {
-            // Calculate number of pixels based on size
-            const pixelSize = 10; // Size of each pixel in pixels
-            const columns = Math.ceil(width / pixelSize);
-            const rows = Math.ceil(height / pixelSize);
-            
-            // Color variations for pixels
-            const colors = ['#3b82f6', '#60a5fa', '#93c5fd', '#2563eb'];
-            
-            // Clear previous pixels if any
-            container.innerHTML = '';
-            
-            // Create and animate pixels
-            for (let i = 0; i < rows; i++) {
-                for (let j = 0; j < columns; j++) {
+        for (let x = 0; x < pixelsX; x++) {
+            for (let y = 0; y < pixelsY; y++) {
+                setTimeout(() => {
                     const pixel = document.createElement('div');
                     pixel.className = 'pixel';
+                    pixel.style.left = (x * pixelSize) + 'px';
+                    pixel.style.top = (y * pixelSize) + 'px';
                     pixel.style.width = pixelSize + 'px';
                     pixel.style.height = pixelSize + 'px';
-                    pixel.style.top = (i * pixelSize) + 'px';
-                    pixel.style.left = (j * pixelSize) + 'px';
-                    pixel.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                    
-                    // Randomize animation delay for better effect
-                    const delay = Math.random() * 2; // Random delay up to 2 seconds
-                    pixel.style.animationDelay = delay + 's';
-                    
-                    // Randomize animation duration for better effect
-                    const duration = 0.5 + Math.random() * 1.5; // Between 0.5 and 2 seconds
-                    pixel.style.animationDuration = duration + 's';
-                    
-                    // Make animation repeat
-                    pixel.style.animationIterationCount = 'infinite';
-                    
+                    pixel.style.animationDelay = (Math.random() * 2) + 's';
                     container.appendChild(pixel);
-                }
+                }, (x + y) * 50);
             }
         }
-    </script>
-</body>
+    }
+    
+    // Event Listeners
+    
+    // Theme toggle
+    themeToggle.addEventListener('change', function() {
+        document.body.classList.toggle('dark-mode');
+        localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+    });
+    
+    // File Input Change Handler
+    fileInput.addEventListener('change', function(e) {
+        console.log('File input changed!', e.target.files);
+        if (e.target.files.length > 0) {
+            console.log('File details:', {
+                name: e.target.files[0].name,
+                size: e.target.files[0].size,
+                type: e.target.files[0].type
+            });
+            handleFileSelection(e.target.files[0]);
+        } else {
+            console.log('No file selected');
+        }
+    });
 
+    // Drag & Drop Handlers
+    uploadContainer.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        uploadContainer.classList.add('active');
+    });
+
+    uploadContainer.addEventListener('dragleave', function() {
+        uploadContainer.classList.remove('active');
+    });
+
+    uploadContainer.addEventListener('drop', function(e) {
+        e.preventDefault();
+        uploadContainer.classList.remove('active');
+        
+        if (e.dataTransfer.files.length) {
+            handleFileSelection(e.dataTransfer.files[0]);
+        }
+    });
+
+    // Remove Background Button
+    removeBgBtn.addEventListener('click', function() {
+        if (!currentJobId) {
+            showNotification('Please upload an image first', 'error');
+            return;
+        }
+        
+        removeBgBtn.disabled = true;
+        processingIndicator.classList.remove('hidden');
+        
+        // Create pixel animation
+        const pixelContainer = document.createElement('div');
+        pixelContainer.className = 'pixel-animation-container';
+        originalPreview.parentNode.style.position = 'relative';
+        originalPreview.parentNode.appendChild(pixelContainer);
+        createPixelAnimation(pixelContainer, originalPreview.offsetWidth, originalPreview.offsetHeight);
+        
+        // Start progress simulation
+        let progress = 0;
+        const progressInterval = setInterval(() => {
+            progress += Math.random() * 20;
+            if (progress > 85) progress = 85;
+            progressBar.style.width = progress + '%';
+        }, 800);
+        
+        // STEP 2: Initiate processing
+        console.log('STEP 2: Initiating process for job:', currentJobId);
+        fetch('/initiate-process', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                job_id: currentJobId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('STEP 2 SUCCESS: Processing initiated:', data);
+                
+                // Update progress
+                progressBar.style.width = '50%';
+                
+                // Update URL to background-removed route
+                updateUrl('/background-removed', { job_id: currentJobId });
+                
+                // Small delay before step 3
+                setTimeout(() => {
+                    // STEP 3: Perform background removal
+                    console.log('STEP 3: Performing background removal for job:', currentJobId);
+                    fetch('/background-removed', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            job_id: currentJobId
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(finalData => {
+                        clearInterval(progressInterval);
+                        
+                        if (finalData.success && finalData.status === 'completed') {
+                            console.log('STEP 3 SUCCESS: Background removal completed:', finalData);
+                            
+                            // Update URL to show completion
+                            updateUrl('/background-removed', { 
+                                job_id: currentJobId, 
+                                completed: 'true' 
+                            });
+                            
+                            handleProcessingComplete(finalData);
+                        } else {
+                            throw new Error(finalData.error || 'Background removal failed');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('STEP 3 ERROR:', error);
+                        clearInterval(progressInterval);
+                        showNotification('Background removal failed: ' + error.message, 'error');
+                        resetProcessingUI();
+                    });
+                }, 1000);
+                
+            } else {
+                throw new Error(data.error || 'Processing initiation failed');
+            }
+        })
+        .catch(error => {
+            console.error('STEP 2 ERROR:', error);
+            clearInterval(progressInterval);
+            showNotification('Processing initiation failed: ' + error.message, 'error');
+            resetProcessingUI();
+        });
+    });
+    
+    // Upload New Button
+    uploadNewBtn.addEventListener('click', function() {
+        resetUI();
+    });
+    
+    // Compare Button
+    compareBtn.addEventListener('click', function() {
+        if (standardPreview.classList.contains('hidden')) {
+            // Switch to standard view
+            comparisonPreview.classList.add('hidden');
+            standardPreview.classList.remove('hidden');
+            compareBtn.innerHTML = '<i class="fas fa-exchange-alt mr-2"></i> Compare';
+        } else {
+            // Switch to comparison view
+            standardPreview.classList.add('hidden');
+            comparisonPreview.classList.remove('hidden');
+            compareBtn.innerHTML = '<i class="fas fa-eye mr-2"></i> Standard View';
+        }
+    });
+    
+    // Download handlers
+    downloadBtn.addEventListener('click', function() {
+        downloadDropdown.classList.toggle('hidden');
+    });
+    
+    downloadPreviewBtn.addEventListener('click', function() {
+        if (currentResultUrl) {
+            const link = document.createElement('a');
+            link.href = currentResultUrl;
+            link.download = `bg_removed_${currentFileName || 'image'}.png`;
+            link.click();
+        }
+        downloadDropdown.classList.add('hidden');
+    });
+    
+    downloadOriginalBtn.addEventListener('click', function() {
+        if (currentOriginalQualityUrl) {
+            const link = document.createElement('a');
+            link.href = currentOriginalQualityUrl;
+            link.download = `bg_removed_original_${currentFileName || 'image'}.png`;
+            link.click();
+        }
+        downloadDropdown.classList.add('hidden');
+    });
+    
+    // URL Modal handlers
+    urlImageBtn.addEventListener('click', function() {
+        urlModal.classList.remove('hidden');
+    });
+    
+    cancelUrlBtn.addEventListener('click', function() {
+        urlModal.classList.add('hidden');
+        imageUrlInput.value = '';
+    });
+    
+    loadUrlBtn.addEventListener('click', function() {
+        const imageUrl = imageUrlInput.value.trim();
+        if (imageUrl) {
+            // Create a temporary image to load the URL
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = function() {
+                // Convert to blob and handle as file
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                
+                canvas.toBlob(function(blob) {
+                    const file = new File([blob], 'url-image.png', { type: 'image/png' });
+                    handleFileSelection(file);
+                    urlModal.classList.add('hidden');
+                    imageUrlInput.value = '';
+                });
+            };
+            img.onerror = function() {
+                showNotification('Failed to load image from URL', 'error');
+            };
+            img.src = imageUrl;
+        }
+    });
+    
+    // Paste Image handler
+    pasteImageBtn.addEventListener('click', async function() {
+        try {
+            const clipboardItems = await navigator.clipboard.read();
+            for (const clipboardItem of clipboardItems) {
+                for (const type of clipboardItem.types) {
+                    if (type.startsWith('image/')) {
+                        const blob = await clipboardItem.getType(type);
+                        const file = new File([blob], 'pasted-image.png', { type: type });
+                        handleFileSelection(file);
+                        return;
+                    }
+                }
+            }
+            showNotification('No image found in clipboard', 'error');
+        } catch (error) {
+            showNotification('Failed to read clipboard. Please use the upload button instead.', 'error');
+        }
+    });
+    
+    // View History handler
+    viewHistoryBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        historySection.classList.toggle('hidden');
+        loadHistory();
+    });
+    
+    // Clear History handler
+    clearHistoryBtn.addEventListener('click', function() {
+        if (confirm('Are you sure you want to clear all history?')) {
+            sessionStorage.removeItem('bgRemoverHistory');
+            loadHistory();
+            if (historyContainer) historyContainer.classList.add('hidden');
+            showNotification('History cleared', 'success');
+        }
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!downloadBtn.contains(e.target) && !downloadDropdown.contains(e.target)) {
+            downloadDropdown.classList.add('hidden');
+        }
+    });
+    
+    // Comparison slider functionality
+    if (slider && afterContainer) {
+        let isSliding = false;
+        
+        slider.addEventListener('mousedown', function() {
+            isSliding = true;
+        });
+        
+        document.addEventListener('mousemove', function(e) {
+            if (!isSliding) return;
+            
+            const container = slider.closest('.img-compare-container');
+            const rect = container.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const percentage = (x / rect.width) * 100;
+            
+            if (percentage >= 0 && percentage <= 100) {
+                afterContainer.style.width = percentage + '%';
+                slider.style.left = percentage + '%';
+            }
+        });
+        
+        document.addEventListener('mouseup', function() {
+            isSliding = false;
+        });
+    }
+    
+    // Get URL parameters and handle job loading
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlJobId = urlParams.get('job_id');
+    const urlStep = urlParams.get('step');
+    const isCompleted = urlParams.get('completed');
+    
+    // If there's a job_id in URL, load that job
+    if (urlJobId) {
+        currentJobId = urlJobId;
+        loadJobFromUrl(urlJobId);
+    }
+    
+    // Make functions globally accessible for onclick handlers
+    window.loadFromHistory = loadFromHistory;
+});
+</script>
+</body>
 </html>
