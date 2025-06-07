@@ -421,6 +421,17 @@
         .history-container::-webkit-scrollbar-thumb:hover {
             background: #555;
         }
+
+        /* Plus button hover effects */
+        .history-container .group:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        /* Smooth transition for plus button */
+        .history-container .group {
+            transition: all 0.3s ease;
+        }
     </style>
 </head>
 
@@ -435,9 +446,9 @@
                 <span class="text-xs bg-blue-100 text-blue-800 px-1 sm:px-2 py-1 rounded">Beta</span>
             </div>
             <div class="flex items-center">
-                <a href="#" id="view-history" class="text-blue-600 hover:text-blue-800 transition-all mr-3">
+                <!-- <a href="#" id="view-history" class="text-blue-600 hover:text-blue-800 transition-all mr-3">
                     <i class="fas fa-history"></i><span class="hidden xs:inline ml-1">History</span>
-                </a>
+                </a> -->
                 <label class="theme-switch">
                     <input type="checkbox" id="theme-toggle">
                     <span class="slider"></span>
@@ -446,8 +457,15 @@
         </div>
     </header>
 
-    <!-- Add History Bar Container -->
+    <!-- Add History Bar Container with Plus Button -->
     <div class="history-container hidden flex overflow-x-auto py-4 gap-3 mb-4 container mx-auto px-4" style="scrollbar-width: thin;">
+        <!-- Add New Image Button (Plus Button) -->
+        <div class="flex-shrink-0 cursor-pointer add-new-image-btn">
+            <div class="w-16 h-16 bg-blue-100 border-2 border-dashed border-blue-400 rounded flex items-center justify-center hover:bg-blue-200 hover:border-blue-500 transition-colors group">
+                <i class="fas fa-plus text-blue-600 text-xl group-hover:text-blue-700"></i>
+            </div>
+        </div>
+        
         <!-- History thumbnails will be added here by JavaScript -->
     </div>
 
@@ -682,6 +700,104 @@
     <!-- Scripts -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
+// Add New Image function for the plus button - Global scope
+function addNewImage() {
+    // Reset UI elements
+    const dropText = document.getElementById('drop-text');
+    const previewContainer = document.getElementById('preview-container');
+    const resultContainer = document.getElementById('result-container');
+    const downloadContainer = document.getElementById('download-container');
+    const compareBtn = document.getElementById('compare-btn');
+    const processingIndicator = document.getElementById('processing-indicator');
+    const progressBar = document.getElementById('progress-bar');
+    const fileInput = document.getElementById('image');
+    const heroSection = document.querySelector('section.text-center.mb-10');
+    const historyContainer = document.querySelector('.history-container');
+    
+    // Reset global variables
+    let currentJobId = null;
+    let currentFileName = '';
+    let currentOriginalUrl = '';
+    let currentResultUrl = '';
+    let currentOriginalQualityUrl = '';
+    
+    // Reset UI elements
+    if (dropText) dropText.classList.remove('hidden');
+    if (previewContainer) previewContainer.classList.add('hidden');
+    if (resultContainer) resultContainer.classList.add('hidden');
+    if (downloadContainer) downloadContainer.classList.add('hidden');
+    if (compareBtn) compareBtn.classList.add('hidden');
+    if (processingIndicator) processingIndicator.classList.add('hidden');
+    if (progressBar) progressBar.style.width = '0%';
+    
+    // Show hero section and hide history bar
+    if (heroSection) heroSection.classList.remove('hidden');
+    if (historyContainer) historyContainer.classList.add('hidden');
+    
+    // Reset file input
+    if (fileInput) fileInput.value = '';
+    
+    // Remove any pixel animations
+    const pixelContainer = document.querySelector('.pixel-animation-container');
+    if (pixelContainer) {
+        pixelContainer.remove();
+    }
+    
+    // Show notification
+    showNotification('Ready to upload a new image!', 'info');
+    
+    // Scroll to upload section smoothly
+    const uploadSection = document.getElementById('upload-container');
+    if (uploadSection) {
+        uploadSection.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' 
+        });
+        
+        // Add a subtle pulse effect to draw attention
+        uploadSection.classList.add('pulse-effect');
+        setTimeout(() => {
+            uploadSection.classList.remove('pulse-effect');
+        }, 2000);
+    }
+    
+    // Update URL
+    window.history.pushState({}, '', '/upload');
+}
+
+// Global showNotification function
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg text-white max-w-sm shadow-lg transform transition-all duration-300 ${
+        type === 'success' ? 'bg-green-500' : 
+        type === 'error' ? 'bg-red-500' : 'bg-blue-500'
+    }`;
+    notification.innerHTML = `
+        <div class="flex items-center gap-2">
+            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Animate in
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+    
+    // Remove after delay
+    setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        notification.style.opacity = '0';
+        setTimeout(() => {
+            if (document.body.contains(notification)) {
+                document.body.removeChild(notification);
+            }
+        }, 300);
+    }, 4000);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize AOS animations
     AOS.init({
@@ -746,15 +862,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const historyContainer = document.querySelector('.history-container');
     
     // Initialize from session storage
-    loadHistory();
+    const historyData = loadHistory();
     initializeTheme();
-    
-    // Initialize history bar on page load if there's history
-    const history = JSON.parse(sessionStorage.getItem('bgRemoverHistory') || '[]');
-    if (history.length > 0) {
+
+    // Always show history bar (for the plus button)
+    if (historyData.length > 0) {
         if (heroSection) heroSection.classList.add('hidden');
         if (historyContainer) historyContainer.classList.remove('hidden');
-        updateHistoryBar(history);
+    } else {
+        // Show plus button even with no history
+        if (historyContainer) {
+            historyContainer.classList.remove('hidden');
+        }
     }
     
     // Function to update URL without reload
@@ -826,12 +945,15 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => {
             console.log('Upload response status:', response.status);
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                return response.text().then(text => {
+                    console.error('Error response text:', text);
+                    throw new Error(`HTTP error! status: ${response.status}, message: ${text}`);
+                });
             }
             return response.json();
         })
         .then(data => {
-            console.log('Upload response:', data);
+            console.log('Upload success response:', data);
             if (data.success) {
                 handleUploadSuccess(data);
             } else {
@@ -926,39 +1048,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Show notification function
-    function showNotification(message, type = 'info') {
-        const notification = document.createElement('div');
-        notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg text-white max-w-sm shadow-lg transform transition-all duration-300 ${
-            type === 'success' ? 'bg-green-500' : 
-            type === 'error' ? 'bg-red-500' : 'bg-blue-500'
-        }`;
-        notification.innerHTML = `
-            <div class="flex items-center gap-2">
-                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
-                <span>${message}</span>
-            </div>
-        `;
-        
-        document.body.appendChild(notification);
-        
-        // Animate in
-        setTimeout(() => {
-            notification.style.transform = 'translateX(0)';
-        }, 100);
-        
-        // Remove after delay
-        setTimeout(() => {
-            notification.style.transform = 'translateX(100%)';
-            notification.style.opacity = '0';
-            setTimeout(() => {
-                if (document.body.contains(notification)) {
-                    document.body.removeChild(notification);
-                }
-            }, 300);
-        }, 4000);
-    }
-
     // Reset UI function
     function resetUI() {
         currentJobId = null;
@@ -1004,7 +1093,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Save to history function
     function saveToHistory(filename, originalUrl, resultUrl, processedFilename) {
         try {
-            const history = JSON.parse(sessionStorage.getItem('bgRemoverHistory') || '[]');
+            const historyData = JSON.parse(sessionStorage.getItem('bgRemoverHistory') || '[]');
             
             const historyItem = {
                 id: Date.now(),
@@ -1017,15 +1106,15 @@ document.addEventListener('DOMContentLoaded', function() {
             };
             
             // Add to beginning of array
-            history.unshift(historyItem);
+            historyData.unshift(historyItem);
             
             // Keep only last 10 items
-            if (history.length > 10) {
-                history.splice(10);
+            if (historyData.length > 10) {
+                historyData.splice(10);
             }
             
-            sessionStorage.setItem('bgRemoverHistory', JSON.stringify(history));
-            updateHistoryBar(history);
+            sessionStorage.setItem('bgRemoverHistory', JSON.stringify(historyData));
+            updateHistoryBar(historyData);
         } catch (error) {
             console.error('Error saving to history:', error);
         }
@@ -1034,16 +1123,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load history function
     function loadHistory() {
         try {
-            const history = JSON.parse(sessionStorage.getItem('bgRemoverHistory') || '[]');
+            const historyData = JSON.parse(sessionStorage.getItem('bgRemoverHistory') || '[]');
             
-            if (history.length === 0) {
+            if (historyData.length === 0) {
                 if (recentImagesContainer) recentImagesContainer.innerHTML = '';
                 if (noHistoryMessage) noHistoryMessage.classList.remove('hidden');
             } else {
                 if (noHistoryMessage) noHistoryMessage.classList.add('hidden');
                 
                 if (recentImagesContainer) {
-                    recentImagesContainer.innerHTML = history.map((item, index) => `
+                    recentImagesContainer.innerHTML = historyData.map((item, index) => `
                         <div class="recent-item bg-white rounded-lg shadow-md overflow-hidden cursor-pointer" 
                              style="--index: ${index}" 
                              onclick="loadFromHistory('${item.id}')">
@@ -1057,28 +1146,51 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
             
-            updateHistoryBar(history);
+            updateHistoryBar(historyData);
+            return historyData;
         } catch (error) {
             console.error('Error loading history:', error);
             sessionStorage.removeItem('bgRemoverHistory');
+            return [];
         }
     }
 
     // Update history bar function
-    function updateHistoryBar(history) {
-        if (!historyContainer) return;
+    function updateHistoryBar(historyData) {
+        if (!document.querySelector('.history-container')) return;
         
-        if (history.length === 0) {
-            historyContainer.classList.add('hidden');
+        const historyContainer = document.querySelector('.history-container');
+        
+        if (historyData.length === 0) {
+            // Show only the plus button when no history
+            historyContainer.innerHTML = `
+                <div class="flex-shrink-0 cursor-pointer add-new-image-btn">
+                    <div class="w-16 h-16 bg-blue-100 border-2 border-dashed border-blue-400 rounded flex items-center justify-center hover:bg-blue-200 hover:border-blue-500 transition-colors group">
+                        <i class="fas fa-plus text-blue-600 text-xl group-hover:text-blue-700"></i>
+                    </div>
+                </div>
+            `;
+            historyContainer.classList.remove('hidden');
             return;
         }
         
-        historyContainer.innerHTML = history.slice(0, 5).map(item => `
-            <div class="flex-shrink-0 cursor-pointer" onclick="loadFromHistory('${item.id}')">
+        // Show plus button + history items
+        const plusButton = `
+            <div class="flex-shrink-0 cursor-pointer add-new-image-btn">
+                <div class="w-16 h-16 bg-blue-100 border-2 border-dashed border-blue-400 rounded flex items-center justify-center hover:bg-blue-200 hover:border-blue-500 transition-colors group">
+                    <i class="fas fa-plus text-blue-600 text-xl group-hover:text-blue-700"></i>
+                </div>
+            </div>
+        `;
+        
+        const historyItems = historyData.slice(0, 5).map(item => `
+            <div class="flex-shrink-0 cursor-pointer history-item" data-item-id="${item.id}">
                 <img src="${item.resultUrl}" alt="${item.filename}" 
                      class="w-16 h-16 object-cover rounded border-2 border-gray-200 hover:border-blue-400 transition-colors">
             </div>
         `).join('');
+        
+        historyContainer.innerHTML = plusButton + historyItems;
     }
 
     // Load from history function
@@ -1256,8 +1368,21 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Event Listeners
+// Event Listeners
+document.addEventListener('click', function(e) {
+    // Handle add new image button
+    if (e.target.closest('.add-new-image-btn')) {
+        addNewImage();
+    }
     
+    // Handle history item clicks
+    const historyItem = e.target.closest('.history-item');
+    if (historyItem) {
+        const itemId = historyItem.dataset.itemId;
+        loadFromHistory(itemId);
+    }
+});
+
     // Theme toggle
     themeToggle.addEventListener('change', function() {
         document.body.classList.toggle('dark-mode');
@@ -1268,7 +1393,32 @@ document.addEventListener('DOMContentLoaded', function() {
     fileInput.addEventListener('change', function(e) {
         console.log('File input changed!', e.target.files);
         if (e.target.files.length > 0) {
-            handleFileSelection(e.target.files[0]);
+            try {
+                const file = e.target.files[0];
+                console.log('Selected file:', file.name, file.size, file.type);
+                
+                // Show preview immediately
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    originalPreview.src = e.target.result;
+                    dropText.classList.add('hidden');
+                    previewContainer.classList.remove('hidden');
+                    originalPreview.parentNode.classList.remove('hidden');
+                    resultContainer.classList.add('hidden');
+                    
+                    if (heroSection) heroSection.classList.add('hidden');
+                    if (historyContainer) historyContainer.classList.remove('hidden');
+                    
+                    console.log('Preview loaded in UI');
+                };
+                reader.readAsDataURL(file);
+                
+                // Now upload to server
+                handleFileSelection(file);
+            } catch (error) {
+                console.error('Error handling file selection:', error);
+                showNotification('Error selecting file: ' + error.message, 'error');
+            }
         }
     });
 
@@ -1551,7 +1701,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Make functions globally accessible for onclick handlers
-    window.loadFromHistory = loadFromHistory;
+window.loadFromHistory = loadFromHistory;
 });
     </script>
 </body>
