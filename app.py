@@ -1,18 +1,18 @@
 # app.py
 
+from flask import Flask, render_template, request, redirect, url_for, send_from_directory, jsonify, make_response
+from werkzeug.utils import secure_filename as werkzeug_secure_filename
 import os
 import uuid
-import datetime
-import tempfile
 import json
-from flask import Flask, render_template, request, redirect, url_for, send_from_directory, jsonify, make_response
+from datetime import datetime
+import logging
 from rembg import remove
 from PIL import Image, UnidentifiedImageError
 import io
-import logging
 import shutil
 import base64
-from werkzeug.utils import secure_filename as werkzeug_secure_filename
+import tempfile
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -65,7 +65,7 @@ def validate_image(file_stream):
 def secure_filename_with_uuid(filename):
     """Generate a secure filename with UUID to prevent collisions"""
     ext = filename.rsplit('.', 1)[1].lower() if '.' in filename else 'png'
-    timestamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+    timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
     return f"{timestamp}_{uuid.uuid4().hex[:8]}.{ext}"
 
 def save_job_info(job_id, job_info):
@@ -99,6 +99,19 @@ def load_job_info(job_id):
     
     return None
 
+def secure_filename(filename):
+    """Custom secure filename function to handle special characters"""
+    # Get file extension
+    if '.' in filename:
+        ext = filename.rsplit('.', 1)[1].lower()
+        name = filename.rsplit('.', 1)[0]
+        # Replace special characters
+        name = ''.join(c for c in name if c.isalnum() or c in ['-', '_'])
+        if not name:
+            name = 'unnamed'
+        return f"{name}.{ext}"
+    return 'unnamed.png'
+
 @app.route('/')
 def index():
     """Render the main landing page"""
@@ -107,89 +120,67 @@ def index():
 # ==================== ROUTE 1: UPLOAD ====================
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
-    """STEP 1: Handle file upload and validation ONLY"""
     if request.method == 'GET':
-        # Render the upload page with refresh headers
-        response = make_response(render_template('bgremove.html'))
-        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-        response.headers['Pragma'] = 'no-cache'
-        response.headers['Expires'] = '0'
-        return response
+        return render_template('bgremove.html')
     
     elif request.method == 'POST':
         try:
-            # Check if the post request has the file part
+            # Check if file exists in request
+            logger.info(f"POST request received to /upload with files: {list(request.files.keys())}")
+            
             if 'image' not in request.files:
+                logger.error("No file part in request")
                 return jsonify({
                     'success': False,
-                    'error': 'No image provided',
+                    'error': 'No file part',
                     'step': 'upload'
                 }), 400
             
             file = request.files['image']
             
-            # Check if the file is selected
+            # Check if filename is empty
             if file.filename == '':
+                logger.error("No file selected")
                 return jsonify({
                     'success': False,
-                    'error': 'No image selected',
+                    'error': 'No file selected',
                     'step': 'upload'
                 }), 400
             
-            # Check if the file is allowed
-            if not allowed_file(file.filename):
-                return jsonify({
-                    'success': False,
-                    'error': 'File type not allowed. Supported formats: PNG, JPG, JPEG, GIF, WEBP',
-                    'step': 'upload'
-                }), 400
-            
-            # Validate that the file is actually an image
-            if not validate_image(file):
-                return jsonify({
-                    'success': False,
-                    'error': 'Invalid image file',
-                    'step': 'upload'
-                }), 400
-            
-            # Generate unique job ID and secure filenames
+            # Generate a unique job ID
             job_id = str(uuid.uuid4())
-            secure_original_name = secure_filename_with_uuid(file.filename)
-            original_filename = f"original_{secure_original_name}"
+            logger.info(f"Generated new job ID: {job_id}")
             
-            # Save paths
-            original_path = os.path.join(app.config['UPLOAD_FOLDER'], 'originals', original_filename)
+            # Create job directories
+            job_dir = os.path.join(app.config['UPLOAD_FOLDER'], job_id)
+            originals_dir = os.path.join(job_dir, 'originals')
+            processed_dir = os.path.join(job_dir, 'processed')
             
-            # Save the original uploaded file
+            os.makedirs(originals_dir, exist_ok=True)
+            os.makedirs(processed_dir, exist_ok=True)
+            
+            # Secure the filename
+            original_filename = secure_filename(file.filename)
+            
+            # Save the original file
+            original_path = os.path.join(originals_dir, original_filename)
             file.save(original_path)
+            logger.info(f"Saved original file to: {original_path}")
             
-            # Optimize image size if too large (before processing)
-            try:
-                with Image.open(original_path) as img:
-                    max_size = 1800
-                    if max(img.width, img.height) > max_size:
-                        ratio = max_size / max(img.width, img.height)
-                        new_size = (int(img.width * ratio), int(img.height * ratio))
-                        try:
-                            img = img.resize(new_size, Image.Resampling.LANCZOS)
-                        except AttributeError:
-                            img = img.resize(new_size, Image.LANCZOS)
-                        img.save(original_path)
-            except Exception as e:
-                logger.warning(f"Error optimizing image: {str(e)}")
-            
-            # Store job information in file storage (NOT session)
+            # Save job info
             job_info = {
                 'job_id': job_id,
+                'status': 'uploaded',
+                'user_filename': file.filename,
                 'original_filename': original_filename,
                 'original_path': original_path,
-                'user_filename': file.filename,
-                'upload_time': datetime.datetime.now().isoformat(),
-                'status': 'uploaded',
-                'step': 'upload_complete'
+                'timestamp': datetime.now().isoformat(),
+                'data': {
+                    'original_url': f"/file/originals/{job_id}/{original_filename}",
+                    'user_filename': file.filename
+                }
             }
             
-            # Save job info to file
             if not save_job_info(job_id, job_info):
                 return jsonify({
                     'success': False,
@@ -197,8 +188,8 @@ def upload():
                     'step': 'upload'
                 }), 500
             
-            # Create URLs for preview (don't include base64 in response)
-            original_url = f"/file/originals/{original_filename}"
+            # Create URLs for preview
+            original_url = f"/file/originals/{job_id}/{original_filename}"
             
             logger.info(f"Upload completed for job {job_id}")
             
@@ -211,14 +202,16 @@ def upload():
                 'message': 'Image uploaded successfully',
                 'next_step': '/initiate-process',
                 'redirect_url': f'/initiate-process?job_id={job_id}',
-                'auto_refresh': True  # Add this flag
+                'auto_refresh': True
             })
             
         except Exception as e:
-            logger.error(f"Upload error: {str(e)}")
+            logger.error(f"Error in upload: {str(e)}")
+            import traceback
+            logger.error(traceback.format_exc())
             return jsonify({
                 'success': False,
-                'error': f'Upload failed: {str(e)}',
+                'error': str(e),
                 'step': 'upload'
             }), 500
 
@@ -280,7 +273,7 @@ def initiate_process():
             
             # Update status to processing (setup only)
             job_info['status'] = 'processing'
-            job_info['process_start_time'] = datetime.datetime.now().isoformat()
+            job_info['process_start_time'] = datetime.now().isoformat()
             job_info['step'] = 'processing_initiated'
             
             # Generate processed filename (but don't process yet)
@@ -428,7 +421,7 @@ def background_removed():
                 
                 # Update status to completed
                 job_info['status'] = 'completed'
-                job_info['process_end_time'] = datetime.datetime.now().isoformat()
+                job_info['process_end_time'] = datetime.now().isoformat()
                 job_info['step'] = 'background_removed'
                 
                 # Create URLs
@@ -539,27 +532,29 @@ def check_status(job_id):
     return jsonify(response_data)
 
 # ==================== EXISTING UTILITY ROUTES ====================
-@app.route('/file/<folder>/<filename>')
-def serve_file(folder, filename):
-    """Serve files from the upload folder with better security"""
-    if folder not in ['originals', 'processed']:
-        return jsonify({'error': 'Invalid folder'}), 400
+@app.route('/file/<path:filename>')
+def serve_file(filename):
+    """Serve files from upload folder"""
+    # For security, validate that the filename is within allowed paths
+    if ".." in filename or filename.startswith("/"):
+        abort(404)
     
-    safe_filename = werkzeug_secure_filename(filename)
-    if safe_filename != filename:
-        return jsonify({'error': 'Invalid filename'}), 400
+    # For originals and processed files
+    if filename.startswith('originals/'):
+        parts = filename.split('/')
+        if len(parts) >= 3:  # originals/job_id/filename
+            job_id = parts[1]
+            file_name = parts[2]
+            return send_from_directory(os.path.join(app.config['UPLOAD_FOLDER'], job_id, 'originals'), file_name)
     
-    directory = os.path.join(app.config['UPLOAD_FOLDER'], folder)
-    file_path = os.path.join(directory, filename)
+    if filename.startswith('processed/'):
+        parts = filename.split('/')
+        if len(parts) >= 3:  # processed/job_id/filename
+            job_id = parts[1]
+            file_name = parts[2]
+            return send_from_directory(os.path.join(app.config['UPLOAD_FOLDER'], job_id, 'processed'), file_name)
     
-    if not os.path.exists(file_path):
-        return jsonify({'error': f'File not found: {file_path}'}), 404
-    
-    response = send_from_directory(directory, filename)
-    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
-    response.headers['Pragma'] = 'no-cache'
-    response.headers['Expires'] = '0'
-    return response
+    abort(404)
 
 @app.route('/download/<filename>')
 def download_file(filename):
@@ -606,7 +601,7 @@ def cleanup_old_files():
     """Clean up old files and processing status"""
     if request.endpoint == 'index' and request.method == 'GET':
         try:
-            now = datetime.datetime.now()
+            now = datetime.now()
             retention_period = datetime.timedelta(hours=1) if os.environ.get('CLOUD_RUN') else datetime.timedelta(hours=24)
             
             # Clean up files
