@@ -450,6 +450,61 @@
         #download-dropdown {
             z-index: 42;
         }
+
+        /* History item container styling */
+        .history-item-container {
+            position: relative;
+        }
+
+        /* Delete button styling */
+        .delete-history-btn {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            border: 2px solid white;
+            transition: all 0.2s ease;
+            transform: scale(0.8);
+        }
+
+        .delete-history-btn:hover {
+            transform: scale(1);
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        }
+
+        /* Show delete button on hover */
+        .history-item-container:hover .delete-history-btn {
+            opacity: 1 !important;
+        }
+
+        /* Prevent click through on delete button */
+        .delete-history-btn {
+            pointer-events: auto;
+        }
+
+        /* Add subtle animation for delete button appearance */
+        .delete-history-btn {
+            animation: deleteButtonAppear 0.2s ease-out;
+        }
+
+        @keyframes deleteButtonAppear {
+            from {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            to {
+                opacity: 1;
+                transform: scale(0.8);
+            }
+        }
+
+        /* Improve history item hover effects */
+        .history-item {
+            transition: all 0.3s ease;
+        }
+
+        .history-item-container:hover .history-item img {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
     </style>
 </head>
 
@@ -1220,7 +1275,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        // Show plus button + history items
+        // Show plus button + history items with delete buttons
         const plusButton = `
             <div class="flex-shrink-0 cursor-pointer add-new-image-btn">
                 <div class="w-16 h-16 bg-blue-100 border-2 border-dashed border-blue-400 rounded flex items-center justify-center hover:bg-blue-200 hover:border-blue-500 transition-colors group">
@@ -1230,9 +1285,18 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
         
         const historyItems = historyData.slice(0, 5).map(item => `
-            <div class="flex-shrink-0 cursor-pointer history-item" data-item-id="${item.id}">
-                <img src="${item.resultUrl}" alt="${item.filename}" 
-                     class="w-16 h-16 object-cover rounded border-2 border-gray-200 hover:border-blue-400 transition-colors">
+            <div class="flex-shrink-0 cursor-pointer history-item-container relative group" data-item-id="${item.id}">
+                <div class="history-item relative" data-item-id="${item.id}">
+                    <img src="${item.resultUrl}" alt="${item.filename}" 
+                         class="w-16 h-16 object-cover rounded border-2 border-gray-200 hover:border-blue-400 transition-colors">
+                    
+                    <!-- Delete button overlay -->
+                    <button class="delete-history-btn absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity z-50 flex items-center justify-center shadow-lg" 
+                            data-item-id="${item.id}" 
+                            title="Delete from history">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
             </div>
         `).join('');
         
@@ -1280,148 +1344,71 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Helper functions for UI states
-    function showUploadComplete() {
-        dropText.classList.add('hidden');
-        previewContainer.classList.remove('hidden');
-        originalPreview.parentNode.classList.remove('hidden');
-        resultContainer.classList.add('hidden');
+    // Enhanced delete function with confirmation:
+function deleteFromHistory(itemId) {
+    try {
+        const historyData = JSON.parse(sessionStorage.getItem('bgRemoverHistory') || '[]');
+        const item = historyData.find(h => h.id.toString() === itemId.toString());
         
-        if (heroSection) heroSection.classList.add('hidden');
-        if (historyContainer) historyContainer.classList.remove('hidden');
-    }
-    
-    function showProcessingState() {
-        processingIndicator.classList.remove('hidden');
-        removeBgBtn.disabled = true;
-        progressBar.style.width = '30%';
-    }
-    
-    function showCompletedState(data) {
-        if (data && data.processed_url) {
-            currentResultUrl = data.processed_url;
-            resultPreview.src = currentResultUrl;
-            resultContainer.classList.remove('hidden');
-            originalPreview.parentNode.classList.add('hidden');
-            
-            downloadSection.classList.remove('hidden'); // Changed from downloadContainer
-            compareBtn.classList.remove('hidden');
-            processingIndicator.classList.add('hidden');
-            progressBar.style.width = '100%';
-            
-            showNotification('Background removed successfully!', 'success');
+        if (!item) {
+            showNotification('Item not found in history', 'error');
+            return;
         }
-    }
-    
-    // Function to load job from URL
-    function loadJobFromUrl(jobId) {
-        console.log('Loading job from URL:', jobId);
         
-        fetch(`/check-status/${jobId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    currentJobId = jobId;
-                    
-                    console.log('Job status:', data.status, data);
-                    
-                    // Set up UI based on job status
-                    if (data.status === 'uploaded') {
-                        if (data.data && data.data.original_url) {
-                            currentOriginalUrl = data.data.original_url;
-                            currentFileName = data.data.user_filename || 'image';
-                            originalPreview.src = currentOriginalUrl;
-                            showUploadComplete();
-                            console.log('Restored uploaded image state');
-                        }
-                    } else if (data.status === 'processing') {
-                        if (data.data && data.data.original_url) {
-                            currentOriginalUrl = data.data.original_url;
-                            currentFileName = data.data.user_filename || 'image';
-                            originalPreview.src = currentOriginalUrl;
-                            showUploadComplete();
-                        }
-                        showProcessingState();
-                        console.log('Restored processing state');
-                    } else if (data.status === 'completed') {
-                        if (data.data) {
-                            currentOriginalUrl = data.data.original_url;
-                            currentResultUrl = data.data.processed_url;
-                            currentFileName = data.data.user_filename || 'image';
-                            currentOriginalQualityUrl = data.data.processed_url;
-                            
-                            originalPreview.src = currentOriginalUrl;
-                            resultPreview.src = currentResultUrl;
-                            compareOriginal.src = currentOriginalUrl;
-                            compareResult.src = currentResultUrl;
-                            
-                            showCompletedState(data.data);
-                            console.log('Restored completed state');
-                        }
-                    }
-                } else {
-                    console.log('Job not found');
-                    if (window.location.pathname !== '/upload') {
-                        window.location.href = '/upload';
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error loading job:', error);
-                showNotification('Failed to load job status', 'error');
-            });
-    }
-    
-    // Create confetti effect
-    function createConfetti() {
-        const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
-        
-        for (let i = 0; i < 50; i++) {
-            setTimeout(() => {
-                const confetti = document.createElement('div');
-                confetti.className = 'confetti';
-                confetti.style.left = Math.random() * 100 + '%';
-                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                confetti.style.animationDelay = Math.random() * 3 + 's';
-                document.body.appendChild(confetti);
-                
-                setTimeout(() => {
-                    confetti.remove();
-                }, 5000);
-            }, i * 100);
+        // Show confirmation dialog
+        if (!confirm(`Delete "${item.filename}" from history?`)) {
+            return; // User cancelled
         }
-    }
-    
-    // Create pixel animation
-    function createPixelAnimation(container, width, height) {
-        const pixelSize = 8;
-        const pixelsX = Math.floor(width / pixelSize);
-        const pixelsY = Math.floor(height / pixelSize);
         
-        for (let x = 0; x < pixelsX; x++) {
-            for (let y = 0; y < pixelsY; y++) {
-                setTimeout(() => {
-                    const pixel = document.createElement('div');
-                    pixel.className = 'pixel';
-                    pixel.style.left = (x * pixelSize) + 'px';
-                    pixel.style.top = (y * pixelSize) + 'px';
-                    pixel.style.width = pixelSize + 'px';
-                    pixel.style.height = pixelSize + 'px';
-                    pixel.style.animationDelay = (Math.random() * 2) + 's';
-                    container.appendChild(pixel);
-                }, (x + y) * 50);
+        const itemIndex = historyData.findIndex(h => h.id.toString() === itemId.toString());
+        
+        if (itemIndex !== -1) {
+            // Remove the item from history
+            historyData.splice(itemIndex, 1);
+            
+            // Update session storage
+            sessionStorage.setItem('bgRemoverHistory', JSON.stringify(historyData));
+            
+            // Update the history bar
+            updateHistoryBar(historyData);
+            
+            // If no more items, hide history bar and show hero
+            if (historyData.length === 0) {
+                if (historyContainer) historyContainer.classList.add('hidden');
+                if (heroSection) heroSection.classList.remove('hidden');
             }
+            
+            // Show notification
+            showNotification(`"${item.filename}" deleted from history`, 'success');
+            
+            console.log('Deleted item from history:', item.filename);
         }
+    } catch (error) {
+        console.error('Error deleting from history:', error);
+        showNotification('Failed to delete from history', 'error');
+    }
+}
+
+// Make the delete function globally accessible
+window.deleteFromHistory = deleteFromHistory;
+
+document.addEventListener('click', function(e) {
+    // Handle delete button clicks
+    if (e.target.closest('.delete-history-btn')) {
+        e.stopPropagation(); // Prevent triggering the load function
+        const deleteBtn = e.target.closest('.delete-history-btn');
+        const itemId = deleteBtn.dataset.itemId;
+        deleteFromHistory(itemId);
+        return;
     }
     
-// Event Listeners
-document.addEventListener('click', function(e) {
     // Handle add new image button
     if (e.target.closest('.add-new-image-btn')) {
         addNewImage();
+        return;
     }
     
-    // Handle history item clicks
+    // Handle history item clicks (only if not clicking delete button)
     const historyItem = e.target.closest('.history-item');
     if (historyItem) {
         const itemId = historyItem.dataset.itemId;
