@@ -568,28 +568,20 @@
             <!-- Update the Upload Section -->
             <section class="mb-12 relative" data-aos="fade-up" data-aos-delay="200">
                 <!-- Button Container with Ad Background -->
-                <div class="relative mb-6">
-                    <!-- Advertisement Space - Behind Upload Button -->
+                <div class="relative mb-6 min-h-[120px]" style="min-height: 120px;">
+                    <!-- Advertisement Space with Fixed Dimensions -->
                     <div class="ad-container absolute inset-0 w-full h-full">
-                        <div class="bg-gray-100 border border-gray-200 rounded-lg p-4 h-full flex items-center justify-center">
-                            <div class="text-gray-500 text-center">
-                                <i class="fas fa-ad text-3xl mb-2"></i>
-                                <p class="text-sm">Advertisement</p>
-                                <p class="text-xs mt-1">Button Background Ad</p>
-                            </div>
+                        <!-- AdSense Ad Unit -->
+                        <div class="w-full h-full min-h-[120px]">
+                            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+                                    crossorigin="anonymous"></script>
+                            <!-- Upload Button Ad -->
+                            <ins class="adsbygoogle"
+                                 style="display:block; width:100%; height:120px;"
+                                 data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                                 data-ad-slot="1111111111"
+                                 data-ad-format="rectangle"></ins>
                         </div>
-                        <!-- Google AdSense Script -->
-                        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
-                                crossorigin="anonymous"></script>
-                        <ins class="adsbygoogle"
-                             style="display:block;position:absolute;top:0;left:0;width:100%;height:100%;"
-                             data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-                             data-ad-slot="1111111111"
-                             data-ad-format="auto"
-                             data-full-width-responsive="true"></ins>
-                        <script>
-                             (adsbygoogle = window.adsbygoogle || []).push({});
-                        </script>
                     </div>
                     
                     <!-- Upload Button - On top of ad -->
@@ -808,7 +800,7 @@ function addNewImage() {
     const dropText = document.getElementById('drop-text');
     const previewContainer = document.getElementById('preview-container');
     const resultContainer = document.getElementById('result-container');
-    const downloadSection = document.getElementById('download-section'); // Use getElementById here
+    const downloadSection = document.getElementById('download-section');
     const compareBtn = document.getElementById('compare-btn');
     const processingIndicator = document.getElementById('processing-indicator');
     const progressBar = document.getElementById('progress-bar');
@@ -827,8 +819,11 @@ function addNewImage() {
     if (dropText) dropText.classList.remove('hidden');
     if (previewContainer) previewContainer.classList.add('hidden');
     if (resultContainer) resultContainer.classList.add('hidden');
-    if (downloadSection) downloadSection.classList.add('hidden'); // Fixed reference
+    if (downloadSection) downloadSection.classList.add('hidden');
     if (compareBtn) compareBtn.classList.add('hidden');
+    
+    // Show button sections again
+    showButtonSections();
     
     // Show hero section and hide history bar
     if (heroSection) heroSection.classList.remove('hidden');
@@ -1083,59 +1078,63 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Handle successful completion
-    function handleProcessingComplete(data) {
-        // Complete progress bar
-        progressBar.style.width = '100%';
-        
-        // Set result data
-        if (data.data.processed_data) {
-            currentResultUrl = data.data.processed_data;
-            currentOriginalUrl = data.data.original_data || currentOriginalUrl;
-            currentOriginalQualityUrl = data.data.processed_data;
-        } else {
-            currentResultUrl = data.data.processed_url;
-            currentOriginalUrl = data.data.original_url || currentOriginalUrl;
-            currentOriginalQualityUrl = data.data.processed_url;
-        }
-        
-        // Update UI
-        originalPreview.parentNode.classList.add('hidden');
-        resultPreview.src = currentResultUrl;
-        resultContainer.classList.remove('hidden');
-        
-        // Setup comparison view
-        compareOriginal.src = currentOriginalUrl;
-        compareResult.src = currentResultUrl;
-        
-        // Show download section instead of download container
-        downloadSection.classList.remove('hidden');
-        compareBtn.classList.remove('hidden');
-        processingIndicator.classList.add('hidden');
-        
-        // Save to history
-        saveToHistory(currentFileName, currentOriginalUrl, currentResultUrl, data.data.filename);
-        
-        // Create confetti effect
-        createConfetti();
-        
-        // Remove pixel animation
-        const pixelContainer = document.querySelector('.pixel-animation-container');
-        if (pixelContainer) {
-            pixelContainer.remove();
-        }
-        
-        // Re-enable button
-        removeBgBtn.disabled = false;
-        
-        showNotification('Background removed successfully!', 'success');
-        
-        // Update URL to show completion
-        updateUrl('/background-removed', { 
-            job_id: currentJobId, 
-            completed: 'true' 
-        });
+    // Update the handleProcessingComplete function to hide the buttons:
+function handleProcessingComplete(data) {
+    // Complete progress bar
+    progressBar.style.width = '100%';
+    
+    // Set result data
+    if (data.data.processed_data) {
+        currentResultUrl = data.data.processed_data;
+        currentOriginalUrl = data.data.original_data || currentOriginalUrl;
+        currentOriginalQualityUrl = data.data.processed_data;
+    } else {
+        currentResultUrl = data.data.processed_url;
+        currentOriginalUrl = data.data.original_url || currentOriginalUrl;
+        currentOriginalQualityUrl = data.data.processed_url;
     }
+    
+    // Update UI
+    originalPreview.parentNode.classList.add('hidden');
+    resultPreview.src = currentResultUrl;
+    resultContainer.classList.remove('hidden');
+    
+    // Setup comparison view
+    compareOriginal.src = currentOriginalUrl;
+    compareResult.src = currentResultUrl;
+    
+    // Show download section and hide other button sections
+    downloadSection.classList.remove('hidden');
+    
+    // Hide upload, paste, and URL button sections
+    hideButtonSections();
+    
+    compareBtn.classList.remove('hidden');
+    processingIndicator.classList.add('hidden');
+    
+    // Save to history
+    saveToHistory(currentFileName, currentOriginalUrl, currentResultUrl, data.data.filename);
+    
+    // Create confetti effect
+    createConfetti();
+    
+    // Remove pixel animation
+    const pixelContainer = document.querySelector('.pixel-animation-container');
+    if (pixelContainer) {
+        pixelContainer.remove();
+    }
+    
+    // Re-enable button
+    removeBgBtn.disabled = false;
+    
+    showNotification('Background removed successfully!', 'success');
+    
+    // Update URL to show completion
+    updateUrl('/background-removed', { 
+        job_id: currentJobId, 
+        completed: 'true' 
+    });
+}
 
     // Reset processing UI
     function resetProcessingUI() {
@@ -1161,10 +1160,13 @@ document.addEventListener('DOMContentLoaded', function() {
         dropText.classList.remove('hidden');
         previewContainer.classList.add('hidden');
         resultContainer.classList.add('hidden');
-        downloadSection.classList.add('hidden'); // Changed from downloadContainer
+        downloadSection.classList.add('hidden');
         compareBtn.classList.add('hidden');
         processingIndicator.classList.add('hidden');
         progressBar.style.width = '0%';
+        
+        // Show button sections again
+        showButtonSections();
         
         // Show hero section and hide history bar
         if (heroSection) heroSection.classList.remove('hidden');
@@ -1324,8 +1326,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 originalPreview.parentNode.classList.add('hidden');
                 resultContainer.classList.remove('hidden');
                 
-                // Show download section
-                downloadSection.classList.remove('hidden'); // Changed from downloadContainer
+                // Show download section and hide other button sections
+                downloadSection.classList.remove('hidden');
+                hideButtonSections(); // Hide upload/paste/url buttons
                 compareBtn.classList.remove('hidden');
                 
                 // Setup comparison view
@@ -1494,13 +1497,15 @@ document.addEventListener('click', function(e) {
         // Start progress simulation
         let progress = 0;
         const progressInterval = setInterval(() => {
-            progress += Math.random() * 20;
-            if (progress > 85) progress = 85;
+            progress += Math.random() * 15;
+            if (progress > 80) progress = 80;
             progressBar.style.width = progress + '%';
-        }, 800);
+        }, 1000);
         
-        // STEP 2: Initiate processing
+        // STEP 2: Initiate processing with better error handling
         console.log('STEP 2: Initiating process for job:', currentJobId);
+        showNotification('Initiating background removal...', 'info');
+        
         fetch('/initiate-process', {
             method: 'POST',
             headers: {
@@ -1510,44 +1515,29 @@ document.addEventListener('click', function(e) {
                 job_id: currentJobId
             })
         })
-        .then(response => response.json())
+        .then(response => {
+            console.log('STEP 2 Response status:', response.status);
+            if (!response.ok) {
+                return response.text().then(text => {
+                    console.error('STEP 2 Error response:', text);
+                    throw new Error(`HTTP ${response.status}: ${text}`);
+                });
+            }
+            return response.json();
+        })
         .then(data => {
+            console.log('STEP 2 Response data:', data);
+            
             if (data.success) {
-                console.log('STEP 2 SUCCESS: Processing initiated:', data);
+                console.log('STEP 2 SUCCESS: Processing initiated');
                 progressBar.style.width = '50%';
+                showNotification('Processing image...', 'info');
                 updateUrl('/background-removed', { job_id: currentJobId });
                 
-                // Small delay before step 3
+                // Longer delay and better error handling for step 3
                 setTimeout(() => {
-                    // STEP 3: Perform background removal
-                    console.log('STEP 3: Performing background removal for job:', currentJobId);
-                    fetch('/background-removed', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            job_id: currentJobId
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(finalData => {
-                        clearInterval(progressInterval);
-                        
-                        if (finalData.success && finalData.status === 'completed') {
-                            console.log('STEP 3 SUCCESS: Background removal completed:', finalData);
-                            handleProcessingComplete(finalData);
-                        } else {
-                            throw new Error(finalData.error || 'Background removal failed');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('STEP 3 ERROR:', error);
-                        clearInterval(progressInterval);
-                        showNotification('Background removal failed: ' + error.message, 'error');
-                        resetProcessingUI();
-                    });
-                }, 1000);
+                    performBackgroundRemoval(progressInterval);
+                }, 2000); // Increased delay
                 
             } else {
                 throw new Error(data.error || 'Processing initiation failed');
@@ -1556,82 +1546,298 @@ document.addEventListener('click', function(e) {
         .catch(error => {
             console.error('STEP 2 ERROR:', error);
             clearInterval(progressInterval);
-            showNotification('Processing initiation failed: ' + error.message, 'error');
+            showNotification('Failed to initiate processing: ' + error.message, 'error');
             resetProcessingUI();
         });
     });
     
-    // Upload New Button
-    uploadNewBtn.addEventListener('click', function() {
-        resetUI();
-    });
-    
-    // Compare Button
-    compareBtn.addEventListener('click', function() {
-        if (standardPreview.classList.contains('hidden')) {
-            comparisonPreview.classList.add('hidden');
-            standardPreview.classList.remove('hidden');
-            compareBtn.innerHTML = '<i class="fas fa-exchange-alt mr-2"></i> Compare';
-        } else {
-            standardPreview.classList.add('hidden');
-            comparisonPreview.classList.remove('hidden');
-            compareBtn.innerHTML = '<i class="fas fa-eye mr-2"></i> Standard View';
+    // Separate function for background removal with retry logic
+    function performBackgroundRemoval(progressInterval, retryCount = 0) {
+        const maxRetries = 3;
+        
+        console.log(`STEP 3: Performing background removal (attempt ${retryCount + 1})`);
+        showNotification('Removing background...', 'info');
+        
+        fetch('/background-removed', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                job_id: currentJobId
+            })
+        })
+        .then(response => {
+            console.log('STEP 3 Response status:', response.status);
+            if (!response.ok) {
+                return response.text().then(text => {
+                    console.error('STEP 3 Error response:', text);
+                    throw new Error(`HTTP ${response.status}: ${text}`);
+                });
+            }
+            return response.json();
+        })
+        .then(finalData => {
+            console.log('STEP 3 Response data:', finalData);
+            clearInterval(progressInterval);
+            
+            if (finalData.success) {
+                if (finalData.status === 'completed') {
+                    console.log('STEP 3 SUCCESS: Background removal completed');
+                    handleProcessingComplete(finalData);
+                } else if (finalData.status === 'processing') {
+                    // Still processing, check again
+                    console.log('Still processing, checking again...');
+                    progressBar.style.width = '70%';
+                    setTimeout(() => {
+                        performBackgroundRemoval(progressInterval, retryCount);
+                    }, 3000);
+                } else {
+                    throw new Error(`Unexpected status: ${finalData.status}`);
+                }
+            } else {
+                throw new Error(finalData.error || 'Background removal failed');
+            }
+        })
+        .catch(error => {
+            console.error('STEP 3 ERROR:', error);
+            
+            if (retryCount < maxRetries) {
+                console.log(`Retrying... (${retryCount + 1}/${maxRetries})`);
+                showNotification(`Retrying... (${retryCount + 1}/${maxRetries})`, 'info');
+                setTimeout(() => {
+                    performBackgroundRemoval(progressInterval, retryCount + 1);
+                }, 5000);
+            } else {
+                clearInterval(progressInterval);
+                showNotification('Background removal failed after multiple attempts: ' + error.message, 'error');
+                resetProcessingUI();
+            }
+        });
+    }
+
+    // ADD THESE MISSING HELPER FUNCTIONS:
+
+    // Function to hide button sections
+    function hideButtonSections() {
+        const buttonSections = document.querySelectorAll('.relative.mb-6:not(#download-section)');
+        buttonSections.forEach(section => {
+            // Check if this section contains upload/paste/url buttons
+            if (section.querySelector('#image') || 
+                section.querySelector('#paste-image-btn') || 
+                section.querySelector('#url-image-btn')) {
+                section.style.display = 'none';
+            }
+        });
+    }
+
+    // Function to show button sections
+    function showButtonSections() {
+        const buttonSections = document.querySelectorAll('.relative.mb-6:not(#download-section)');
+        buttonSections.forEach(section => {
+            // Check if this section contains upload/paste/url buttons
+            if (section.querySelector('#image') || 
+                section.querySelector('#paste-image-btn') || 
+                section.querySelector('#url-image-btn')) {
+                section.style.display = 'block';
+            }
+        });
+    }
+
+    function createPixelAnimation(container, width, height) {
+        // Create pixel animation effect
+        for (let i = 0; i < 50; i++) {
+            setTimeout(() => {
+                const pixel = document.createElement('div');
+                pixel.className = 'pixel';
+                pixel.style.left = Math.random() * width + 'px';
+                pixel.style.top = Math.random() * height + 'px';
+                pixel.style.width = '4px';
+                pixel.style.height = '4px';
+                pixel.style.animationDelay = Math.random() * 2 + 's';
+                container.appendChild(pixel);
+                
+                setTimeout(() => {
+                    if (container.contains(pixel)) {
+                        container.removeChild(pixel);
+                    }
+                }, 3000);
+            }, i * 100);
         }
-    });
-    
+    }
+
+    function createConfetti() {
+        const colors = ['#f43f5e', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'];
+        
+        for (let i = 0; i < 50; i++) {
+            setTimeout(() => {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * window.innerWidth + 'px';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDelay = Math.random() * 3 + 's';
+                document.body.appendChild(confetti);
+                
+                setTimeout(() => {
+                    if (document.body.contains(confetti)) {
+                        document.body.removeChild(confetti);
+                    }
+                }, 5000);
+            }, i * 50);
+        }
+    }
+
     // Download handlers
-    downloadBtn.addEventListener('click', function() {
-        downloadDropdown.classList.toggle('hidden');
-    });
-    
-    downloadPreviewBtn.addEventListener('click', function() {
-        if (currentResultUrl) {
-            // Store image data for taskpage1
-            localStorage.setItem('downloadImageData', currentResultUrl);
-            localStorage.setItem('downloadFilename', `bg_removed_${currentFileName || 'image'}.png`);
-            localStorage.setItem('downloadType', 'png');
-            
-            // Clear any existing session steps
-            sessionStorage.removeItem('downloadStep');
-            
-            // Navigate to taskpage1 for preview quality download
-            window.location.href = '/taskpage1.html';
+    if (downloadBtn) {
+        downloadBtn.addEventListener('click', function() {
+            if (downloadDropdown) {
+                downloadDropdown.classList.toggle('hidden');
+            }
+        });
+    }
+
+    if (downloadPreviewBtn) {
+        downloadPreviewBtn.addEventListener('click', function() {
+            if (currentResultUrl) {
+                // Store image data for taskpage1
+                localStorage.setItem('downloadImageData', currentResultUrl);
+                localStorage.setItem('downloadFilename', `bg_removed_${currentFileName || 'image'}.png`);
+                localStorage.setItem('downloadType', 'png');
+                
+                // Clear any existing session steps
+                sessionStorage.removeItem('downloadStep');
+                
+                // Navigate to taskpage1 for preview quality download
+                window.location.href = '/taskpage1.html';
+            }
+            if (downloadDropdown) {
+                downloadDropdown.classList.add('hidden');
+            }
+        });
+    }
+
+    if (downloadOriginalBtn) {
+        downloadOriginalBtn.addEventListener('click', function() {
+            if (currentOriginalQualityUrl) {
+                // Store image data for taskpage2
+                localStorage.setItem('downloadImageData', currentOriginalQualityUrl);
+                localStorage.setItem('downloadFilename', `bg_removed_original_${currentFileName || 'image'}.png`);
+                localStorage.setItem('downloadType', 'png');
+                
+                // Clear any existing session steps
+                sessionStorage.removeItem('downloadStep');
+                
+                // Navigate to taskpage2 for original quality download
+                window.location.href = '/taskpage2.html';
+            }
+            if (downloadDropdown) {
+                downloadDropdown.classList.add('hidden');
+            }
+        });
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (downloadBtn && downloadDropdown && 
+            !downloadBtn.contains(e.target) && 
+            !downloadDropdown.contains(e.target)) {
+            downloadDropdown.classList.add('hidden');
         }
-        downloadDropdown.classList.add('hidden');
     });
-    
-    downloadOriginalBtn.addEventListener('click', function() {
-        if (currentOriginalQualityUrl) {
-            // Store image data for taskpage2
-            localStorage.setItem('downloadImageData', currentOriginalQualityUrl);
-            localStorage.setItem('downloadFilename', `bg_removed_original_${currentFileName || 'image'}.png`);
-            localStorage.setItem('downloadType', 'png');
+
+    // Compare button functionality
+    if (compareBtn) {
+        compareBtn.addEventListener('click', function() {
+            if (standardPreview.classList.contains('hidden')) {
+                // Show standard view
+                standardPreview.classList.remove('hidden');
+                comparisonPreview.classList.add('hidden');
+                compareBtn.innerHTML = '<i class="fas fa-exchange-alt mr-2"></i> Compare';
+            } else {
+                // Show comparison view
+                standardPreview.classList.add('hidden');
+                comparisonPreview.classList.remove('hidden');
+                compareBtn.innerHTML = '<i class="fas fa-eye mr-2"></i> Standard View';
+            }
+        });
+    }
+
+    // Upload new button
+    if (uploadNewBtn) {
+        uploadNewBtn.addEventListener('click', function() {
+            resetUI();
+        });
+    }
+
+    // Clear history
+    if (clearHistoryBtn) {
+        clearHistoryBtn.addEventListener('click', function() {
+            if (confirm('Are you sure you want to clear all history?')) {
+                sessionStorage.removeItem('bgRemoverHistory');
+                loadHistory();
+                showNotification('History cleared', 'success');
+            }
+        });
+    }
+
+    // Paste button functionality
+    if (pasteImageBtn) {
+        pasteImageBtn.addEventListener('click', async function() {
+            try {
+                const clipboardItems = await navigator.clipboard.read();
+                
+                for (const clipboardItem of clipboardItems) {
+                    for (const type of clipboardItem.types) {
+                        if (type.startsWith('image/')) {
+                            const blob = await clipboardItem.getType(type);
+                            const file = new File([blob], 'pasted-image.png', { type: blob.type });
+                            handleFileSelection(file);
+                            showNotification('Image pasted successfully!', 'success');
+                            return;
+                        }
+                    }
+                }
+                
+                showNotification('No image found in clipboard', 'error');
+            } catch (error) {
+                console.error('Error pasting image:', error);
+                showNotification('Failed to paste image. Please try uploading instead.', 'error');
+            }
+        });
+    }
+
+    // URL button functionality
+    if (urlImageBtn) {
+        urlImageBtn.addEventListener('click', function() {
+            urlModal.classList.remove('hidden');
+        });
+    }
+
+    if (cancelUrlBtn) {
+        cancelUrlBtn.addEventListener('click', function() {
+            urlModal.classList.add('hidden');
+            imageUrlInput.value = '';
+        });
+    }
+
+    if (loadUrlBtn) {
+        loadUrlBtn.addEventListener('click', function() {
+            const url = imageUrlInput.value.trim();
+            if (!url) {
+                showNotification('Please enter a valid URL', 'error');
+                return;
+            }
             
-            // Clear any existing session steps
-            sessionStorage.removeItem('downloadStep');
+            // Close modal
+            urlModal.classList.add('hidden');
+            imageUrlInput.value = '';
             
-            // Navigate to taskpage2 for original quality download
-            window.location.href = '/taskpage2.html';
-        }
-        downloadDropdown.classList.add('hidden');
-    });
-    
-    // URL Modal handlers
-    urlImageBtn.addEventListener('click', function() {
-        urlModal.classList.remove('hidden');
-    });
-    
-    cancelUrlBtn.addEventListener('click', function() {
-        urlModal.classList.add('hidden');
-        imageUrlInput.value = '';
-    });
-    
-    loadUrlBtn.addEventListener('click', function() {
-        const imageUrl = imageUrlInput.value.trim();
-        if (imageUrl) {
+            // Load image from URL
             const img = new Image();
             img.crossOrigin = 'anonymous';
+            
             img.onload = function() {
+                // Convert image to file
                 const canvas = document.createElement('canvas');
                 canvas.width = img.width;
                 canvas.height = img.height;
@@ -1641,101 +1847,130 @@ document.addEventListener('click', function(e) {
                 canvas.toBlob(function(blob) {
                     const file = new File([blob], 'url-image.png', { type: 'image/png' });
                     handleFileSelection(file);
-                    urlModal.classList.add('hidden');
-                    imageUrlInput.value = '';
-                });
+                }, 'image/png');
             };
+            
             img.onerror = function() {
                 showNotification('Failed to load image from URL', 'error');
             };
-            img.src = imageUrl;
-        }
-    });
-    
-    // Paste Image handler
-    pasteImageBtn.addEventListener('click', async function() {
-        try {
-            const clipboardItems = await navigator.clipboard.read();
-            for (const clipboardItem of clipboardItems) {
-                for (const type of clipboardItem.types) {
-                    if (type.startsWith('image/')) {
-                        const blob = await clipboardItem.getType(type);
-                        const file = new File([blob], 'pasted-image.png', { type: type });
-                        handleFileSelection(file);
-                        return;
-                    }
-                }
-            }
-            showNotification('No image found in clipboard', 'error');
-        } catch (error) {
-            showNotification('Failed to read clipboard. Please use the upload button instead.', 'error');
-        }
-    });
-    
-    // View History handler
-    viewHistoryBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        historySection.classList.toggle('hidden');
-        loadHistory();
-    });
-    
-    // Clear History handler
-    clearHistoryBtn.addEventListener('click', function() {
-        if (confirm('Are you sure you want to clear all history?')) {
-            sessionStorage.removeItem('bgRemoverHistory');
-            loadHistory();
-            if (historyContainer) historyContainer.classList.add('hidden');
-            showNotification('History cleared', 'success');
-        }
-    });
-    
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function(e) {
-        if (!downloadBtn.contains(e.target) && !downloadDropdown.contains(e.target)) {
-            downloadDropdown.classList.add('hidden');
-        }
-    });
-    
-    // Comparison slider functionality
-    if (slider && afterContainer) {
-        let isSliding = false;
-        
-        slider.addEventListener('mousedown', function() {
-            isSliding = true;
-        });
-        
-        document.addEventListener('mousemove', function(e) {
-            if (!isSliding) return;
             
-            const container = slider.closest('.img-compare-container');
-            const rect = container.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const percentage = (x / rect.width) * 100;
-            
-            if (percentage >= 0 && percentage <= 100) {
-                afterContainer.style.width = percentage + '%';
-                slider.style.left = percentage + '%';
-            }
-        });
-        
-        document.addEventListener('mouseup', function() {
-            isSliding = false;
+            img.src = url;
+            showNotification('Loading image from URL...', 'info');
         });
     }
-    
-    // Get URL parameters and handle job loading
+
+    // Close modal when clicking outside
+    urlModal.addEventListener('click', function(e) {
+        if (e.target === urlModal) {
+            urlModal.classList.add('hidden');
+            imageUrlInput.value = '';
+        }
+    });
+
+    // Check if there's a job ID in the URL on page load
     const urlParams = new URLSearchParams(window.location.search);
-    const urlJobId = urlParams.get('job_id');
+    const jobId = urlParams.get('job_id');
     
-    // If there's a job_id in URL, load that job
-    if (urlJobId) {
-        currentJobId = urlJobId;
-        loadJobFromUrl(urlJobId);
+    if (jobId) {
+        loadJobFromUrl(jobId);
     }
-    
-    // Make functions globally accessible for onclick handlers
+
+    function loadJobFromUrl(jobId) {
+        console.log('Loading job from URL:', jobId);
+        
+        fetch(`/check-status/${jobId}`)
+            .then(response => response.json())
+            .then((data) => {  // FIXED: Added parentheses and arrow
+                if (data.success) {
+                    currentJobId = jobId;
+                    
+                    console.log('Job status:', data.status, data);
+                    
+                    if (data.status === 'completed' && data.data) {
+                        currentOriginalUrl = data.data.original_url;
+                        currentResultUrl = data.data.processed_url;
+                        currentFileName = data.data.user_filename || 'image';
+                        currentOriginalQualityUrl = data.data.processed_url;
+                        
+                        originalPreview.src = currentOriginalUrl;
+                        resultPreview.src = currentResultUrl;
+                        compareOriginal.src = currentOriginalUrl;
+                        compareResult.src = currentResultUrl;
+                        
+                        showCompletedState(data.data);
+                        console.log('Restored completed state');
+                    }
+                } else {
+                    console.log('Job not found');
+                    showNotification('Job not found', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error loading job:', error);
+                showNotification('Failed to load job status', 'error');
+            });
+    }
+
+    function showCompletedState(data) {
+        dropText.classList.add('hidden');
+        previewContainer.classList.remove('hidden');
+        originalPreview.parentNode.classList.add('hidden');
+        resultContainer.classList.remove('hidden');
+        
+        downloadSection.classList.remove('hidden');
+        hideButtonSections();
+        compareBtn.classList.remove('hidden');
+        processingIndicator.classList.add('hidden');
+        progressBar.style.width = '100%';
+        
+        if (heroSection) heroSection.classList.add('hidden');
+        if (historyContainer) historyContainer.classList.remove('hidden');
+        
+        showNotification('Background removed successfully!', 'success');
+    }
+
+}); // Close DOMContentLoaded event listener
+
+// Make global functions available
 window.loadFromHistory = loadFromHistory;
-});
+window.addNewImage = addNewImage;
+window.showNotification = showNotification;
+
+// Add this to your existing JavaScript, after the DOMContentLoaded:
+
+// Function to initialize AdSense when element becomes visible
+function initializeAdSense() {
+    // Check if AdSense is already loaded
+    if (typeof adsbygoogle !== 'undefined') {
+        try {
+            // Only push ads for visible containers
+            const visibleAdContainers = document.querySelectorAll('.adsbygoogle:not([data-adsbygoogle-status])');
+            
+            visibleAdContainers.forEach((adContainer) => {
+                // Check if the container is visible and has dimensions
+                const rect = adContainer.getBoundingClientRect();
+                if (rect.width > 0 && rect.height > 0) {
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                }
+            });
+        } catch (error) {
+            console.log('AdSense initialization skipped:', error.message);
+        }
+    }
+}
+
+// Initialize ads after page load
+setTimeout(initializeAdSense, 2000);
+
+// Re-initialize when download section becomes visible
+function showDownloadSection() {
+    downloadSection.classList.remove('hidden');
+    
+    // Wait for element to be visible, then try to load ads
+    setTimeout(() => {
+        initializeAdSense();
+    }, 500);
+}
     </script>
 </body>
 </html>
