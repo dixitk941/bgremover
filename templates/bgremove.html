@@ -432,6 +432,24 @@
         .history-container .group {
             transition: all 0.3s ease;
         }
+
+        /* Download dropdown positioning */
+        #download-dropdown {
+            min-width: 200px;
+        }
+
+        /* Ensure download section has proper z-index */
+        #download-section {
+            z-index: 40;
+        }
+
+        #download-section .relative {
+            z-index: 41;
+        }
+
+        #download-dropdown {
+            z-index: 42;
+        }
     </style>
 </head>
 
@@ -579,23 +597,6 @@
                                 <i class="fas fa-magic mr-2"></i> Remove Background
                             </button>
                             
-                            <!-- Download Button with Dropdown -->
-                            <div class="relative hidden" id="download-container">
-                                <button id="download-btn" class="btn bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-md transition-all flex items-center">
-                                    <i class="fas fa-download mr-2"></i> Download
-                                </button>
-                                
-                                <!-- Dropdown Menu - Increased z-index -->
-                                <div id="download-dropdown" class="hidden absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-50 min-w-full">
-                                    <button id="download-preview-btn" class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center">
-                                        <i class="fas fa-eye mr-2 text-blue-500"></i> Preview Quality
-                                    </button>
-                                    <button id="download-original-btn" class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center">
-                                        <i class="fas fa-star mr-2 text-yellow-500"></i> Original Quality
-                                    </button>
-                                </div>
-                            </div>
-                            
                             <button id="compare-btn" class="btn hidden bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-6 rounded-md transition-all">
                                 <i class="fas fa-exchange-alt mr-2"></i> Compare
                             </button>
@@ -640,6 +641,52 @@
                            <button id="url-image-btn" class="btn bg-orange-600 hover:bg-orange-700 text-white font-medium py-2 px-6 rounded-md transition-all shadow-lg relative z-30">
     <i class="fas fa-link mr-2"></i> Insert Image URL
 </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Download Button Container with Ad Background (UPDATED) -->
+                <div class="relative mb-6 hidden" id="download-section">
+                    <!-- Advertisement Space - Behind Download Button -->
+                    <div class="ad-container absolute inset-0 w-full h-full">
+                        <div class="bg-gray-100 border border-gray-200 rounded-lg p-4 h-full flex items-center justify-center">
+                            <div class="text-gray-500 text-center">
+                                <i class="fas fa-ad text-3xl mb-2"></i>
+                                <p class="text-sm">Advertisement</p>
+                                <p class="text-xs mt-1">Download Background Ad</p>
+                            </div>
+                        </div>
+                        <!-- Google AdSense Script -->
+                        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+                                crossorigin="anonymous"></script>
+                        <ins class="adsbygoogle"
+                             style="display:block;position:absolute;top:0;left:0;width:100%;height:100%;"
+                             data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                             data-ad-slot="3333333333"
+                             data-ad-format="auto"
+                             data-full-width-responsive="true"></ins>
+                        <script>
+                             (adsbygoogle = window.adsbygoogle || []).push({});
+                        </script>
+                    </div>
+                    
+                    <!-- Download Button with Dropdown - On top of ad -->
+                    <div class="text-center relative z-20 py-8">
+                        <div class="relative inline-block">
+                            <button id="download-btn" class="btn bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-md transition-all shadow-lg flex items-center">
+                                <i class="fas fa-download mr-2"></i> Download Result
+                                <i class="fas fa-chevron-down ml-2"></i>
+                            </button>
+                            
+                            <!-- Dropdown Menu - ADD THIS -->
+                            <div id="download-dropdown" class="hidden absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-white border border-gray-200 rounded-md shadow-lg z-50 min-w-full whitespace-nowrap">
+                                <button id="download-preview-btn" class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center">
+                                    <i class="fas fa-eye mr-2 text-blue-500"></i> Preview Quality
+                                </button>
+                                <button id="download-original-btn" class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center">
+                                    <i class="fas fa-star mr-2 text-yellow-500"></i> Original Quality
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -700,13 +747,13 @@
     <!-- Scripts -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-// Add New Image function for the plus button - Global scope
+// Update the global addNewImage function:
 function addNewImage() {
     // Reset UI elements
     const dropText = document.getElementById('drop-text');
     const previewContainer = document.getElementById('preview-container');
     const resultContainer = document.getElementById('result-container');
-    const downloadContainer = document.getElementById('download-container');
+    const downloadSection = document.getElementById('download-section'); // Use getElementById here
     const compareBtn = document.getElementById('compare-btn');
     const processingIndicator = document.getElementById('processing-indicator');
     const progressBar = document.getElementById('progress-bar');
@@ -725,10 +772,8 @@ function addNewImage() {
     if (dropText) dropText.classList.remove('hidden');
     if (previewContainer) previewContainer.classList.add('hidden');
     if (resultContainer) resultContainer.classList.add('hidden');
-    if (downloadContainer) downloadContainer.classList.add('hidden');
+    if (downloadSection) downloadSection.classList.add('hidden'); // Fixed reference
     if (compareBtn) compareBtn.classList.add('hidden');
-    if (processingIndicator) processingIndicator.classList.add('hidden');
-    if (progressBar) progressBar.style.width = '0%';
     
     // Show hero section and hide history bar
     if (heroSection) heroSection.classList.remove('hidden');
@@ -822,6 +867,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const downloadDropdown = document.getElementById('download-dropdown');
     const downloadPreviewBtn = document.getElementById('download-preview-btn');
     const downloadOriginalBtn = document.getElementById('download-original-btn');
+    const downloadSection = document.getElementById('download-section'); // ADD THIS LINE
     const compareBtn = document.getElementById('compare-btn');
     const uploadNewBtn = document.getElementById('upload-new-btn');
     const viewHistoryBtn = document.getElementById('view-history');
@@ -1007,8 +1053,8 @@ document.addEventListener('DOMContentLoaded', function() {
         compareOriginal.src = currentOriginalUrl;
         compareResult.src = currentResultUrl;
         
-        // Show controls
-        downloadContainer.classList.remove('hidden');
+        // Show download section instead of download container
+        downloadSection.classList.remove('hidden');
         compareBtn.classList.remove('hidden');
         processingIndicator.classList.add('hidden');
         
@@ -1060,7 +1106,7 @@ document.addEventListener('DOMContentLoaded', function() {
         dropText.classList.remove('hidden');
         previewContainer.classList.add('hidden');
         resultContainer.classList.add('hidden');
-        downloadContainer.classList.add('hidden');
+        downloadSection.classList.add('hidden'); // Changed from downloadContainer
         compareBtn.classList.add('hidden');
         processingIndicator.classList.add('hidden');
         progressBar.style.width = '0%';
@@ -1214,8 +1260,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 originalPreview.parentNode.classList.add('hidden');
                 resultContainer.classList.remove('hidden');
                 
-                // Show controls
-                downloadContainer.classList.remove('hidden');
+                // Show download section
+                downloadSection.classList.remove('hidden'); // Changed from downloadContainer
                 compareBtn.classList.remove('hidden');
                 
                 // Setup comparison view
@@ -1258,7 +1304,7 @@ document.addEventListener('DOMContentLoaded', function() {
             resultContainer.classList.remove('hidden');
             originalPreview.parentNode.classList.add('hidden');
             
-            downloadContainer.classList.remove('hidden');
+            downloadSection.classList.remove('hidden'); // Changed from downloadContainer
             compareBtn.classList.remove('hidden');
             processingIndicator.classList.add('hidden');
             progressBar.style.width = '100%';
