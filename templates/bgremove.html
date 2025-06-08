@@ -648,9 +648,9 @@
                         
                         <!-- Controls -->
                         <div id="controls" class="mt-8 flex flex-wrap justify-center gap-4">
-                            <button id="remove-bg-btn" class="btn bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-md transition-all">
+                            <!-- <button id="remove-bg-btn" class="btn bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-md transition-all">
                                 <i class="fas fa-magic mr-2"></i> Remove Background
-                            </button>
+                            </button> -->
                             
                             <!-- <button id="compare-btn" class="btn hidden bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-6 rounded-md transition-all">
                                 <i class="fas fa-exchange-alt mr-2"></i> Compare
@@ -743,6 +743,39 @@
                                 </button>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Remove Background Button Container with Ad Background -->
+                <div class="relative mb-6 hidden" id="remove-bg-container">
+                    <!-- Advertisement Space - Behind Remove Background Button -->
+                    <div class="ad-container absolute inset-0 w-full h-full">
+                        <div class="bg-gray-100 border border-gray-200 rounded-lg p-4 h-full flex items-center justify-center">
+                            <div class="text-gray-500 text-center">
+                                <i class="fas fa-ad text-3xl mb-2"></i>
+                                <p class="text-sm">Advertisement</p>
+                                <p class="text-xs mt-1">Button Background Ad</p>
+                            </div>
+                        </div>
+                        <!-- Google AdSense Script -->
+                        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+                                crossorigin="anonymous"></script>
+                        <ins class="adsbygoogle"
+                             style="display:block;position:absolute;top:0;left:0;width:100%;height:100%;"
+                             data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                             data-ad-slot="4444444444"
+                             data-ad-format="auto"
+                             data-full-width-responsive="true"></ins>
+                        <script>
+                             (adsbygoogle = window.adsbygoogle || []).push({});
+                        </script>
+                    </div>
+                    
+                    <!-- Remove Background Button - On top of ad -->
+                    <div class="text-center relative z-20 py-8">
+                        <button id="remove-bg-btn" class="btn bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-md transition-all shadow-lg">
+                            <i class="fas fa-magic mr-2"></i> Remove Background
+                        </button>
                     </div>
                 </div>
             </section>
@@ -1038,20 +1071,21 @@ function handleFileSelection(file) {
         originalPreview.parentNode.classList.remove('hidden');
         resultContainer.classList.add('hidden');
         
-        // Reset any previous results
-        downloadContainer.classList.add('hidden');
-        compareBtn.classList.add('hidden');
-        processingIndicator.classList.add('hidden');
-        progressBar.style.width = '0%';
-        
         // Hide hero section and show history bar
         if (heroSection) heroSection.classList.add('hidden');
         if (historyContainer) historyContainer.classList.remove('hidden');
         
-        // Hide upload, paste, and URL buttons immediately after upload
+        // RESTORE THIS LINE - Hide upload and paste buttons:
         hideButtonSections();
         
-        showNotification('Image preview loaded! Click "Remove Background" to start processing.', 'success');
+        // Show the Remove Background button container
+        const removeBgContainer = document.getElementById('remove-bg-container');
+        if (removeBgContainer) {
+            removeBgContainer.classList.remove('hidden');
+            removeBgContainer.style.display = 'block';
+        }
+        
+        console.log('Preview loaded in UI');
     };
     reader.readAsDataURL(file);
     
@@ -1217,6 +1251,12 @@ function handleProcessingComplete(data) {
         // Re-enable buttons
         removeBgBtn.classList.remove('hidden');
         removeBgBtn.disabled = false;
+        
+        // Hide the Remove Background button container
+        const removeBgContainer = document.getElementById('remove-bg-container');
+        if (removeBgContainer) {
+            removeBgContainer.classList.add('hidden');
+        }
         
         // Update URL
         window.history.pushState({}, '', '/upload');
@@ -1474,11 +1514,19 @@ document.addEventListener('click', function(e) {
                     originalPreview.parentNode.classList.remove('hidden');
                     resultContainer.classList.add('hidden');
                     
+                    // Hide hero section and show history bar
                     if (heroSection) heroSection.classList.add('hidden');
                     if (historyContainer) historyContainer.classList.remove('hidden');
                     
-                    // Hide upload, paste, and URL buttons immediately after upload
+                    // RESTORE THIS LINE - Hide upload and paste buttons:
                     hideButtonSections();
+                    
+                    // Show the Remove Background button container
+                    const removeBgContainer = document.getElementById('remove-bg-container');
+                    if (removeBgContainer) {
+                        removeBgContainer.classList.remove('hidden');
+                        removeBgContainer.style.display = 'block';
+                    }
                     
                     console.log('Preview loaded in UI');
                 };
@@ -1655,7 +1703,7 @@ document.addEventListener('click', function(e) {
 
     // Function to hide button sections
     function hideButtonSections() {
-        const buttonSections = document.querySelectorAll('.relative.mb-6:not(#download-section)');
+        const buttonSections = document.querySelectorAll('.relative.mb-6:not(#download-section):not(#remove-bg-container)');
         buttonSections.forEach(section => {
             // Check if this section contains upload/paste/url buttons
             if (section.querySelector('#image') || 
@@ -1670,10 +1718,11 @@ document.addEventListener('click', function(e) {
 function showButtonSections() {
     const buttonSections = document.querySelectorAll('.relative.mb-6:not(#download-section)');
     buttonSections.forEach(section => {
-        // Check if this section contains upload/paste/url buttons
+        // Check if this section contains upload/paste/url buttons or remove-bg button
         if (section.querySelector('#image') || 
             section.querySelector('#paste-image-btn') || 
-            section.querySelector('#url-image-btn')) {
+            section.querySelector('#url-image-btn') ||
+            section.querySelector('#remove-bg-btn')) {
             
             // Reset all display properties to ensure visibility
             section.style.display = 'block';
@@ -1893,13 +1942,15 @@ function showButtonSections() {
                 showNotification('Failed to load image from URL', 'error');
             };
             
+                       
             img.src = url;
-            showNotification('Loading image from URL...', 'info');
+                       showNotification('Loading image from URL...', 'info');
         });
     }
 
     // Close modal when clicking outside
     urlModal.addEventListener('click', function(e) {
+
         if (e.target === urlModal) {
             urlModal.classList.add('hidden');
             imageUrlInput.value = '';
@@ -1911,43 +1962,54 @@ function showButtonSections() {
     const jobId = urlParams.get('job_id');
     
     if (jobId) {
-        loadJobFromUrl(jobId);
-    }
-
-    function loadJobFromUrl(jobId) {
-        console.log('Loading job from URL:', jobId);
+        console.log('Found job ID in URL:', jobId);
         
-        fetch(`/check-status/${jobId}`)
-            .then(response => response.json())
-            .then((data) => {  // FIXED: Added parentheses and arrow
-                if (data.success) {
-                    currentJobId = jobId;
-                    
-                    console.log('Job status:', data.status, data);
-                    
-                    if (data.status === 'completed' && data.data) {
-                        currentOriginalUrl = data.data.original_url;
-                        currentResultUrl = data.data.processed_url;
-                        currentFileName = data.data.user_filename || 'image';
-                        currentOriginalQualityUrl = data.data.processed_url;
-                        
-                        originalPreview.src = currentOriginalUrl;
-                        resultPreview.src = currentResultUrl;
-                        compareOriginal.src = currentOriginalUrl;
-                        compareResult.src = currentResultUrl;
-                        
-                        showCompletedState(data.data);
-                        console.log('Restored completed state');
-                    }
-                } else {
-                    console.log('Job not found');
-                    showNotification('Job not found', 'error');
-                }
+        // STEP 3: Check job status with better error handling
+        showNotification('Checking job status...', 'info');
+        
+        fetch('/background-removed', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                job_id: jobId
             })
-            .catch(error => {
-                console.error('Error loading job:', error);
-                showNotification('Failed to load job status', 'error');
-            });
+        })
+        .then(response => {
+            console.log('STEP 3 Response status:', response.status);
+            if (!response.ok) {
+                return response.text().then(text => {
+                    console.error('STEP 3 Error response:', text);
+                    throw new Error(`HTTP ${response.status}: ${text}`);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('STEP 3 Response data:', data);
+            
+            if (data.success) {
+                if (data.status === 'completed') {
+                    console.log('Job completed successfully');
+                    showCompletedState(data);
+                } else if (data.status === 'processing') {
+                    console.log('Job is still processing');
+                    setTimeout(() => {
+                        // Check again after a delay
+                        window.location.reload();
+                    }, 5000);
+                } else {
+                    throw new Error(`Unexpected job status: ${data.status}`);
+                }
+            } else {
+                throw new Error(data.error || 'Failed to check job status');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading job:', error);
+            showNotification('Failed to load job status', 'error');
+        });
     }
 
     function showCompletedState(data) {
@@ -2001,7 +2063,6 @@ function showDownloadSection() {
         initializeAdSense();
     }, 500);
 }
-
 </script>
 </body>
 </html>
