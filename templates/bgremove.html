@@ -568,20 +568,28 @@
             <!-- Update the Upload Section -->
             <section class="mb-12 relative" data-aos="fade-up" data-aos-delay="200">
                 <!-- Button Container with Ad Background -->
-                <div class="relative mb-6 min-h-[120px]" style="min-height: 120px;">
-                    <!-- Advertisement Space with Fixed Dimensions -->
+                <div class="relative mb-6">
+                    <!-- Advertisement Space - Behind Upload Button -->
                     <div class="ad-container absolute inset-0 w-full h-full">
-                        <!-- AdSense Ad Unit -->
-                        <div class="w-full h-full min-h-[120px]">
-                            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
-                                    crossorigin="anonymous"></script>
-                            <!-- Upload Button Ad -->
-                            <ins class="adsbygoogle"
-                                 style="display:block; width:100%; height:120px;"
-                                 data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-                                 data-ad-slot="1111111111"
-                                 data-ad-format="rectangle"></ins>
+                        <div class="bg-gray-100 border border-gray-200 rounded-lg p-4 h-full flex items-center justify-center">
+                            <div class="text-gray-500 text-center">
+                                <i class="fas fa-ad text-3xl mb-2"></i>
+                                <p class="text-sm">Advertisement</p>
+                                <p class="text-xs mt-1">Button Background Ad</p>
+                            </div>
                         </div>
+                        <!-- Google AdSense Script -->
+                        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+                                crossorigin="anonymous"></script>
+                        <ins class="adsbygoogle"
+                             style="display:block;position:absolute;top:0;left:0;width:100%;height:100%;"
+                             data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                             data-ad-slot="1111111111"
+                             data-ad-format="auto"
+                             data-full-width-responsive="true"></ins>
+                        <script>
+                             (adsbygoogle = window.adsbygoogle || []).push({});
+                        </script>
                     </div>
                     
                     <!-- Upload Button - On top of ad -->
@@ -644,12 +652,12 @@
                                 <i class="fas fa-magic mr-2"></i> Remove Background
                             </button>
                             
-                            <button id="compare-btn" class="btn hidden bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-6 rounded-md transition-all">
+                            <!-- <button id="compare-btn" class="btn hidden bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-6 rounded-md transition-all">
                                 <i class="fas fa-exchange-alt mr-2"></i> Compare
-                            </button>
-                            <button id="upload-new-btn" class="btn bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-6 rounded-md transition-all">
+                            </button> -->
+                            <!-- <button id="upload-new-btn" class="btn bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-6 rounded-md transition-all">
                                 <i class="fas fa-redo-alt mr-2"></i> New Image
-                            </button>
+                            </button> -->
                         </div>
                     </div>
                 </div>
@@ -685,9 +693,9 @@
                             <button id="paste-image-btn" class="btn bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-6 rounded-md transition-all shadow-lg">
                                 <i class="fas fa-paste mr-2"></i> Paste Image
                             </button>
-                           <button id="url-image-btn" class="btn bg-orange-600 hover:bg-orange-700 text-white font-medium py-2 px-6 rounded-md transition-all shadow-lg relative z-30">
+                           <!-- <button id="url-image-btn" class="btn bg-orange-600 hover:bg-orange-700 text-white font-medium py-2 px-6 rounded-md transition-all shadow-lg relative z-30">
     <i class="fas fa-link mr-2"></i> Insert Image URL
-</button>
+</button> -->
                         </div>
                     </div>
                 </div>
@@ -794,7 +802,7 @@
     <!-- Scripts -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-// Update the global addNewImage function:
+// Update the addNewImage function:
 function addNewImage() {
     // Reset UI elements
     const dropText = document.getElementById('drop-text');
@@ -807,13 +815,14 @@ function addNewImage() {
     const fileInput = document.getElementById('image');
     const heroSection = document.querySelector('section.text-center.mb-10');
     const historyContainer = document.querySelector('.history-container');
+    const removeBgBtn = document.getElementById('remove-bg-btn');
     
-    // Reset global variables
-    let currentJobId = null;
-    let currentFileName = '';
-    let currentOriginalUrl = '';
-    let currentResultUrl = '';
-    let currentOriginalQualityUrl = '';
+    // Reset global variables properly - don't use 'let' here to avoid creating local variables
+    currentJobId = null;
+    currentFileName = '';
+    currentOriginalUrl = '';
+    currentResultUrl = '';
+    currentOriginalQualityUrl = '';
     
     // Reset UI elements
     if (dropText) dropText.classList.remove('hidden');
@@ -822,12 +831,24 @@ function addNewImage() {
     if (downloadSection) downloadSection.classList.add('hidden');
     if (compareBtn) compareBtn.classList.add('hidden');
     
-    // Show button sections again
-    showButtonSections();
+    // Show button sections again - UPDATED VERSION
+    const buttonSections = document.querySelectorAll('.relative.mb-6:not(#download-section)');
+    buttonSections.forEach(section => {
+        // Reset display to block and ensure visibility
+        section.style.display = 'block';
+        section.style.visibility = 'visible';
+        section.style.opacity = '1';
+    });
     
     // Show hero section and hide history bar
     if (heroSection) heroSection.classList.remove('hidden');
     if (historyContainer) historyContainer.classList.add('hidden');
+    
+    // Show the Remove Background button
+    if (removeBgBtn) {
+        removeBgBtn.classList.remove('hidden');
+        removeBgBtn.disabled = false;
+    }
     
     // Reset file input
     if (fileInput) fileInput.value = '';
@@ -990,78 +1011,82 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // STEP 1: File Upload Handler (Complete Implementation)
-    function handleFileSelection(file) {
-        if (!file || !file.type.match('image.*')) {
-            showNotification('Please select a valid image file', 'error');
-            return;
-        }
-        
-        // Check file size (16MB limit)
-        if (file.size > 16 * 1024 * 1024) {
-            showNotification('File too large. Maximum size is 16MB', 'error');
-            return;
-        }
-        
-        console.log('File selected:', file.name, file.size, file.type);
-        
-        const formData = new FormData();
-        formData.append('image', file);
-        
-        // Show initial preview
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            originalPreview.src = e.target.result;
-            dropText.classList.add('hidden');
-            previewContainer.classList.remove('hidden');
-            originalPreview.parentNode.classList.remove('hidden');
-            resultContainer.classList.add('hidden');
-            
-            // Reset any previous results
-            downloadContainer.classList.add('hidden');
-            compareBtn.classList.add('hidden');
-            processingIndicator.classList.add('hidden');
-            progressBar.style.width = '0%';
-            
-            // Hide hero section and show history bar
-            if (heroSection) heroSection.classList.add('hidden');
-            if (historyContainer) historyContainer.classList.remove('hidden');
-            
-            showNotification('Image preview loaded! Click "Remove Background" to start processing.', 'success');
-        };
-        reader.readAsDataURL(file);
-        
-        // STEP 1: Upload to server
-        console.log('STEP 1: Uploading file to server');
-        showNotification('Uploading image...', 'info');
-        
-        fetch('/upload', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => {
-            console.log('Upload response status:', response.status);
-            if (!response.ok) {
-                return response.text().then(text => {
-                    console.error('Error response text:', text);
-                    throw new Error(`HTTP error! status: ${response.status}, message: ${text}`);
-                });
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Upload success response:', data);
-            if (data.success) {
-                handleUploadSuccess(data);
-            } else {
-                throw new Error(data.error || 'Upload failed');
-            }
-        })
-        .catch(error => {
-            console.error('STEP 1 ERROR:', error);
-            showNotification('Upload failed: ' + error.message, 'error');
-            resetUI();
-        });
+    // Update the handleFileSelection function:
+function handleFileSelection(file) {
+    if (!file || !file.type.match('image.*')) {
+        showNotification('Please select a valid image file', 'error');
+        return;
     }
+    
+    // Check file size (16MB limit)
+    if (file.size > 16 * 1024 * 1024) {
+        showNotification('File too large. Maximum size is 16MB', 'error');
+        return;
+    }
+    
+    console.log('File selected:', file.name, file.size, file.type);
+    
+    const formData = new FormData();
+    formData.append('image', file);
+    
+    // Show initial preview
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        originalPreview.src = e.target.result;
+        dropText.classList.add('hidden');
+        previewContainer.classList.remove('hidden');
+        originalPreview.parentNode.classList.remove('hidden');
+        resultContainer.classList.add('hidden');
+        
+        // Reset any previous results
+        downloadContainer.classList.add('hidden');
+        compareBtn.classList.add('hidden');
+        processingIndicator.classList.add('hidden');
+        progressBar.style.width = '0%';
+        
+        // Hide hero section and show history bar
+        if (heroSection) heroSection.classList.add('hidden');
+        if (historyContainer) historyContainer.classList.remove('hidden');
+        
+        // Hide upload, paste, and URL buttons immediately after upload
+        hideButtonSections();
+        
+        showNotification('Image preview loaded! Click "Remove Background" to start processing.', 'success');
+    };
+    reader.readAsDataURL(file);
+    
+    // STEP 1: Upload to server
+    console.log('STEP 1: Uploading file to server');
+    showNotification('Uploading image...', 'info');
+    
+    fetch('/upload', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        console.log('Upload response status:', response.status);
+        if (!response.ok) {
+            return response.text().then(text => {
+                console.error('Error response text:', text);
+                throw new Error(`HTTP error! status: ${response.status}, message: ${text}`);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Upload success response:', data);
+        if (data.success) {
+            handleUploadSuccess(data);
+        } else {
+            throw new Error(data.error || 'Upload failed');
+        }
+    })
+    .catch(error => {
+        console.error('STEP 1 ERROR:', error);
+        showNotification('Upload failed: ' + error.message, 'error');
+        resetUI();
+    });
+}
     
     // Handle upload success
     function handleUploadSuccess(data) {
@@ -1078,7 +1103,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Update the handleProcessingComplete function to hide the buttons:
+    // Update the handleProcessingComplete function:
 function handleProcessingComplete(data) {
     // Complete progress bar
     progressBar.style.width = '100%';
@@ -1109,6 +1134,9 @@ function handleProcessingComplete(data) {
     // Hide upload, paste, and URL button sections
     hideButtonSections();
     
+    // Hide the Remove Background button
+    removeBgBtn.classList.add('hidden');
+    
     compareBtn.classList.remove('hidden');
     processingIndicator.classList.add('hidden');
     
@@ -1124,7 +1152,7 @@ function handleProcessingComplete(data) {
         pixelContainer.remove();
     }
     
-    // Re-enable button
+    // Re-enable button (even though it's hidden)
     removeBgBtn.disabled = false;
     
     showNotification('Background removed successfully!', 'success');
@@ -1187,6 +1215,7 @@ function handleProcessingComplete(data) {
         compareBtn.innerHTML = '<i class="fas fa-exchange-alt mr-2"></i> Compare';
         
         // Re-enable buttons
+        removeBgBtn.classList.remove('hidden');
         removeBgBtn.disabled = false;
         
         // Update URL
@@ -1339,6 +1368,9 @@ function handleProcessingComplete(data) {
                 if (heroSection) heroSection.classList.add('hidden');
                 if (historyContainer) historyContainer.classList.remove('hidden');
                 
+                // Hide the Remove Background button
+                if (removeBgBtn) removeBgBtn.classList.add('hidden');
+                
                 showNotification('Image loaded from history!', 'success');
             }
         } catch (error) {
@@ -1444,6 +1476,9 @@ document.addEventListener('click', function(e) {
                     
                     if (heroSection) heroSection.classList.add('hidden');
                     if (historyContainer) historyContainer.classList.remove('hidden');
+                    
+                    // Hide upload, paste, and URL buttons immediately after upload
+                    hideButtonSections();
                     
                     console.log('Preview loaded in UI');
                 };
@@ -1631,19 +1666,23 @@ document.addEventListener('click', function(e) {
         });
     }
 
-    // Function to show button sections
-    function showButtonSections() {
-        const buttonSections = document.querySelectorAll('.relative.mb-6:not(#download-section)');
-        buttonSections.forEach(section => {
-            // Check if this section contains upload/paste/url buttons
-            if (section.querySelector('#image') || 
-                section.querySelector('#paste-image-btn') || 
-                section.querySelector('#url-image-btn')) {
-                section.style.display = 'block';
-            }
-        });
-    }
-
+    // Update the showButtonSections function:
+function showButtonSections() {
+    const buttonSections = document.querySelectorAll('.relative.mb-6:not(#download-section)');
+    buttonSections.forEach(section => {
+        // Check if this section contains upload/paste/url buttons
+        if (section.querySelector('#image') || 
+            section.querySelector('#paste-image-btn') || 
+            section.querySelector('#url-image-btn')) {
+            
+            // Reset all display properties to ensure visibility
+            section.style.display = 'block';
+            section.style.visibility = 'visible';
+            section.style.opacity = '1';
+        }
+    });
+}
+    
     function createPixelAnimation(container, width, height) {
         // Create pixel animation effect
         for (let i = 0; i < 50; i++) {
@@ -1919,6 +1958,10 @@ document.addEventListener('click', function(e) {
         
         downloadSection.classList.remove('hidden');
         hideButtonSections();
+        
+        // Hide the Remove Background button
+        removeBgBtn.classList.add('hidden');
+        
         compareBtn.classList.remove('hidden');
         processingIndicator.classList.add('hidden');
         progressBar.style.width = '100%';
@@ -1942,35 +1985,23 @@ window.showNotification = showNotification;
 function initializeAdSense() {
     // Check if AdSense is already loaded
     if (typeof adsbygoogle !== 'undefined') {
-        try {
-            // Only push ads for visible containers
-            const visibleAdContainers = document.querySelectorAll('.adsbygoogle:not([data-adsbygoogle-status])');
-            
-            visibleAdContainers.forEach((adContainer) => {
-                // Check if the container is visible and has dimensions
-                const rect = adContainer.getBoundingClientRect();
-                if (rect.width > 0 && rect.height > 0) {
-                    (adsbygoogle = window.adsbygoogle || []).push({});
-                }
-            });
-        } catch (error) {
-            console.log('AdSense initialization skipped:', error.message);
+
         }
     }
-}
+
 
 // Initialize ads after page load
 setTimeout(initializeAdSense, 2000);
 
 // Re-initialize when download section becomes visible
 function showDownloadSection() {
-    downloadSection.classList.remove('hidden');
-    
+    downloadSection.classList.remove
     // Wait for element to be visible, then try to load ads
     setTimeout(() => {
         initializeAdSense();
     }, 500);
 }
-    </script>
+
+</script>
 </body>
 </html>
