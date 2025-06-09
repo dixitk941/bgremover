@@ -1139,65 +1139,85 @@ function handleFileSelection(file) {
     
     // Update the handleProcessingComplete function:
 function handleProcessingComplete(data) {
-    // Complete progress bar
-    if (progressBar) progressBar.style.width = '100%';
-    
-    // Set result data
-    if (data && data.data) {
-        if (data.data.processed_data) {
-            currentResultUrl = data.data.processed_data;
-            currentOriginalUrl = data.data.original_data || currentOriginalUrl;
-            currentOriginalQualityUrl = data.data.processed_data;
-        } else {
-            currentResultUrl = data.data.processed_url;
-            currentOriginalUrl = data.data.original_url || currentOriginalUrl;
-            currentOriginalQualityUrl = data.data.processed_url;
+    try {
+        // Complete progress bar
+        if (progressBar) progressBar.style.width = '100%';
+        
+        // Set result data
+        if (data && data.data) {
+            if (data.data.processed_data) {
+                currentResultUrl = data.data.processed_data;
+                currentOriginalUrl = data.data.original_data || currentOriginalUrl;
+                currentOriginalQualityUrl = data.data.processed_data;
+            } else {
+                currentResultUrl = data.data.processed_url;
+                currentOriginalUrl = data.data.original_url || currentOriginalUrl;
+                currentOriginalQualityUrl = data.data.processed_url;
+            }
+            
+            // Update UI with safer null checks
+            if (originalPreview && originalPreview.parentNode) 
+                originalPreview.parentNode.classList.add('hidden');
+            if (resultPreview) resultPreview.src = currentResultUrl;
+            if (resultContainer) resultContainer.classList.remove('hidden');
+            
+            // Setup comparison view with null checks
+            if (compareOriginal) compareOriginal.src = currentOriginalUrl;
+            if (compareResult) compareResult.src = currentResultUrl;
+            
+            // Show download section and hide other button sections
+            if (downloadSection) downloadSection.classList.remove('hidden');
+            
+            // Safely hide button sections
+            try {
+                hideButtonSections();
+            } catch (err) {
+                console.log('Error hiding button sections:', err);
+            }
+            
+            // Safely hide the Remove Background container
+            const removeBgContainer = document.getElementById('remove-bg-container');
+            if (removeBgContainer) removeBgContainer.classList.add('hidden');
+            
+            // Hide the Remove Background button safely
+            if (removeBgBtn) {
+                removeBgBtn.classList.add('hidden');
+                removeBgBtn.disabled = false;
+            }
+            
+            if (compareBtn) compareBtn.classList.remove('hidden');
+            if (processingIndicator) processingIndicator.classList.add('hidden');
+            
+            // Save to history
+            saveToHistory(currentFileName, currentOriginalUrl, currentResultUrl, data.data.filename);
+            
+            // Safely create confetti effect
+            try {
+                createConfetti();
+            } catch (err) {
+                console.log('Error creating confetti:', err);
+            }
+            
+            // Remove pixel animation
+            const pixelContainer = document.querySelector('.pixel-animation-container');
+            if (pixelContainer) {
+                pixelContainer.remove();
+            }
+            
+            showNotification('Background removed successfully!', 'success');
+            
+            // Update URL to show completion
+            updateUrl('/background-removed', { 
+                job_id: currentJobId, 
+                completed: 'true' 
+            });
         }
+    } catch (error) {
+        console.error('Error in handleProcessingComplete:', error);
+        showNotification('Error displaying results, but processing completed', 'info');
         
-        // Update UI with null checks
-        if (originalPreview && originalPreview.parentNode) 
-            originalPreview.parentNode.classList.add('hidden');
-        if (resultPreview) resultPreview.src = currentResultUrl;
-        if (resultContainer) resultContainer.classList.remove('hidden');
-        
-        // Setup comparison view
-        if (compareOriginal) compareOriginal.src = currentOriginalUrl;
-        if (compareResult) compareResult.src = currentResultUrl;
-        
-        // Show download section and hide other button sections
+        // Try to show download section anyway
         if (downloadSection) downloadSection.classList.remove('hidden');
-        
-        // Hide upload, paste, and URL button sections
-        hideButtonSections();
-        
-        // Hide the Remove Background button with null check
-        if (removeBgBtn) removeBgBtn.classList.add('hidden');
-        
-        if (compareBtn) compareBtn.classList.remove('hidden');
-        if (processingIndicator) processingIndicator.classList.add('hidden');
-        
-        // Save to history
-        saveToHistory(currentFileName, currentOriginalUrl, currentResultUrl, data.data.filename);
-        
-        // Create confetti effect
-        createConfetti();
-        
-        // Remove pixel animation
-        const pixelContainer = document.querySelector('.pixel-animation-container');
-        if (pixelContainer) {
-            pixelContainer.remove();
-        }
-        
-        // Re-enable button (even though it's hidden)
-        if (removeBgBtn) removeBgBtn.disabled = false;
-        
-        showNotification('Background removed successfully!', 'success');
-        
-        // Update URL to show completion
-        updateUrl('/background-removed', { 
-            job_id: currentJobId, 
-            completed: 'true' 
-        });
     }
 }
 
@@ -1723,15 +1743,23 @@ document.addEventListener('click', function(e) {
 
     // Function to hide button sections
     function hideButtonSections() {
-        const buttonSections = document.querySelectorAll('.relative.mb-6:not(#download-section):not(#remove-bg-container)');
-        buttonSections.forEach(section => {
-            // Check if this section contains upload/paste/url buttons
-            if (section.querySelector('#image') || 
-                section.querySelector('#paste-image-btn') || 
-                section.querySelector('#url-image-btn')) {
-                section.style.display = 'none';
-            }
-        });
+        try {
+            const buttonSections = document.querySelectorAll('.relative.mb-6:not(#download-section):not(#remove-bg-container)');
+            if (!buttonSections || buttonSections.length === 0) return;
+            
+            buttonSections.forEach(section => {
+                if (!section) return;
+                
+                // Check if this section contains upload/paste/url buttons
+                if (section.querySelector('#image') || 
+                    section.querySelector('#paste-image-btn') || 
+                    section.querySelector('#url-image-btn')) {
+                    section.style.display = 'none';
+                }
+            });
+        } catch (error) {
+            console.error('Error in hideButtonSections:', error);
+        }
     }
 
     // Update the showButtonSections function:
@@ -2061,15 +2089,26 @@ window.loadFromHistory = loadFromHistory;
 window.addNewImage = addNewImage;
 window.showNotification = showNotification;
 
-// Add this to your existing JavaScript, after the DOMContentLoaded:
-
-// Function to initialize AdSense when element becomes visible
+// Fix the initializeAdSense function:
 function initializeAdSense() {
     // Check if AdSense is already loaded
     if (typeof adsbygoogle !== 'undefined') {
-
+        try {
+            // Only push ads for visible containers
+            const visibleAdContainers = document.querySelectorAll('.adsbygoogle:not([data-adsbygoogle-status])');
+            
+            visibleAdContainers.forEach((adContainer) => {
+                // Check if the container is visible and has dimensions
+                const rect = adContainer.getBoundingClientRect();
+                if (rect.width > 0 && rect.height > 0) {
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                }
+            });
+        } catch (error) {
+            console.log('AdSense initialization skipped:', error.message);
         }
     }
+}
 
 
 // Initialize ads after page load
@@ -2077,7 +2116,8 @@ setTimeout(initializeAdSense, 2000);
 
 // Re-initialize when download section becomes visible
 function showDownloadSection() {
-    downloadSection.classList.remove
+    if (downloadSection) downloadSection.classList.remove('hidden');
+    
     // Wait for element to be visible, then try to load ads
     setTimeout(() => {
         initializeAdSense();
