@@ -1140,69 +1140,72 @@ function handleFileSelection(file) {
     // Update the handleProcessingComplete function:
 function handleProcessingComplete(data) {
     // Complete progress bar
-    progressBar.style.width = '100%';
+    if (progressBar) progressBar.style.width = '100%';
     
     // Set result data
-    if (data.data.processed_data) {
-        currentResultUrl = data.data.processed_data;
-        currentOriginalUrl = data.data.original_data || currentOriginalUrl;
-        currentOriginalQualityUrl = data.data.processed_data;
-    } else {
-        currentResultUrl = data.data.processed_url;
-        currentOriginalUrl = data.data.original_url || currentOriginalUrl;
-        currentOriginalQualityUrl = data.data.processed_url;
+    if (data && data.data) {
+        if (data.data.processed_data) {
+            currentResultUrl = data.data.processed_data;
+            currentOriginalUrl = data.data.original_data || currentOriginalUrl;
+            currentOriginalQualityUrl = data.data.processed_data;
+        } else {
+            currentResultUrl = data.data.processed_url;
+            currentOriginalUrl = data.data.original_url || currentOriginalUrl;
+            currentOriginalQualityUrl = data.data.processed_url;
+        }
+        
+        // Update UI with null checks
+        if (originalPreview && originalPreview.parentNode) 
+            originalPreview.parentNode.classList.add('hidden');
+        if (resultPreview) resultPreview.src = currentResultUrl;
+        if (resultContainer) resultContainer.classList.remove('hidden');
+        
+        // Setup comparison view
+        if (compareOriginal) compareOriginal.src = currentOriginalUrl;
+        if (compareResult) compareResult.src = currentResultUrl;
+        
+        // Show download section and hide other button sections
+        if (downloadSection) downloadSection.classList.remove('hidden');
+        
+        // Hide upload, paste, and URL button sections
+        hideButtonSections();
+        
+        // Hide the Remove Background button with null check
+        if (removeBgBtn) removeBgBtn.classList.add('hidden');
+        
+        if (compareBtn) compareBtn.classList.remove('hidden');
+        if (processingIndicator) processingIndicator.classList.add('hidden');
+        
+        // Save to history
+        saveToHistory(currentFileName, currentOriginalUrl, currentResultUrl, data.data.filename);
+        
+        // Create confetti effect
+        createConfetti();
+        
+        // Remove pixel animation
+        const pixelContainer = document.querySelector('.pixel-animation-container');
+        if (pixelContainer) {
+            pixelContainer.remove();
+        }
+        
+        // Re-enable button (even though it's hidden)
+        if (removeBgBtn) removeBgBtn.disabled = false;
+        
+        showNotification('Background removed successfully!', 'success');
+        
+        // Update URL to show completion
+        updateUrl('/background-removed', { 
+            job_id: currentJobId, 
+            completed: 'true' 
+        });
     }
-    
-    // Update UI
-    originalPreview.parentNode.classList.add('hidden');
-    resultPreview.src = currentResultUrl;
-    resultContainer.classList.remove('hidden');
-    
-    // Setup comparison view
-    compareOriginal.src = currentOriginalUrl;
-    compareResult.src = currentResultUrl;
-    
-    // Show download section and hide other button sections
-    downloadSection.classList.remove('hidden');
-    
-    // Hide upload, paste, and URL button sections
-    hideButtonSections();
-    
-    // Hide the Remove Background button
-    removeBgBtn.classList.add('hidden');
-    
-    compareBtn.classList.remove('hidden');
-    processingIndicator.classList.add('hidden');
-    
-    // Save to history
-    saveToHistory(currentFileName, currentOriginalUrl, currentResultUrl, data.data.filename);
-    
-    // Create confetti effect
-    createConfetti();
-    
-    // Remove pixel animation
-    const pixelContainer = document.querySelector('.pixel-animation-container');
-    if (pixelContainer) {
-        pixelContainer.remove();
-    }
-    
-    // Re-enable button (even though it's hidden)
-    removeBgBtn.disabled = false;
-    
-    showNotification('Background removed successfully!', 'success');
-    
-    // Update URL to show completion
-    updateUrl('/background-removed', { 
-        job_id: currentJobId, 
-        completed: 'true' 
-    });
 }
 
     // Reset processing UI
     function resetProcessingUI() {
-        removeBgBtn.disabled = false;
-        processingIndicator.classList.add('hidden');
-        progressBar.style.width = '0%';
+        if (removeBgBtn) removeBgBtn.disabled = false;
+        if (processingIndicator) processingIndicator.classList.add('hidden');
+        if (progressBar) progressBar.style.width = '0%';
         
         const pixelContainer = document.querySelector('.pixel-animation-container');
         if (pixelContainer) {
@@ -1386,23 +1389,24 @@ function handleProcessingComplete(data) {
                 currentResultUrl = item.resultUrl;
                 currentOriginalQualityUrl = item.resultUrl;
                 
-                // Update UI
-                originalPreview.src = item.originalUrl;
-                resultPreview.src = item.resultUrl;
+                // Update UI with null checks
+                if (originalPreview) originalPreview.src = item.originalUrl;
+                if (resultPreview) resultPreview.src = item.resultUrl;
                 
-                dropText.classList.add('hidden');
-                previewContainer.classList.remove('hidden');
-                originalPreview.parentNode.classList.add('hidden');
-                resultContainer.classList.remove('hidden');
+                if (dropText) dropText.classList.add('hidden');
+                if (previewContainer) previewContainer.classList.remove('hidden');
+                if (originalPreview && originalPreview.parentNode) 
+                    originalPreview.parentNode.classList.add('hidden');
+                if (resultContainer) resultContainer.classList.remove('hidden');
                 
                 // Show download section and hide other button sections
-                downloadSection.classList.remove('hidden');
-                hideButtonSections(); // Hide upload/paste/url buttons
-                compareBtn.classList.remove('hidden');
+                if (downloadSection) downloadSection.classList.remove('hidden');
+                hideButtonSections(); // This function should also have null checks
+                if (compareBtn) compareBtn.classList.remove('hidden');
                 
                 // Setup comparison view
-                compareOriginal.src = item.originalUrl;
-                compareResult.src = item.resultUrl;
+                if (compareOriginal) compareOriginal.src = item.originalUrl;
+                if (compareResult) compareResult.src = item.resultUrl;
                 
                 // Hide hero section and show history bar
                 if (heroSection) heroSection.classList.add('hidden');
@@ -1692,9 +1696,25 @@ document.addEventListener('click', function(e) {
                     performBackgroundRemoval(progressInterval, retryCount + 1);
                 }, 5000);
             } else {
-                clearInterval(progressInterval);
+                if (progressInterval) clearInterval(progressInterval);
                 showNotification('Background removal failed after multiple attempts: ' + error.message, 'error');
-                resetProcessingUI();
+                
+                // Safe UI reset with null checks
+                if (removeBgBtn) removeBgBtn.disabled = false;
+                if (processingIndicator) processingIndicator.classList.add('hidden');
+                if (progressBar) progressBar.style.width = '0%';
+                
+                const pixelContainer = document.querySelector('.pixel-animation-container');
+                if (pixelContainer) {
+                    pixelContainer.remove();
+                }
+                
+                // Show the Remove Background button container again
+                const removeBgContainer = document.getElementById('remove-bg-container');
+                if (removeBgContainer) {
+                    removeBgContainer.classList.remove('hidden');
+                    removeBgContainer.style.display = 'block';
+                }
             }
         });
     }
@@ -2063,6 +2083,7 @@ function showDownloadSection() {
         initializeAdSense();
     }, 500);
 }
+
 </script>
 </body>
 </html>
