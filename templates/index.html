@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Background Remover - Remove Image Backgrounds Instantly with AI</title>
+    <title>BG Remover - Remove Image Backgrounds Instantly with AI</title>
     <meta name="description" content="Automatically remove backgrounds from any image with our AI background remover—no design skills or expensive tools required.">
     
     <!-- Favicon -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎨</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,24 +22,21 @@
         }
 
         :root {
-            --primary: #5C4EFA;
-            --primary-hover: #4B3ED9;
-            --secondary: #FF6B6B;
-            --dark: #1A1A2E;
-            --dark-light: #16213E;
+            --primary: #7C3AED;
+            --primary-light: #A78BFA;
+            --dark: #0F172A;
             --gray-900: #111827;
-            --gray-800: #1f2937;
-            --gray-700: #374151;
-            --gray-600: #4b5563;
-            --gray-500: #6b7280;
-            --gray-400: #9ca3af;
-            --gray-300: #d1d5db;
-            --gray-200: #e5e7eb;
-            --gray-100: #f3f4f6;
-            --gray-50: #f9fafb;
-            --white: #ffffff;
-            --success: #10b981;
-            --warning: #f59e0b;
+            --gray-800: #1E293B;
+            --gray-700: #334155;
+            --gray-600: #475569;
+            --gray-500: #64748B;
+            --gray-400: #94A3B8;
+            --gray-300: #CBD5E1;
+            --gray-200: #E2E8F0;
+            --gray-100: #F1F5F9;
+            --gray-50: #F8FAFC;
+            --white: #FFFFFF;
+            --black: #000000;
         }
 
         html {
@@ -48,10 +45,80 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--white);
+            background: var(--gray-50);
             color: var(--gray-900);
             line-height: 1.6;
             overflow-x: hidden;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes wipe {
+            0% { clip-path: inset(0 100% 0 0); }
+            100% { clip-path: inset(0 0 0 0); }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         /* Navigation */
@@ -61,14 +128,14 @@
             left: 0;
             right: 0;
             z-index: 1000;
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--gray-200);
             transition: all 0.3s ease;
         }
 
         .navbar.scrolled {
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
         }
 
         .nav-container {
@@ -87,30 +154,30 @@
             gap: 10px;
             text-decoration: none;
             font-weight: 700;
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             color: var(--gray-900);
         }
 
         .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--primary), #8B5CF6);
-            border-radius: 12px;
+            width: 36px;
+            height: 36px;
+            background: var(--black);
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
         .logo-icon svg {
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
             color: white;
         }
 
         .nav-links {
             display: flex;
             align-items: center;
-            gap: 32px;
+            gap: 8px;
             list-style: none;
         }
 
@@ -118,18 +185,21 @@
             text-decoration: none;
             color: var(--gray-600);
             font-weight: 500;
-            font-size: 0.95rem;
-            transition: color 0.2s ease;
+            font-size: 0.9rem;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
         }
 
         .nav-links a:hover {
             color: var(--gray-900);
+            background: var(--gray-100);
         }
 
         .nav-actions {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 12px;
         }
 
         .btn {
@@ -137,10 +207,10 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            padding: 12px 24px;
-            border-radius: 12px;
+            padding: 10px 20px;
+            border-radius: 10px;
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             text-decoration: none;
             transition: all 0.2s ease;
             cursor: pointer;
@@ -157,286 +227,400 @@
         }
 
         .btn-primary {
-            background: var(--primary);
+            background: var(--black);
             color: white;
         }
 
         .btn-primary:hover {
-            background: var(--primary-hover);
+            background: var(--gray-800);
             transform: translateY(-1px);
         }
 
-        .mobile-menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 8px;
+        .btn-large {
+            padding: 14px 28px;
+            font-size: 1rem;
+            border-radius: 12px;
+        }
+
+        .btn-purple {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-purple:hover {
+            background: #6D28D9;
+            transform: translateY(-1px);
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 100px 24px 0;
+        }
+
+        .breadcrumb-list {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            list-style: none;
+            font-size: 0.85rem;
+        }
+
+        .breadcrumb-list a {
+            color: var(--gray-500);
+            text-decoration: none;
+        }
+
+        .breadcrumb-list a:hover {
+            color: var(--gray-900);
+        }
+
+        .breadcrumb-list span {
+            color: var(--gray-400);
+        }
+
+        .breadcrumb-list .current {
+            color: var(--gray-700);
         }
 
         /* Hero Section */
         .hero {
-            padding: 160px 24px 80px;
-            background: linear-gradient(180deg, #F8F7FF 0%, var(--white) 100%);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            padding: 40px 24px 80px;
+            text-align: center;
         }
 
         .hero-content {
             max-width: 800px;
-            text-align: center;
-            margin-bottom: 48px;
+            margin: 0 auto 48px;
         }
 
-        .hero-badge {
-            display: inline-flex;
+        .hero-title {
+            display: flex;
             align-items: center;
-            gap: 8px;
-            background: linear-gradient(135deg, rgba(92, 78, 250, 0.1), rgba(139, 92, 246, 0.1));
-            color: var(--primary);
-            padding: 8px 16px;
-            border-radius: 100px;
-            font-size: 0.875rem;
-            font-weight: 600;
-            margin-bottom: 24px;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
         }
 
-        .hero-badge svg {
-            width: 16px;
-            height: 16px;
+        .hero-icon {
+            width: 48px;
+            height: 48px;
         }
 
         .hero h1 {
-            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
             font-weight: 800;
-            line-height: 1.1;
-            margin-bottom: 24px;
             color: var(--gray-900);
+            line-height: 1.1;
             letter-spacing: -0.02em;
+            animation: fadeInUp 0.8s ease;
         }
 
-        .hero h1 span {
-            background: linear-gradient(135deg, var(--primary), #8B5CF6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .hero-description {
-            font-size: 1.25rem;
+        .hero p {
+            font-size: 1.125rem;
             color: var(--gray-600);
             max-width: 600px;
-            margin: 0 auto 48px;
-            line-height: 1.7;
+            margin: 24px auto 0;
+            animation: fadeInUp 0.8s ease 0.2s backwards;
         }
 
-        /* Upload Area */
+        /* Upload Card */
         .upload-section {
-            width: 100%;
-            max-width: 680px;
+            max-width: 900px;
             margin: 0 auto;
+            position: relative;
+            animation: fadeInUp 0.8s ease 0.4s backwards;
         }
 
         .upload-card {
             background: var(--white);
-            border: 2px dashed var(--gray-300);
             border-radius: 24px;
-            padding: 48px;
-            text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
+            padding: 60px 40px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--gray-200);
             position: relative;
             overflow: hidden;
         }
 
-        .upload-card:hover {
-            border-color: var(--primary);
-            background: rgba(92, 78, 250, 0.02);
+        /* Transparent checkered background */
+        .upload-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(45deg, #E5E7EB 25%, transparent 25%),
+                linear-gradient(-45deg, #E5E7EB 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #E5E7EB 75%),
+                linear-gradient(-45deg, transparent 75%, #E5E7EB 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            opacity: 0.4;
         }
 
-        .upload-card.dragover {
-            border-color: var(--primary);
-            background: rgba(92, 78, 250, 0.05);
-            transform: scale(1.01);
-        }
-
-        .upload-icon {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 24px;
-            background: linear-gradient(135deg, var(--primary), #8B5CF6);
-            border-radius: 50%;
+        .upload-content {
+            position: relative;
+            z-index: 1;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            color: white;
-        }
-
-        .upload-icon svg {
-            width: 36px;
-            height: 36px;
-        }
-
-        .upload-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--gray-900);
-            margin-bottom: 8px;
-        }
-
-        .upload-subtitle {
-            color: var(--gray-500);
-            margin-bottom: 24px;
+            gap: 16px;
         }
 
         .upload-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
             background: var(--primary);
             color: white;
             padding: 16px 32px;
-            border-radius: 12px;
+            border-radius: 14px;
             font-weight: 600;
             font-size: 1rem;
-            border: none;
             cursor: pointer;
+            border: none;
             transition: all 0.2s ease;
         }
 
         .upload-btn:hover {
-            background: var(--primary-hover);
+            background: #6D28D9;
             transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(92, 78, 250, 0.3);
+            box-shadow: 0 8px 25px rgba(124, 58, 237, 0.25);
         }
 
-        .upload-formats {
-            margin-top: 16px;
-            font-size: 0.875rem;
-            color: var(--gray-400);
+        .upload-btn svg {
+            width: 20px;
+            height: 20px;
         }
 
-        #file-input {
+        .upload-hint {
+            color: var(--gray-500);
+            font-size: 0.95rem;
+        }
+
+        .file-input {
             display: none;
         }
 
-        /* Sample Images */
-        .sample-section {
-            margin-top: 32px;
-            text-align: center;
+        /* Floating sample images */
+        .floating-images {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            top: 0;
+            left: 0;
         }
 
-        .sample-label {
-            font-size: 0.875rem;
-            color: var(--gray-500);
-            margin-bottom: 16px;
-        }
-
-        .sample-images {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .sample-image {
-            width: 64px;
-            height: 64px;
-            border-radius: 12px;
+        .floating-image {
+            position: absolute;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
             overflow: hidden;
+            animation: float 4s ease-in-out infinite;
+            pointer-events: auto;
             cursor: pointer;
-            transition: all 0.2s ease;
-            border: 2px solid transparent;
+            transition: transform 0.3s ease;
         }
 
-        .sample-image:hover {
-            transform: scale(1.1);
-            border-color: var(--primary);
+        .floating-image:hover {
+            transform: scale(1.05) rotate(0deg) !important;
         }
 
-        .sample-image img {
+        .floating-image img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        /* Trust Badges */
-        .trust-section {
-            margin-top: 64px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 48px;
-            flex-wrap: wrap;
+        .floating-image.left-1 {
+            width: 140px;
+            height: 140px;
+            left: -180px;
+            top: 50%;
+            transform: translateY(-50%) rotate(-5deg);
+            animation-delay: 0s;
         }
 
-        .trust-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--gray-500);
-            font-size: 0.875rem;
+        .floating-image.right-1 {
+            width: 160px;
+            height: 180px;
+            right: -200px;
+            top: 50%;
+            transform: translateY(-50%) rotate(5deg);
+            animation-delay: 1s;
         }
 
-        .trust-item svg {
-            width: 20px;
-            height: 20px;
-            color: var(--success);
-        }
-
-        /* Features Section */
-        .features-section {
-            padding: 120px 24px;
+        /* Live Demo Animation Section */
+        .live-demo-section {
+            padding: 100px 24px;
             background: var(--white);
         }
 
         .section-container {
-            max-width: 1280px;
+            max-width: 1200px;
             margin: 0 auto;
         }
 
         .section-header {
             text-align: center;
-            margin-bottom: 64px;
+            margin-bottom: 60px;
         }
 
-        .section-tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--gray-100);
-            color: var(--gray-600);
-            padding: 8px 16px;
-            border-radius: 100px;
-            font-size: 0.875rem;
-            font-weight: 600;
-            margin-bottom: 16px;
-        }
-
-        .section-title {
-            font-size: clamp(2rem, 4vw, 3rem);
+        .section-header h2 {
+            font-size: clamp(2rem, 4vw, 2.75rem);
             font-weight: 800;
             color: var(--gray-900);
-            margin-bottom: 16px;
             letter-spacing: -0.02em;
+            margin-bottom: 16px;
         }
 
-        .section-description {
-            font-size: 1.125rem;
+        .section-header p {
+            font-size: 1.1rem;
             color: var(--gray-600);
             max-width: 600px;
             margin: 0 auto;
         }
 
+        /* Live BG Remove Animation */
+        .demo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 60px;
+            flex-wrap: wrap;
+        }
+
+        .demo-card {
+            background: var(--gray-50);
+            border-radius: 24px;
+            padding: 24px;
+            border: 1px solid var(--gray-200);
+            max-width: 400px;
+        }
+
+        .demo-image-container {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            aspect-ratio: 1;
+            background-image: 
+                linear-gradient(45deg, #E5E7EB 25%, transparent 25%),
+                linear-gradient(-45deg, #E5E7EB 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #E5E7EB 75%),
+                linear-gradient(-45deg, transparent 75%, #E5E7EB 75%);
+            background-size: 16px 16px;
+            background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+        }
+
+        .demo-original {
+            position: absolute;
+            inset: 0;
+            background: url('https://images.unsplash.com/photo-1524656855800-59465ebcec69?w=400&h=400&fit=crop') center/cover;
+        }
+
+        .demo-processed {
+            position: absolute;
+            inset: 0;
+            background: url('https://images.unsplash.com/photo-1524656855800-59465ebcec69?w=400&h=400&fit=crop') center/cover;
+            clip-path: inset(0 100% 0 0);
+            animation: wipeReveal 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes wipeReveal {
+            0% { clip-path: inset(0 100% 0 0); }
+            40% { clip-path: inset(0 100% 0 0); }
+            60% { clip-path: inset(0 0 0 0); }
+            100% { clip-path: inset(0 0 0 0); }
+        }
+
+        .demo-slider {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            animation: sliderMove 3s ease-in-out infinite alternate;
+        }
+
+        .demo-slider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        @keyframes sliderMove {
+            0% { left: 0%; }
+            40% { left: 0%; }
+            60% { left: 100%; }
+            100% { left: 100%; }
+        }
+
+        .demo-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            max-width: 400px;
+        }
+
+        .demo-step {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            width: 48px;
+            height: 48px;
+            background: var(--gray-100);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--gray-900);
+            flex-shrink: 0;
+        }
+
+        .step-content h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 6px;
+        }
+
+        .step-content p {
+            font-size: 0.95rem;
+            color: var(--gray-600);
+            line-height: 1.5;
+        }
+
+        /* Features Grid */
+        .features-section {
+            padding: 100px 24px;
+            background: var(--gray-50);
+        }
+
         .features-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 32px;
+            gap: 24px;
         }
 
         .feature-card {
-            background: var(--gray-50);
-            border-radius: 24px;
-            padding: 40px;
+            background: var(--white);
+            border-radius: 20px;
+            padding: 32px;
+            border: 1px solid var(--gray-200);
             transition: all 0.3s ease;
         }
 
@@ -446,91 +630,66 @@
         }
 
         .feature-icon {
-            width: 56px;
-            height: 56px;
-            background: linear-gradient(135deg, var(--primary), #8B5CF6);
-            border-radius: 16px;
+            width: 48px;
+            height: 48px;
+            background: var(--gray-100);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
         .feature-icon svg {
-            width: 28px;
-            height: 28px;
-            color: white;
+            width: 24px;
+            height: 24px;
+            color: var(--gray-700);
         }
 
-        .feature-title {
-            font-size: 1.25rem;
+        .feature-card h3 {
+            font-size: 1.1rem;
             font-weight: 700;
             color: var(--gray-900);
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
 
-        .feature-description {
+        .feature-card p {
+            font-size: 0.95rem;
             color: var(--gray-600);
-            line-height: 1.7;
-        }
-
-        /* How It Works */
-        .how-it-works {
-            padding: 120px 24px;
-            background: linear-gradient(180deg, #F8F7FF 0%, var(--white) 100%);
-        }
-
-        .steps-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 48px;
-            margin-top: 64px;
-        }
-
-        .step-card {
-            text-align: center;
-            position: relative;
-        }
-
-        .step-number {
-            width: 64px;
-            height: 64px;
-            background: var(--white);
-            border: 2px solid var(--primary);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--primary);
-            margin: 0 auto 24px;
-        }
-
-        .step-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--gray-900);
-            margin-bottom: 12px;
-        }
-
-        .step-description {
-            color: var(--gray-600);
-            line-height: 1.7;
+            line-height: 1.6;
         }
 
         /* Stats Section */
         .stats-section {
             padding: 80px 24px;
-            background: var(--gray-900);
+            background: var(--white);
+        }
+
+        .stats-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .stats-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .stats-header h2 {
+            font-size: clamp(1.75rem, 3vw, 2.25rem);
+            font-weight: 800;
+            color: var(--gray-900);
+            margin-bottom: 8px;
+        }
+
+        .stats-header p {
+            color: var(--gray-600);
         }
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 48px;
-            max-width: 1000px;
-            margin: 0 auto;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;
         }
 
         .stat-item {
@@ -538,199 +697,420 @@
         }
 
         .stat-value {
-            font-size: 3rem;
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
             font-weight: 800;
-            color: white;
+            color: var(--gray-900);
+            line-height: 1;
             margin-bottom: 8px;
         }
 
         .stat-label {
-            color: var(--gray-400);
+            font-size: 0.9rem;
+            color: var(--gray-600);
+        }
+
+        /* How It Works */
+        .how-section {
+            padding: 100px 24px;
+            background: var(--gray-50);
+        }
+
+        .how-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+            margin-top: 60px;
+        }
+
+        .how-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 40px 32px;
+            text-align: center;
+            border: 1px solid var(--gray-200);
+            transition: all 0.3s ease;
+        }
+
+        .how-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        .how-step-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--primary);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .how-card-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--gray-100);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+        }
+
+        .how-card-icon svg {
+            width: 36px;
+            height: 36px;
+            color: var(--gray-700);
+        }
+
+        .how-card h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 12px;
+        }
+
+        .how-card p {
+            font-size: 0.95rem;
+            color: var(--gray-600);
+            line-height: 1.6;
+        }
+
+        /* Showcase Section */
+        .showcase-section {
+            padding: 100px 24px;
+            background: var(--white);
+        }
+
+        .showcase-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            margin-top: 60px;
+        }
+
+        .showcase-content h3 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 16px;
+        }
+
+        .showcase-content p {
             font-size: 1rem;
+            color: var(--gray-600);
+            line-height: 1.7;
+            margin-bottom: 24px;
+        }
+
+        .showcase-images {
+            display: flex;
+            gap: 20px;
+            position: relative;
+        }
+
+        .showcase-image {
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .showcase-image img {
+            width: 100%;
+            height: auto;
+        }
+
+        /* Comparison Cards */
+        .comparison-section {
+            padding: 100px 24px;
+            background: var(--gray-50);
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-top: 60px;
+        }
+
+        .comparison-card {
+            background: var(--white);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid var(--gray-200);
+            transition: all 0.3s ease;
+        }
+
+        .comparison-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        .comparison-image {
+            aspect-ratio: 4/3;
+            background-image: 
+                linear-gradient(45deg, #E5E7EB 25%, transparent 25%),
+                linear-gradient(-45deg, #E5E7EB 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #E5E7EB 75%),
+                linear-gradient(-45deg, transparent 75%, #E5E7EB 75%);
+            background-size: 12px 12px;
+            background-position: 0 0, 0 6px, 6px -6px, -6px 0px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .comparison-image img {
+            max-width: 80%;
+            max-height: 80%;
+            object-fit: contain;
+        }
+
+        .comparison-content {
+            padding: 24px;
+        }
+
+        .comparison-content h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 8px;
+        }
+
+        .comparison-content p {
+            font-size: 0.9rem;
+            color: var(--gray-600);
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            padding: 100px 24px;
+            background: var(--white);
+        }
+
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-list {
+            margin-top: 48px;
+        }
+
+        .faq-item {
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .faq-question {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 24px 0;
+            background: none;
+            border: none;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            transition: color 0.2s ease;
+        }
+
+        .faq-question:hover {
+            color: var(--primary);
+        }
+
+        .faq-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item.active .faq-icon {
+            transform: rotate(45deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+        }
+
+        .faq-answer p {
+            padding-bottom: 24px;
+            color: var(--gray-600);
+            line-height: 1.7;
         }
 
         /* CTA Section */
         .cta-section {
-            padding: 120px 24px;
-            background: linear-gradient(135deg, var(--primary), #8B5CF6);
-            text-align: center;
+            padding: 100px 24px;
+            background: var(--gray-50);
         }
 
-        .cta-content {
-            max-width: 700px;
+        .cta-card {
+            max-width: 800px;
             margin: 0 auto;
+            background: var(--white);
+            border-radius: 32px;
+            padding: 60px 48px;
+            text-align: center;
+            border: 1px solid var(--gray-200);
         }
 
-        .cta-title {
-            font-size: clamp(2rem, 4vw, 3rem);
+        .cta-card h2 {
+            font-size: clamp(1.75rem, 3vw, 2.25rem);
             font-weight: 800;
-            color: white;
-            margin-bottom: 24px;
+            color: var(--gray-900);
+            margin-bottom: 16px;
         }
 
-        .cta-description {
-            font-size: 1.25rem;
-            color: rgba(255, 255, 255, 0.9);
-            margin-bottom: 40px;
-        }
-
-        .cta-btn {
-            background: white;
-            color: var(--primary);
-            padding: 18px 40px;
-            border-radius: 14px;
-            font-weight: 700;
+        .cta-card p {
+            color: var(--gray-600);
             font-size: 1.1rem;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .cta-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+            margin-bottom: 32px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         /* Footer */
         .footer {
-            background: var(--gray-900);
-            padding: 80px 24px 40px;
+            background: var(--white);
+            border-top: 1px solid var(--gray-200);
+            padding: 60px 24px 30px;
         }
 
         .footer-container {
-            max-width: 1280px;
+            max-width: 1200px;
             margin: 0 auto;
         }
 
         .footer-grid {
             display: grid;
-            grid-template-columns: 2fr repeat(3, 1fr);
-            gap: 64px;
-            margin-bottom: 64px;
+            grid-template-columns: 2fr repeat(4, 1fr);
+            gap: 48px;
+            margin-bottom: 48px;
         }
 
-        .footer-brand {
-            max-width: 300px;
-        }
-
-        .footer-logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .footer-logo-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--primary), #8B5CF6);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .footer-logo-text {
+        .footer-brand h3 {
             font-size: 1.25rem;
             font-weight: 700;
-            color: white;
-        }
-
-        .footer-description {
-            color: var(--gray-400);
-            line-height: 1.7;
-            margin-bottom: 24px;
-        }
-
-        .social-links {
-            display: flex;
-            gap: 12px;
-        }
-
-        .social-link {
-            width: 40px;
-            height: 40px;
-            background: var(--gray-800);
-            border-radius: 10px;
+            color: var(--gray-900);
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            color: var(--gray-400);
-            transition: all 0.2s ease;
+            gap: 8px;
         }
 
-        .social-link:hover {
-            background: var(--primary);
-            color: white;
+        .footer-brand p {
+            color: var(--gray-600);
+            font-size: 0.9rem;
+            line-height: 1.6;
         }
 
         .footer-column h4 {
-            color: white;
+            font-size: 0.9rem;
             font-weight: 600;
-            margin-bottom: 20px;
+            color: var(--gray-900);
+            margin-bottom: 16px;
         }
 
-        .footer-links {
+        .footer-column ul {
             list-style: none;
         }
 
-        .footer-links li {
-            margin-bottom: 12px;
+        .footer-column li {
+            margin-bottom: 10px;
         }
 
-        .footer-links a {
-            color: var(--gray-400);
+        .footer-column a {
+            color: var(--gray-600);
             text-decoration: none;
+            font-size: 0.9rem;
             transition: color 0.2s ease;
         }
 
-        .footer-links a:hover {
-            color: white;
+        .footer-column a:hover {
+            color: var(--gray-900);
         }
 
         .footer-bottom {
-            padding-top: 40px;
-            border-top: 1px solid var(--gray-800);
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
+            justify-content: space-between;
+            padding-top: 24px;
+            border-top: 1px solid var(--gray-200);
         }
 
         .footer-copyright {
             color: var(--gray-500);
-            font-size: 0.875rem;
+            font-size: 0.85rem;
         }
 
-        .footer-legal {
+        .footer-social {
             display: flex;
-            gap: 24px;
+            gap: 16px;
         }
 
-        .footer-legal a {
-            color: var(--gray-500);
-            text-decoration: none;
-            font-size: 0.875rem;
-            transition: color 0.2s ease;
+        .footer-social a {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray-600);
+            border-radius: 8px;
+            transition: all 0.2s ease;
         }
 
-        .footer-legal a:hover {
-            color: white;
+        .footer-social a:hover {
+            background: var(--gray-100);
+            color: var(--gray-900);
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
         }
 
         /* Responsive */
-        @media (max-width: 1024px) {
-            .nav-links {
+        @media (max-width: 1200px) {
+            .floating-image.left-1,
+            .floating-image.right-1 {
                 display: none;
             }
+        }
 
-            .mobile-menu-btn {
-                display: block;
+        @media (max-width: 1024px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 32px;
+            }
+
+            .how-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .showcase-grid {
+                grid-template-columns: 1fr;
+                gap: 40px;
             }
 
             .footer-grid {
@@ -739,184 +1119,177 @@
         }
 
         @media (max-width: 768px) {
-            .hero {
-                padding: 120px 16px 60px;
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
             }
 
             .upload-card {
-                padding: 32px 24px;
+                padding: 40px 24px;
             }
 
-            .trust-section {
+            .demo-container {
                 flex-direction: column;
-                gap: 24px;
             }
 
             .features-grid {
                 grid-template-columns: 1fr;
             }
 
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
             .footer-grid {
                 grid-template-columns: 1fr;
-                gap: 40px;
+                gap: 32px;
             }
 
             .footer-bottom {
                 flex-direction: column;
+                gap: 16px;
                 text-align: center;
-            }
-        }
-
-        /* Loading animation */
-        .loading-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255, 255, 255, 0.95);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
-
-        .loading-overlay.active {
-            display: flex;
-        }
-
-        .loading-spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid var(--gray-200);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        .loading-text {
-            margin-top: 24px;
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: var(--gray-700);
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
             }
         }
     </style>
 </head>
 <body>
-    <!-- Loading Overlay -->
-    <div class="loading-overlay" id="loading-overlay">
-        <div class="loading-spinner"></div>
-        <p class="loading-text">Removing background...</p>
-    </div>
-
     <!-- Navigation -->
     <nav class="navbar" id="navbar">
         <div class="nav-container">
             <a href="/" class="logo">
                 <div class="logo-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <circle cx="8.5" cy="8.5" r="1.5"/>
+                        <path d="M21 15l-5-5L5 21"/>
                     </svg>
                 </div>
-                BGRemover
+                <span>BG Remover</span>
             </a>
             
             <ul class="nav-links">
-                <li><a href="#features">Features</a></li>
-                <li><a href="#how-it-works">How It Works</a></li>
+                <li><a href="#features">Product</a></li>
+                <li><a href="#how-it-works">Solutions</a></li>
+                <li><a href="#showcase">Resources</a></li>
+                <li><a href="#faq">Enterprise</a></li>
                 <li><a href="#pricing">Pricing</a></li>
             </ul>
-
+            
             <div class="nav-actions">
-                <a href="/upload" class="btn btn-primary">Get Started</a>
+                <a href="#" class="btn btn-ghost">Contact Sales</a>
+                <a href="#" class="btn btn-ghost">Log in</a>
+                <a href="/upload" class="btn btn-primary">Start creating</a>
             </div>
-
-            <button class="mobile-menu-btn" aria-label="Toggle menu">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            
+            <button class="mobile-menu-btn" aria-label="Menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="6" x2="21" y2="6"/>
+                    <line x1="3" y1="12" x2="21" y2="12"/>
+                    <line x1="3" y1="18" x2="21" y2="18"/>
                 </svg>
             </button>
         </div>
     </nav>
 
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <ul class="breadcrumb-list">
+            <li><a href="/">Home</a></li>
+            <li><span>›</span></li>
+            <li><a href="#">Tools</a></li>
+            <li><span>›</span></li>
+            <li class="current">Background Remover</li>
+        </ul>
+    </div>
+
     <!-- Hero Section -->
     <section class="hero">
         <div class="hero-content">
-            <div class="hero-badge">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            <div class="hero-title">
+                <svg class="hero-icon" viewBox="0 0 48 48" fill="none">
+                    <rect x="4" y="4" width="40" height="40" rx="8" stroke="currentColor" stroke-width="3"/>
+                    <path d="M4 36l12-12 8 8 12-16 8 12" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
-                AI-Powered Background Removal
+                <h1>Remove backgrounds<br>instantly with AI</h1>
             </div>
-            <h1>Remove backgrounds <span>instantly with AI</span></h1>
-            <p class="hero-description">
-                Automatically remove backgrounds from any image with our AI background remover—no design skills or expensive tools required.
-            </p>
+            <p>Automatically remove backgrounds from any product image with our AI background remover—no design skills or expensive tools required.</p>
         </div>
 
-        <!-- Upload Area -->
         <div class="upload-section">
-            <form id="upload-form" action="/upload" method="POST" enctype="multipart/form-data">
-                <div class="upload-card" id="upload-card">
-                    <div class="upload-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                        </svg>
-                    </div>
-                    <h3 class="upload-title">Start from a photo</h3>
-                    <p class="upload-subtitle">Or drop an image here</p>
-                    <button type="button" class="upload-btn" id="upload-btn">Upload Image</button>
-                    <p class="upload-formats">Supports PNG, JPG, JPEG, WEBP • Max 16MB</p>
-                    <input type="file" id="file-input" name="image" accept="image/png,image/jpeg,image/jpg,image/webp">
+            <!-- Floating sample images -->
+            <div class="floating-images">
+                <div class="floating-image left-1">
+                    <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=200&h=200&fit=crop" alt="Jewelry sample">
                 </div>
-            </form>
+                <div class="floating-image right-1">
+                    <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200&h=240&fit=crop" alt="Sneaker sample">
+                </div>
+            </div>
 
-            <!-- Sample Images -->
-            <div class="sample-section">
-                <p class="sample-label">No image? Try one of these</p>
-                <div class="sample-images">
-                    <div class="sample-image" data-sample="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop">
-                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop" alt="Sample portrait">
-                    </div>
-                    <div class="sample-image" data-sample="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&h=200&fit=crop">
-                        <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&h=200&fit=crop" alt="Sample product">
-                    </div>
-                    <div class="sample-image" data-sample="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&h=200&fit=crop">
-                        <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&h=200&fit=crop" alt="Sample headphones">
-                    </div>
-                    <div class="sample-image" data-sample="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200&h=200&fit=crop">
-                        <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200&h=200&fit=crop" alt="Sample shoe">
-                    </div>
+            <div class="upload-card" id="dropZone">
+                <div class="upload-content">
+                    <label class="upload-btn" for="fileInput">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"/>
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                        </svg>
+                        Start from a photo
+                    </label>
+                    <input type="file" id="fileInput" class="file-input" accept="image/*">
+                    <p class="upload-hint">Or drop an image here</p>
                 </div>
             </div>
         </div>
+    </section>
 
-        <!-- Trust Badges -->
-        <div class="trust-section">
-            <div class="trust-item">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-                100% Free
+    <!-- Live Demo Section -->
+    <section class="live-demo-section" id="demo">
+        <div class="section-container">
+            <div class="section-header animate-on-scroll">
+                <h2>See the magic happen</h2>
+                <p>Watch how our AI instantly removes backgrounds with precision edge detection</p>
             </div>
-            <div class="trust-item">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                AI-Powered Results
-            </div>
-            <div class="trust-item">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-                Secure & Private
+
+            <div class="demo-container">
+                <div class="demo-card animate-on-scroll">
+                    <div class="demo-image-container" id="liveDemo">
+                        <div class="demo-original"></div>
+                        <div class="demo-processed" id="demoProcessed"></div>
+                        <div class="demo-slider" id="demoSlider"></div>
+                    </div>
+                </div>
+
+                <div class="demo-steps animate-on-scroll">
+                    <div class="demo-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3>Choose a photo</h3>
+                            <p>Upload any JPEG or PNG product image. BG Remover removes the background for you.</p>
+                        </div>
+                    </div>
+                    <div class="demo-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3>Let AI do the work</h3>
+                            <p>Our AI removes the background instantly. It's up to you.</p>
+                        </div>
+                    </div>
+                    <div class="demo-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3>Download your image</h3>
+                            <p>Download your photo in PNG, JPEG, or save to your account for easy access.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -924,124 +1297,79 @@
     <!-- Features Section -->
     <section class="features-section" id="features">
         <div class="section-container">
-            <div class="section-header">
-                <span class="section-tag">✨ Features</span>
-                <h2 class="section-title">Professional background removal made easy</h2>
-                <p class="section-description">
-                    Everything you need to create stunning product photos, profile pictures, and more.
-                </p>
+            <div class="section-header animate-on-scroll">
+                <h2>All the AI product photography tools you need</h2>
+                <p>Keep your brand unique while saving time and budget with AI-generated photography tools</p>
             </div>
 
             <div class="features-grid">
-                <div class="feature-card">
+                <div class="feature-card animate-on-scroll">
                     <div class="feature-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
                         </svg>
                     </div>
-                    <h3 class="feature-title">Lightning Fast</h3>
-                    <p class="feature-description">
-                        Remove backgrounds in seconds with our advanced AI technology. No waiting, no delays.
-                    </p>
+                    <h3>Erase photo backgrounds</h3>
+                    <p>Remove any unwanted background from your product photos instantly with AI.</p>
                 </div>
 
-                <div class="feature-card">
+                <div class="feature-card animate-on-scroll">
                     <div class="feature-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2"/>
+                            <path d="M3 9h18"/>
+                            <path d="M9 21V9"/>
                         </svg>
                     </div>
-                    <h3 class="feature-title">Pixel-Perfect Results</h3>
-                    <p class="feature-description">
-                        Our AI preserves fine details like hair, fur, and complex edges with stunning accuracy.
-                    </p>
+                    <h3>Generate AI backgrounds</h3>
+                    <p>Create stunning backgrounds for your products with AI in seconds.</p>
                 </div>
 
-                <div class="feature-card">
+                <div class="feature-card animate-on-scroll">
                     <div class="feature-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M8 12l2 2 4-4"/>
                         </svg>
                     </div>
-                    <h3 class="feature-title">Transparent PNG</h3>
-                    <p class="feature-description">
-                        Download your images with transparent backgrounds, ready for any design project.
-                    </p>
+                    <h3>Create lifestyle images</h3>
+                    <p>Generate realistic lifestyle photos for your products without a photo shoot.</p>
                 </div>
 
-                <div class="feature-card">
+                <div class="feature-card animate-on-scroll">
                     <div class="feature-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                            <polyline points="22,6 12,13 2,6"/>
                         </svg>
                     </div>
-                    <h3 class="feature-title">Secure & Private</h3>
-                    <p class="feature-description">
-                        Your images are processed securely and automatically deleted after processing.
-                    </p>
+                    <h3>Enhance and resize images</h3>
+                    <p>Upscale low-resolution images and resize for any platform with perfect quality.</p>
                 </div>
 
-                <div class="feature-card">
+                <div class="feature-card animate-on-scroll">
                     <div class="feature-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                            <path d="M2 17l10 5 10-5"/>
+                            <path d="M2 12l10 5 10-5"/>
                         </svg>
                     </div>
-                    <h3 class="feature-title">100% Free</h3>
-                    <p class="feature-description">
-                        No signup required, no hidden fees. Professional-quality results at no cost.
-                    </p>
+                    <h3>Export and share</h3>
+                    <p>Download in any format or share directly to your marketplace listings.</p>
                 </div>
 
-                <div class="feature-card">
+                <div class="feature-card animate-on-scroll">
                     <div class="feature-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                         </svg>
                     </div>
-                    <h3 class="feature-title">Works Everywhere</h3>
-                    <p class="feature-description">
-                        Use on any device - desktop, tablet, or mobile. No app installation needed.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- How It Works -->
-    <section class="how-it-works" id="how-it-works">
-        <div class="section-container">
-            <div class="section-header">
-                <span class="section-tag">🚀 Simple Process</span>
-                <h2 class="section-title">How to remove a background from an image</h2>
-                <p class="section-description">
-                    Three simple steps to get professional results in seconds.
-                </p>
-            </div>
-
-            <div class="steps-grid">
-                <div class="step-card">
-                    <div class="step-number">1</div>
-                    <h3 class="step-title">Upload Your Image</h3>
-                    <p class="step-description">
-                        Choose a JPEG or PNG image to upload. Any size works – our AI handles it all.
-                    </p>
-                </div>
-
-                <div class="step-card">
-                    <div class="step-number">2</div>
-                    <h3 class="step-title">AI Does The Work</h3>
-                    <p class="step-description">
-                        Our advanced AI automatically detects and removes the background with precision.
-                    </p>
-                </div>
-
-                <div class="step-card">
-                    <div class="step-number">3</div>
-                    <h3 class="step-title">Download Your Image</h3>
-                    <p class="step-description">
-                        Download your image with a transparent background, ready to use anywhere.
-                    </p>
+                    <h3>Collaborate with your team</h3>
+                    <p>Work together with shared folders, templates, and brand assets.</p>
                 </div>
             </div>
         </div>
@@ -1049,38 +1377,223 @@
 
     <!-- Stats Section -->
     <section class="stats-section">
-        <div class="stats-grid">
-            <div class="stat-item">
-                <div class="stat-value">10M+</div>
-                <div class="stat-label">Images Processed</div>
+        <div class="stats-container">
+            <div class="stats-header animate-on-scroll">
+                <h2>Real results from brands and marketplaces</h2>
+                <p>See what happens when you use BG Remover</p>
             </div>
-            <div class="stat-item">
-                <div class="stat-value">5s</div>
-                <div class="stat-label">Average Processing Time</div>
+
+            <div class="stats-grid">
+                <div class="stat-item animate-on-scroll">
+                    <div class="stat-value">96%</div>
+                    <div class="stat-label">average boost in sales</div>
+                </div>
+                <div class="stat-item animate-on-scroll">
+                    <div class="stat-value">93%</div>
+                    <div class="stat-label">reduction in photo editing costs</div>
+                </div>
+                <div class="stat-item animate-on-scroll">
+                    <div class="stat-value">56%</div>
+                    <div class="stat-label">uplift in sell-through rate</div>
+                </div>
+                <div class="stat-item animate-on-scroll">
+                    <div class="stat-value">99%</div>
+                    <div class="stat-label">visual branding compliance achieved</div>
+                </div>
             </div>
-            <div class="stat-item">
-                <div class="stat-value">99%</div>
-                <div class="stat-label">Accuracy Rate</div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-section" id="how-it-works">
+        <div class="section-container">
+            <div class="section-header animate-on-scroll">
+                <h2>How to remove a background from an image</h2>
             </div>
-            <div class="stat-item">
-                <div class="stat-value">100%</div>
-                <div class="stat-label">Free Forever</div>
+
+            <div class="how-grid">
+                <div class="how-card animate-on-scroll">
+                    <span class="how-step-badge">Step 1</span>
+                    <div class="how-card-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                    </div>
+                    <h3>Choose a photo</h3>
+                    <p>Upload your JPEG or PNG product image. The tool removes the background for you.</p>
+                </div>
+
+                <div class="how-card animate-on-scroll">
+                    <span class="how-step-badge">Step 2</span>
+                    <div class="how-card-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5"/>
+                            <path d="M8.5 8.5v.01"/>
+                            <path d="M16 15.5v.01"/>
+                            <path d="M12 12v.01"/>
+                            <path d="M11 17v.01"/>
+                            <path d="M7 14v.01"/>
+                        </svg>
+                    </div>
+                    <h3>Let AI do the work</h3>
+                    <p>Our AI removes the background instantly. It takes just a few seconds.</p>
+                </div>
+
+                <div class="how-card animate-on-scroll">
+                    <span class="how-step-badge">Step 3</span>
+                    <div class="how-card-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                    </div>
+                    <h3>Download your image</h3>
+                    <p>Download your photo in PNG, JPEG, or save to your account at each step.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comparison Section -->
+    <section class="comparison-section">
+        <div class="section-container">
+            <div class="section-header animate-on-scroll">
+                <h2>AI product photography for every type of product shot</h2>
+            </div>
+
+            <div class="comparison-grid">
+                <div class="comparison-card animate-on-scroll">
+                    <div class="comparison-image">
+                        <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&h=225&fit=crop" alt="Watch product">
+                    </div>
+                    <div class="comparison-content">
+                        <h4>Create e-commerce product photos with AI</h4>
+                        <p>Perfect for online stores and marketplaces</p>
+                    </div>
+                </div>
+
+                <div class="comparison-card animate-on-scroll">
+                    <div class="comparison-image">
+                        <img src="https://images.unsplash.com/photo-1560343090-f0409e92791a?w=300&h=225&fit=crop" alt="Skincare product">
+                    </div>
+                    <div class="comparison-content">
+                        <h4>Create authentic lifestyle product photos with AI</h4>
+                        <p>Generate realistic lifestyle scenes instantly</p>
+                    </div>
+                </div>
+
+                <div class="comparison-card animate-on-scroll">
+                    <div class="comparison-image">
+                        <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=300&h=225&fit=crop" alt="Clothing product">
+                    </div>
+                    <div class="comparison-content">
+                        <h4>Create authentic skincare product photos with AI</h4>
+                        <p>Perfect for beauty and cosmetics brands</p>
+                    </div>
+                </div>
+
+                <div class="comparison-card animate-on-scroll">
+                    <div class="comparison-image">
+                        <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300&h=225&fit=crop" alt="Electronics product">
+                    </div>
+                    <div class="comparison-content">
+                        <h4>Create authentic photos with AI</h4>
+                        <p>Works for any product category</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section" id="faq">
+        <div class="faq-container">
+            <div class="section-header animate-on-scroll">
+                <h2>Background remover:<br>your questions answered</h2>
+            </div>
+
+            <div class="faq-list">
+                <div class="faq-item animate-on-scroll">
+                    <button class="faq-question">
+                        What is the best background remover for product photos?
+                        <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"/>
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                        </svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>BG Remover uses advanced AI technology specifically trained on product images, making it the best choice for e-commerce and product photography. It handles complex edges, hair, and transparent objects with precision that other tools can't match.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item animate-on-scroll">
+                    <button class="faq-question">
+                        How does an AI background remover work?
+                        <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"/>
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                        </svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Our AI analyzes your image using deep learning models trained on millions of images. It identifies the subject and separates it from the background with pixel-perfect accuracy, preserving fine details like hair, fur, and transparent edges.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item animate-on-scroll">
+                    <button class="faq-question">
+                        Can I remove the background from an image without losing quality?
+                        <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"/>
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                        </svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Yes! Our tool preserves the original image quality. We even upscale smaller images during processing for better edge detection, then resize back to the original dimensions. The result is a high-quality transparent PNG.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item animate-on-scroll">
+                    <button class="faq-question">
+                        Is there a free background remover that works on mobile and desktop?
+                        <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"/>
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                        </svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>BG Remover works perfectly on both mobile and desktop browsers. No app installation required—just upload your image and get instant results. It's completely free to use with no watermarks.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item animate-on-scroll">
+                    <button class="faq-question">
+                        How can I automatically remove and replace a background with a new one?
+                        <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"/>
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                        </svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>After removing the background, you can download the transparent PNG and add any background you like. Our tool focuses on creating the perfect cutout that you can use anywhere.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- CTA Section -->
     <section class="cta-section">
-        <div class="cta-content">
-            <h2 class="cta-title">Ready to remove your first background?</h2>
-            <p class="cta-description">
-                Join millions of users who trust our AI-powered background remover for their creative projects.
-            </p>
-            <a href="/upload" class="cta-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+        <div class="cta-card animate-on-scroll">
+            <h2>Go further with BG Remover</h2>
+            <p>Remove backgrounds instantly. Create professional product photos. All for free.</p>
+            <a href="/upload" class="btn btn-primary btn-large">
+                Start creating
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
                 </svg>
-                Get Started Free
             </a>
         </div>
     </section>
@@ -1090,73 +1603,80 @@
         <div class="footer-container">
             <div class="footer-grid">
                 <div class="footer-brand">
-                    <div class="footer-logo">
-                        <div class="footer-logo-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    <h3>
+                        <div class="logo-icon" style="width: 28px; height: 28px; border-radius: 6px;">
+                            <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                                <circle cx="8.5" cy="8.5" r="1.5"/>
+                                <path d="M21 15l-5-5L5 21"/>
                             </svg>
                         </div>
-                        <span class="footer-logo-text">BGRemover</span>
-                    </div>
-                    <p class="footer-description">
-                        Professional AI-powered background removal for everyone. Free, fast, and easy to use.
-                    </p>
-                    <div class="social-links">
-                        <a href="#" class="social-link" aria-label="Twitter">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                            </svg>
-                        </a>
-                        <a href="#" class="social-link" aria-label="LinkedIn">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                            </svg>
-                        </a>
-                        <a href="#" class="social-link" aria-label="GitHub">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                            </svg>
-                        </a>
-                    </div>
+                        BG Remover
+                    </h3>
+                    <p>AI-powered background removal for everyone. Create professional product photos in seconds.</p>
                 </div>
 
                 <div class="footer-column">
-                    <h4>Product</h4>
-                    <ul class="footer-links">
-                        <li><a href="#features">Features</a></li>
-                        <li><a href="#how-it-works">How It Works</a></li>
-                        <li><a href="#">API</a></li>
-                        <li><a href="#">Pricing</a></li>
+                    <h4>Free tools</h4>
+                    <ul>
+                        <li><a href="#">AI Photo Remove</a></li>
+                        <li><a href="#">AI Enhance</a></li>
+                        <li><a href="#">AI Shadow</a></li>
+                        <li><a href="#">Image Resize</a></li>
                     </ul>
                 </div>
 
                 <div class="footer-column">
-                    <h4>Resources</h4>
-                    <ul class="footer-links">
-                        <li><a href="#">Documentation</a></li>
-                        <li><a href="#">Blog</a></li>
-                        <li><a href="#">Support</a></li>
-                        <li><a href="#">FAQ</a></li>
+                    <h4>Our apps</h4>
+                    <ul>
+                        <li><a href="#">iPhone app</a></li>
+                        <li><a href="#">Android app</a></li>
+                        <li><a href="#">macOS app</a></li>
+                        <li><a href="#">Web App</a></li>
                     </ul>
                 </div>
 
                 <div class="footer-column">
                     <h4>Company</h4>
-                    <ul class="footer-links">
-                        <li><a href="#">About Us</a></li>
-                        <li><a href="#">Contact</a></li>
+                    <ul>
+                        <li><a href="#">About</a></li>
                         <li><a href="#">Careers</a></li>
                         <li><a href="#">Press</a></li>
+                        <li><a href="#">Blog</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-column">
+                    <h4>Help & legal</h4>
+                    <ul>
+                        <li><a href="#">Help center</a></li>
+                        <li><a href="#">Privacy policy</a></li>
+                        <li><a href="#">Terms of service</a></li>
+                        <li><a href="#">Contact us</a></li>
                     </ul>
                 </div>
             </div>
 
             <div class="footer-bottom">
-                <p class="footer-copyright">© 2026 BGRemover. All rights reserved.</p>
-                <div class="footer-legal">
-                    <a href="#">Privacy Policy</a>
-                    <a href="#">Terms of Service</a>
-                    <a href="#">Cookie Policy</a>
+                <p class="footer-copyright">© 2026 BG Remover. All rights reserved.</p>
+                <div class="footer-social">
+                    <a href="#" aria-label="Twitter">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                        </svg>
+                    </a>
+                    <a href="#" aria-label="Instagram">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="2" width="20" height="20" rx="5"/>
+                            <circle cx="12" cy="12" r="4"/>
+                            <circle cx="18" cy="6" r="1"/>
+                        </svg>
+                    </a>
+                    <a href="#" aria-label="YouTube">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                        </svg>
+                    </a>
                 </div>
             </div>
         </div>
@@ -1166,127 +1686,143 @@
         // Navbar scroll effect
         const navbar = document.getElementById('navbar');
         window.addEventListener('scroll', () => {
-            if (window.scrollY > 20) {
+            if (window.scrollY > 50) {
                 navbar.classList.add('scrolled');
             } else {
                 navbar.classList.remove('scrolled');
             }
         });
 
-        // Upload functionality
-        const uploadCard = document.getElementById('upload-card');
-        const uploadBtn = document.getElementById('upload-btn');
-        const fileInput = document.getElementById('file-input');
-        const uploadForm = document.getElementById('upload-form');
-        const loadingOverlay = document.getElementById('loading-overlay');
+        // Scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
 
-        uploadBtn.addEventListener('click', () => {
-            fileInput.click();
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.animate-on-scroll').forEach(el => {
+            observer.observe(el);
         });
 
-        uploadCard.addEventListener('click', (e) => {
-            if (e.target !== uploadBtn) {
+        // FAQ accordion
+        document.querySelectorAll('.faq-question').forEach(button => {
+            button.addEventListener('click', () => {
+                const faqItem = button.parentElement;
+                const isActive = faqItem.classList.contains('active');
+                
+                // Close all FAQ items
+                document.querySelectorAll('.faq-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                
+                // Open clicked one if it wasn't active
+                if (!isActive) {
+                    faqItem.classList.add('active');
+                }
+            });
+        });
+
+        // File upload handling
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+
+        // Click to upload
+        dropZone.addEventListener('click', (e) => {
+            if (e.target !== fileInput && !e.target.closest('.upload-btn')) {
                 fileInput.click();
             }
         });
 
         // Drag and drop
-        uploadCard.addEventListener('dragover', (e) => {
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
             e.preventDefault();
-            uploadCard.classList.add('dragover');
-        });
-
-        uploadCard.addEventListener('dragleave', () => {
-            uploadCard.classList.remove('dragover');
-        });
-
-        uploadCard.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadCard.classList.remove('dragover');
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                fileInput.files = files;
-                handleFileUpload();
-            }
-        });
-
-        fileInput.addEventListener('change', handleFileUpload);
-
-        function handleFileUpload() {
-            const file = fileInput.files[0];
-            if (file) {
-                // Validate file type
-                const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
-                if (!allowedTypes.includes(file.type)) {
-                    alert('Please upload a valid image file (PNG, JPG, JPEG, or WEBP)');
-                    return;
-                }
-
-                // Validate file size (16MB)
-                if (file.size > 16 * 1024 * 1024) {
-                    alert('File size must be less than 16MB');
-                    return;
-                }
-
-                // Show loading and submit
-                loadingOverlay.classList.add('active');
-                
-                const formData = new FormData();
-                formData.append('image', file);
-
-                fetch('/upload', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success && data.redirect_url) {
-                        window.location.href = data.redirect_url;
-                    } else {
-                        loadingOverlay.classList.remove('active');
-                        alert(data.error || 'Error processing image');
-                    }
-                })
-                .catch(error => {
-                    loadingOverlay.classList.remove('active');
-                    console.error('Error:', error);
-                    alert('Error uploading image. Please try again.');
-                });
-            }
+            e.stopPropagation();
         }
 
-        // Sample images
-        document.querySelectorAll('.sample-image').forEach(img => {
-            img.addEventListener('click', async () => {
-                const imageUrl = img.dataset.sample;
-                loadingOverlay.classList.add('active');
-                
-                try {
-                    const response = await fetch(imageUrl);
-                    const blob = await response.blob();
-                    const file = new File([blob], 'sample.jpg', { type: 'image/jpeg' });
-                    
-                    const formData = new FormData();
-                    formData.append('image', file);
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.style.borderColor = 'var(--primary)';
+                dropZone.style.background = 'rgba(124, 58, 237, 0.05)';
+            });
+        });
 
-                    const uploadResponse = await fetch('/upload', {
-                        method: 'POST',
-                        body: formData
-                    });
-                    
-                    const data = await uploadResponse.json();
-                    
-                    if (data.success && data.redirect_url) {
-                        window.location.href = data.redirect_url;
-                    } else {
-                        loadingOverlay.classList.remove('active');
-                        alert(data.error || 'Error processing image');
-                    }
-                } catch (error) {
-                    loadingOverlay.classList.remove('active');
-                    console.error('Error:', error);
-                    alert('Error processing sample image. Please try again.');
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.style.borderColor = '';
+                dropZone.style.background = '';
+            });
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            const files = e.dataTransfer.files;
+            if (files.length) {
+                fileInput.files = files;
+                handleFile(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                alert('Please upload an image file');
+                return;
+            }
+
+            // Create form data and submit
+            const formData = new FormData();
+            formData.append('image', file);
+
+            // Show loading state
+            dropZone.innerHTML = `
+                <div class="upload-content">
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
+                        <div style="width: 48px; height: 48px; border: 3px solid var(--gray-200); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                        <p style="color: var(--gray-600); font-weight: 500;">Uploading...</p>
+                    </div>
+                </div>
+                <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+            `;
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = data.redirect_url;
+                } else {
+                    alert('Upload failed: ' + (data.error || 'Unknown error'));
+                    location.reload();
                 }
+            })
+            .catch(error => {
+                console.error('Upload error:', error);
+                alert('Upload failed. Please try again.');
+                location.reload();
+            });
+        }
+
+        // Floating images hover effect
+        document.querySelectorAll('.floating-image').forEach(img => {
+            img.addEventListener('click', () => {
+                fileInput.click();
             });
         });
     </script>

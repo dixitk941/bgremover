@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload Image - Background Remover</title>
+    <title>Remove Background - BG Remover</title>
+    <meta name="description" content="Upload your image and remove the background instantly with AI">
     
     <!-- Favicon -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎨</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,31 +22,51 @@
         }
 
         :root {
-            --primary: #5C4EFA;
-            --primary-hover: #4B3ED9;
-            --primary-light: #EEF2FF;
-            --secondary: #FF6B6B;
-            --dark: #1A1A2E;
+            --primary: #7C3AED;
+            --primary-light: #A78BFA;
+            --dark: #0F172A;
             --gray-900: #111827;
-            --gray-800: #1f2937;
-            --gray-700: #374151;
-            --gray-600: #4b5563;
-            --gray-500: #6b7280;
-            --gray-400: #9ca3af;
-            --gray-300: #d1d5db;
-            --gray-200: #e5e7eb;
-            --gray-100: #f3f4f6;
-            --gray-50: #f9fafb;
-            --white: #ffffff;
-            --success: #10b981;
-            --success-light: #D1FAE5;
+            --gray-800: #1E293B;
+            --gray-700: #334155;
+            --gray-600: #475569;
+            --gray-500: #64748B;
+            --gray-400: #94A3B8;
+            --gray-300: #CBD5E1;
+            --gray-200: #E2E8F0;
+            --gray-100: #F1F5F9;
+            --gray-50: #F8FAFC;
+            --white: #FFFFFF;
+            --black: #000000;
+            --success: #10B981;
+            --error: #EF4444;
         }
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #F8F7FF 0%, #EEF2FF 50%, #F8F7FF 100%);
-            min-height: 100vh;
+            background: var(--gray-50);
             color: var(--gray-900);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Animations */
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
         }
 
         /* Navigation */
@@ -76,30 +97,24 @@
             gap: 10px;
             text-decoration: none;
             font-weight: 700;
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             color: var(--gray-900);
         }
 
         .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--primary), #8B5CF6);
-            border-radius: 12px;
+            width: 36px;
+            height: 36px;
+            background: var(--black);
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
         .logo-icon svg {
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
             color: white;
-        }
-
-        .nav-actions {
-            display: flex;
-            align-items: center;
-            gap: 16px;
         }
 
         .btn {
@@ -107,10 +122,10 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            padding: 12px 24px;
-            border-radius: 12px;
+            padding: 10px 20px;
+            border-radius: 10px;
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             text-decoration: none;
             transition: all 0.2s ease;
             cursor: pointer;
@@ -126,621 +141,802 @@
             background: var(--gray-100);
         }
 
+        .btn-primary {
+            background: var(--black);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--gray-800);
+        }
+
         /* Main Content */
         .main-content {
-            padding: 120px 24px 60px;
-            min-height: 100vh;
+            padding: 100px 24px 40px;
+            max-width: 1000px;
+            margin: 0 auto;
+            min-height: calc(100vh - 60px);
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            margin-bottom: 24px;
+        }
+
+        .breadcrumb-list {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            justify-content: center;
+            gap: 8px;
+            list-style: none;
+            font-size: 0.85rem;
         }
 
-        .upload-container {
-            width: 100%;
-            max-width: 720px;
+        .breadcrumb-list a {
+            color: var(--gray-500);
+            text-decoration: none;
         }
 
+        .breadcrumb-list a:hover {
+            color: var(--gray-900);
+        }
+
+        .breadcrumb-list span {
+            color: var(--gray-400);
+        }
+
+        .breadcrumb-list .current {
+            color: var(--gray-700);
+        }
+
+        /* Page Header */
         .page-header {
             text-align: center;
             margin-bottom: 40px;
         }
 
-        .page-title {
-            font-size: 2.5rem;
+        .page-header h1 {
+            font-size: 2rem;
             font-weight: 800;
             color: var(--gray-900);
-            margin-bottom: 12px;
-            letter-spacing: -0.02em;
+            margin-bottom: 8px;
         }
 
-        .page-subtitle {
-            font-size: 1.125rem;
+        .page-header p {
             color: var(--gray-600);
+            font-size: 1rem;
         }
 
         /* Upload Card */
         .upload-card {
             background: var(--white);
             border-radius: 24px;
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06), 0 0 0 1px var(--gray-200);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--gray-200);
             overflow: hidden;
         }
 
         .upload-area {
-            padding: 64px 48px;
-            border: 2px dashed transparent;
-            border-radius: 24px;
-            margin: 16px;
-            background: var(--gray-50);
+            padding: 60px 40px;
+            position: relative;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Checkered background */
+        .upload-area::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(45deg, #E5E7EB 25%, transparent 25%),
+                linear-gradient(-45deg, #E5E7EB 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #E5E7EB 75%),
+                linear-gradient(-45deg, transparent 75%, #E5E7EB 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            opacity: 0.4;
+        }
+
+        .upload-content {
+            position: relative;
+            z-index: 1;
             text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
         }
 
-        .upload-area:hover {
-            border-color: var(--primary);
-            background: var(--primary-light);
-        }
-
-        .upload-area.dragover {
-            border-color: var(--primary);
-            background: var(--primary-light);
-            transform: scale(1.01);
-        }
-
-        .upload-icon-wrapper {
-            width: 100px;
-            height: 100px;
-            margin: 0 auto 28px;
-            background: linear-gradient(135deg, var(--primary), #8B5CF6);
-            border-radius: 50%;
+        .upload-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--gray-100);
+            border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 12px 40px rgba(92, 78, 250, 0.3);
+            margin: 0 auto 24px;
         }
 
-        .upload-icon-wrapper svg {
-            width: 44px;
-            height: 44px;
-            color: white;
+        .upload-icon svg {
+            width: 36px;
+            height: 36px;
+            color: var(--gray-600);
         }
 
-        .upload-text-main {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--gray-900);
-            margin-bottom: 8px;
-        }
-
-        .upload-text-sub {
-            font-size: 1rem;
-            color: var(--gray-500);
-            margin-bottom: 28px;
-        }
-
-        .upload-btn-main {
+        .upload-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
             background: var(--primary);
             color: white;
-            padding: 16px 40px;
+            padding: 16px 32px;
             border-radius: 14px;
             font-weight: 600;
-            font-size: 1.1rem;
-            border: none;
+            font-size: 1rem;
             cursor: pointer;
+            border: none;
             transition: all 0.2s ease;
-            box-shadow: 0 4px 16px rgba(92, 78, 250, 0.3);
+            margin-bottom: 16px;
         }
 
-        .upload-btn-main:hover {
-            background: var(--primary-hover);
+        .upload-btn:hover {
+            background: #6D28D9;
             transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(92, 78, 250, 0.4);
+            box-shadow: 0 8px 25px rgba(124, 58, 237, 0.25);
+        }
+
+        .upload-hint {
+            color: var(--gray-500);
+            font-size: 0.9rem;
+            margin-bottom: 24px;
         }
 
         .upload-formats {
-            margin-top: 20px;
-            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
             color: var(--gray-400);
+            font-size: 0.85rem;
         }
 
-        #file-input {
-            display: none;
-        }
-
-        /* Sample Images */
-        .sample-section {
-            padding: 32px;
-            border-top: 1px solid var(--gray-200);
-        }
-
-        .sample-header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .sample-line {
-            height: 1px;
-            width: 60px;
-            background: var(--gray-300);
-        }
-
-        .sample-label {
-            font-size: 0.875rem;
-            color: var(--gray-500);
+        .format-badge {
+            background: var(--gray-100);
+            padding: 4px 10px;
+            border-radius: 6px;
             font-weight: 500;
-        }
-
-        .sample-images {
-            display: flex;
-            justify-content: center;
-            gap: 16px;
-            flex-wrap: wrap;
-        }
-
-        .sample-image {
-            width: 72px;
-            height: 72px;
-            border-radius: 16px;
-            overflow: hidden;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: 3px solid transparent;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .sample-image:hover {
-            transform: scale(1.1) rotate(2deg);
-            border-color: var(--primary);
-            box-shadow: 0 8px 24px rgba(92, 78, 250, 0.3);
-        }
-
-        .sample-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* Features */
-        .features-bar {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin-top: 40px;
-            flex-wrap: wrap;
-        }
-
-        .feature-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
             color: var(--gray-600);
-            font-size: 0.9rem;
         }
 
-        .feature-icon {
-            width: 20px;
-            height: 20px;
-            color: var(--success);
-        }
-
-        /* Loading Overlay */
-        .loading-overlay {
+        .file-input {
             display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255, 255, 255, 0.98);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
         }
 
-        .loading-overlay.active {
+        /* Processing States */
+        .processing-state {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .processing-state.active {
             display: flex;
         }
 
-        .loading-container {
-            text-align: center;
-        }
-
-        .loading-animation {
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 32px;
-            position: relative;
-        }
-
-        .loading-circle {
-            width: 100%;
-            height: 100%;
+        .spinner-large {
+            width: 64px;
+            height: 64px;
             border: 4px solid var(--gray-200);
             border-top-color: var(--primary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
 
-        .loading-icon {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 48px;
-            height: 48px;
+        .processing-text {
+            text-align: center;
+        }
+
+        .processing-text h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 8px;
+        }
+
+        .processing-text p {
+            color: var(--gray-500);
+            font-size: 0.95rem;
+        }
+
+        /* Progress Steps */
+        .progress-steps {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .progress-step {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--gray-400);
+            font-size: 0.9rem;
+        }
+
+        .progress-step.active {
             color: var(--primary);
         }
 
-        .loading-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--gray-900);
-            margin-bottom: 12px;
+        .progress-step.completed {
+            color: var(--success);
         }
 
-        .loading-subtitle {
-            font-size: 1rem;
+        .step-indicator {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .progress-step:not(.completed):not(.active) .step-indicator {
+            background: var(--gray-200);
             color: var(--gray-500);
         }
 
-        .loading-progress {
-            width: 280px;
-            height: 6px;
+        .progress-step.active .step-indicator {
+            background: var(--primary);
+            color: white;
+        }
+
+        .progress-step.completed .step-indicator {
+            background: var(--success);
+            color: white;
+        }
+
+        .step-connector {
+            width: 40px;
+            height: 2px;
             background: var(--gray-200);
-            border-radius: 100px;
-            margin: 24px auto 0;
+        }
+
+        .step-connector.completed {
+            background: var(--success);
+        }
+
+        /* Preview State */
+        .preview-container {
+            display: none;
+            padding: 24px;
+        }
+
+        .preview-container.active {
+            display: block;
+        }
+
+        .preview-image-wrapper {
+            position: relative;
+            border-radius: 16px;
             overflow: hidden;
+            background-image: 
+                linear-gradient(45deg, #E5E7EB 25%, transparent 25%),
+                linear-gradient(-45deg, #E5E7EB 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #E5E7EB 75%),
+                linear-gradient(-45deg, transparent 75%, #E5E7EB 75%);
+            background-size: 16px 16px;
+            background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .loading-progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary), #8B5CF6);
-            border-radius: 100px;
-            animation: progress 3s ease-in-out infinite;
+        .preview-image-wrapper img {
+            max-width: 100%;
+            max-height: 500px;
+            object-fit: contain;
         }
 
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+        /* Result State */
+        .result-container {
+            display: none;
+            padding: 24px;
+            animation: fadeIn 0.3s ease;
         }
 
-        @keyframes progress {
-            0% { width: 0%; }
-            50% { width: 70%; }
-            100% { width: 100%; }
+        .result-container.active {
+            display: block;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .result-card {
+            background: var(--gray-50);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--gray-200);
+        }
+
+        .result-card-header {
+            padding: 12px 16px;
+            background: var(--white);
+            border-bottom: 1px solid var(--gray-200);
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--gray-700);
+        }
+
+        .result-card-image {
+            padding: 16px;
+            min-height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .result-card-image.checkered {
+            background-image: 
+                linear-gradient(45deg, #E5E7EB 25%, transparent 25%),
+                linear-gradient(-45deg, #E5E7EB 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #E5E7EB 75%),
+                linear-gradient(-45deg, transparent 75%, #E5E7EB 75%);
+            background-size: 12px 12px;
+            background-position: 0 0, 0 6px, 6px -6px, -6px 0px;
+        }
+
+        .result-card-image img {
+            max-width: 100%;
+            max-height: 300px;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .btn-download {
+            background: var(--primary);
+            color: white;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .btn-download:hover {
+            background: #6D28D9;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--white);
+            color: var(--gray-700);
+            border: 1px solid var(--gray-300);
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-50);
+            border-color: var(--gray-400);
+        }
+
+        /* Error State */
+        .error-message {
+            display: none;
+            background: #FEF2F2;
+            border: 1px solid #FECACA;
+            color: #991B1B;
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-top: 16px;
+            text-align: center;
+        }
+
+        .error-message.active {
+            display: block;
         }
 
         /* Responsive */
         @media (max-width: 768px) {
-            .page-title {
-                font-size: 1.75rem;
+            .main-content {
+                padding: 90px 16px 32px;
             }
 
             .upload-area {
                 padding: 40px 24px;
+                min-height: 300px;
             }
 
-            .upload-icon-wrapper {
-                width: 80px;
-                height: 80px;
+            .result-grid {
+                grid-template-columns: 1fr;
             }
 
-            .upload-icon-wrapper svg {
-                width: 36px;
-                height: 36px;
+            .action-buttons {
+                flex-direction: column;
+                width: 100%;
             }
 
-            .upload-text-main {
-                font-size: 1.25rem;
-            }
-
-            .features-bar {
-                gap: 20px;
+            .action-buttons .btn {
+                width: 100%;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Loading Overlay -->
-    <div class="loading-overlay" id="loading-overlay">
-        <div class="loading-container">
-            <div class="loading-animation">
-                <div class="loading-circle"></div>
-                <svg class="loading-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-            </div>
-            <h2 class="loading-title">Removing background...</h2>
-            <p class="loading-subtitle">Our AI is working its magic</p>
-            <div class="loading-progress">
-                <div class="loading-progress-bar"></div>
-            </div>
-        </div>
-    </div>
-
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
             <a href="/" class="logo">
                 <div class="logo-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <circle cx="8.5" cy="8.5" r="1.5"/>
+                        <path d="M21 15l-5-5L5 21"/>
                     </svg>
                 </div>
-                BGRemover
+                <span>BG Remover</span>
             </a>
-
-            <div class="nav-actions">
-                <a href="/" class="btn btn-ghost">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                    </svg>
-                    Home
-                </a>
+            
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <a href="/" class="btn btn-ghost">Back to Home</a>
             </div>
         </div>
     </nav>
 
     <!-- Main Content -->
     <main class="main-content">
-        <div class="upload-container">
-            <div class="page-header">
-                <h1 class="page-title">Remove Background</h1>
-                <p class="page-subtitle">Upload an image and watch the magic happen</p>
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb">
+            <ul class="breadcrumb-list">
+                <li><a href="/">Home</a></li>
+                <li><span>›</span></li>
+                <li><a href="#">Tools</a></li>
+                <li><span>›</span></li>
+                <li class="current">Background Remover</li>
+            </ul>
+        </nav>
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>Remove Background</h1>
+            <p>Upload an image and our AI will remove the background instantly</p>
+        </div>
+
+        <!-- Upload Card -->
+        <div class="upload-card">
+            <!-- Upload State -->
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-content" id="uploadContent">
+                    <div class="upload-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                    </div>
+                    <label class="upload-btn" for="fileInput">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"/>
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                        </svg>
+                        Choose an image
+                    </label>
+                    <input type="file" id="fileInput" class="file-input" accept="image/*">
+                    <p class="upload-hint">or drag and drop an image here</p>
+                    <div class="upload-formats">
+                        <span class="format-badge">PNG</span>
+                        <span class="format-badge">JPG</span>
+                        <span class="format-badge">JPEG</span>
+                        <span class="format-badge">WEBP</span>
+                    </div>
+                </div>
+
+                <!-- Processing State -->
+                <div class="processing-state" id="processingState">
+                    <div class="spinner-large"></div>
+                    <div class="processing-text">
+                        <h3 id="processingTitle">Processing your image...</h3>
+                        <p id="processingDesc">Our AI is removing the background</p>
+                    </div>
+                    <div class="progress-steps">
+                        <div class="progress-step" id="step1">
+                            <span class="step-indicator">1</span>
+                            <span>Upload</span>
+                        </div>
+                        <div class="step-connector" id="connector1"></div>
+                        <div class="progress-step" id="step2">
+                            <span class="step-indicator">2</span>
+                            <span>Process</span>
+                        </div>
+                        <div class="step-connector" id="connector2"></div>
+                        <div class="progress-step" id="step3">
+                            <span class="step-indicator">3</span>
+                            <span>Complete</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="error-message" id="errorMessage"></div>
             </div>
 
-            <div class="upload-card">
-                <form id="upload-form" action="/upload" method="POST" enctype="multipart/form-data">
-                    <div class="upload-area" id="upload-area">
-                        <div class="upload-icon-wrapper">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                            </svg>
-                        </div>
-                        <h3 class="upload-text-main">Start from a photo</h3>
-                        <p class="upload-text-sub">or drop an image here</p>
-                        <button type="button" class="upload-btn-main" id="upload-btn">
-                            Choose Image
-                        </button>
-                        <p class="upload-formats">PNG, JPG, JPEG, WEBP • Max 16MB</p>
-                        <input type="file" id="file-input" name="image" accept="image/png,image/jpeg,image/jpg,image/webp">
-                    </div>
-                </form>
-
-                <div class="sample-section">
-                    <div class="sample-header">
-                        <div class="sample-line"></div>
-                        <span class="sample-label">No image? Try one of these</span>
-                        <div class="sample-line"></div>
-                    </div>
-                    <div class="sample-images">
-                        <div class="sample-image" data-sample="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop">
-                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop" alt="Sample portrait">
-                        </div>
-                        <div class="sample-image" data-sample="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&h=200&fit=crop">
-                            <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&h=200&fit=crop" alt="Sample product">
-                        </div>
-                        <div class="sample-image" data-sample="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&h=200&fit=crop">
-                            <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&h=200&fit=crop" alt="Sample headphones">
-                        </div>
-                        <div class="sample-image" data-sample="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200&h=200&fit=crop">
-                            <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200&h=200&fit=crop" alt="Sample shoe">
-                        </div>
-                        <div class="sample-image" data-sample="https://images.unsplash.com/photo-1560343090-f0409e92791a?w=200&h=200&fit=crop">
-                            <img src="https://images.unsplash.com/photo-1560343090-f0409e92791a?w=200&h=200&fit=crop" alt="Sample cosmetic">
-                        </div>
-                    </div>
+            <!-- Preview Container -->
+            <div class="preview-container" id="previewContainer">
+                <div class="preview-image-wrapper">
+                    <img id="previewImage" src="" alt="Preview">
                 </div>
             </div>
 
-            <div class="features-bar">
-                <div class="feature-item">
-                    <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                    100% Free
+            <!-- Result Container -->
+            <div class="result-container" id="resultContainer">
+                <div class="result-grid">
+                    <div class="result-card">
+                        <div class="result-card-header">Original</div>
+                        <div class="result-card-image">
+                            <img id="originalImage" src="" alt="Original">
+                        </div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-card-header">Background Removed</div>
+                        <div class="result-card-image checkered">
+                            <img id="processedImage" src="" alt="Processed">
+                        </div>
+                    </div>
                 </div>
-                <div class="feature-item">
-                    <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                    AI-Powered
-                </div>
-                <div class="feature-item">
-                    <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                    No Signup Required
-                </div>
-                <div class="feature-item">
-                    <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                    HD Quality
+                <div class="action-buttons">
+                    <a href="#" id="downloadBtn" class="btn btn-download" download="bg_removed.png">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        Download PNG
+                    </a>
+                    <button class="btn btn-secondary" onclick="resetUpload()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                        Upload Another
+                    </button>
                 </div>
             </div>
         </div>
     </main>
 
     <script>
-        // Upload functionality
-        const uploadArea = document.getElementById('upload-area');
-        const uploadBtn = document.getElementById('upload-btn');
-        const fileInput = document.getElementById('file-input');
-        const loadingOverlay = document.getElementById('loading-overlay');
+        // State management
+        let currentJobId = null;
 
-        // Check if we have a job_id from the URL (means we need to process)
+        // DOM Elements
+        const uploadArea = document.getElementById('uploadArea');
+        const uploadContent = document.getElementById('uploadContent');
+        const processingState = document.getElementById('processingState');
+        const previewContainer = document.getElementById('previewContainer');
+        const resultContainer = document.getElementById('resultContainer');
+        const errorMessage = document.getElementById('errorMessage');
+        const fileInput = document.getElementById('fileInput');
+
+        // Check if there's a job_id in URL (coming from redirect)
         const urlParams = new URLSearchParams(window.location.search);
-        const jobId = urlParams.get('job_id');
-        const currentStep = '{{ step | default("upload") }}';
-
-        // If we have a job_id, auto-process the image
-        if (jobId) {
-            processImage(jobId);
+        const jobIdFromUrl = urlParams.get('job_id');
+        
+        if (jobIdFromUrl) {
+            currentJobId = jobIdFromUrl;
+            startProcessing();
         }
 
-        async function processImage(jobId) {
-            loadingOverlay.classList.add('active');
-            
-            try {
-                // Step 1: Initiate processing
-                const initiateResponse = await fetch('/initiate-process', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ job_id: jobId })
-                });
-                
-                const initiateData = await initiateResponse.json();
-                
-                if (!initiateData.success) {
-                    throw new Error(initiateData.error || 'Failed to initiate processing');
-                }
-                
-                // Step 2: Perform background removal
-                const processResponse = await fetch('/background-removed', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ job_id: jobId })
-                });
-                
-                const processData = await processResponse.json();
-                
-                if (processData.success) {
-                    // Redirect to results page
-                    window.location.href = '/result?job_id=' + jobId;
-                } else {
-                    throw new Error(processData.error || 'Failed to process image');
-                }
-            } catch (error) {
-                loadingOverlay.classList.remove('active');
-                console.error('Processing error:', error);
-                alert('Error processing image: ' + error.message);
-                // Redirect back to upload
-                window.location.href = '/upload';
+        // File input handling
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                handleFile(e.target.files[0]);
             }
-        }
-
-        uploadBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            fileInput.click();
-        });
-
-        uploadArea.addEventListener('click', () => {
-            fileInput.click();
         });
 
         // Drag and drop
         uploadArea.addEventListener('dragover', (e) => {
             e.preventDefault();
-            uploadArea.classList.add('dragover');
+            uploadArea.style.borderColor = 'var(--primary)';
         });
 
-        uploadArea.addEventListener('dragleave', () => {
-            uploadArea.classList.remove('dragover');
+        uploadArea.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '';
         });
 
         uploadArea.addEventListener('drop', (e) => {
             e.preventDefault();
-            uploadArea.classList.remove('dragover');
+            uploadArea.style.borderColor = '';
             const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                fileInput.files = files;
-                handleFileUpload();
+            if (files.length) {
+                handleFile(files[0]);
             }
         });
 
-        fileInput.addEventListener('change', handleFileUpload);
+        // Click to upload
+        uploadArea.addEventListener('click', (e) => {
+            if (e.target.closest('.upload-btn') || e.target === fileInput) return;
+            if (!processingState.classList.contains('active')) {
+                fileInput.click();
+            }
+        });
 
-        function handleFileUpload() {
-            const file = fileInput.files[0];
-            if (file) {
-                // Validate file type
-                const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
-                if (!allowedTypes.includes(file.type)) {
-                    alert('Please upload a valid image file (PNG, JPG, JPEG, or WEBP)');
-                    return;
+        function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                showError('Please upload an image file');
+                return;
+            }
+
+            // Show upload state
+            uploadContent.style.display = 'none';
+            processingState.classList.add('active');
+            updateProgress(1);
+            updateProcessingText('Uploading image...', 'Please wait while we upload your file');
+
+            // Create form data
+            const formData = new FormData();
+            formData.append('image', file);
+
+            // Upload file
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    currentJobId = data.job_id;
+                    updateProgress(1, true);
+                    startProcessing();
+                } else {
+                    throw new Error(data.error || 'Upload failed');
                 }
+            })
+            .catch(error => {
+                showError(error.message);
+                resetToUpload();
+            });
+        }
 
-                // Validate file size (16MB)
-                if (file.size > 16 * 1024 * 1024) {
-                    alert('File size must be less than 16MB');
-                    return;
+        function startProcessing() {
+            uploadContent.style.display = 'none';
+            processingState.classList.add('active');
+            updateProgress(2);
+            updateProcessingText('Processing...', 'Initiating background removal');
+
+            // Step 1: Initiate process
+            fetch('/initiate-process', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ job_id: currentJobId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateProcessingText('Removing background...', 'Our AI is working on your image');
+                    return performBackgroundRemoval();
+                } else {
+                    throw new Error(data.error || 'Failed to initiate processing');
                 }
+            })
+            .catch(error => {
+                showError(error.message);
+                resetToUpload();
+            });
+        }
 
-                // Show loading and submit
-                loadingOverlay.classList.add('active');
-                
-                const formData = new FormData();
-                formData.append('image', file);
+        function performBackgroundRemoval() {
+            return fetch('/background-removed', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ job_id: currentJobId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateProgress(2, true);
+                    updateProgress(3, true);
+                    showResult(data.data);
+                } else {
+                    throw new Error(data.error || 'Background removal failed');
+                }
+            })
+            .catch(error => {
+                showError(error.message);
+                resetToUpload();
+            });
+        }
 
-                fetch('/upload', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success && data.job_id) {
-                        // Process immediately after upload
-                        processImage(data.job_id);
-                    } else {
-                        loadingOverlay.classList.remove('active');
-                        alert(data.error || 'Error uploading image');
-                    }
-                })
-                .catch(error => {
-                    loadingOverlay.classList.remove('active');
-                    console.error('Error:', error);
-                    alert('Error uploading image. Please try again.');
-                });
+        function showResult(data) {
+            processingState.classList.remove('active');
+            uploadArea.style.display = 'none';
+            resultContainer.classList.add('active');
+
+            // Set images
+            document.getElementById('originalImage').src = data.original_data;
+            document.getElementById('processedImage').src = data.processed_data;
+
+            // Set download link
+            const downloadBtn = document.getElementById('downloadBtn');
+            downloadBtn.href = data.processed_data;
+            downloadBtn.download = `bg_removed_${data.user_filename || 'image'}.png`;
+        }
+
+        function updateProgress(step, completed = false) {
+            const stepEl = document.getElementById(`step${step}`);
+            const connectorEl = document.getElementById(`connector${step - 1}`);
+
+            if (completed) {
+                stepEl.classList.remove('active');
+                stepEl.classList.add('completed');
+                stepEl.querySelector('.step-indicator').innerHTML = '✓';
+                if (connectorEl) connectorEl.classList.add('completed');
+            } else {
+                stepEl.classList.add('active');
             }
         }
 
-        // Sample images
-        document.querySelectorAll('.sample-image').forEach(img => {
-            img.addEventListener('click', async () => {
-                const imageUrl = img.dataset.sample;
-                loadingOverlay.classList.add('active');
-                
-                try {
-                    const response = await fetch(imageUrl);
-                    const blob = await response.blob();
-                    const file = new File([blob], 'sample.jpg', { type: 'image/jpeg' });
-                    
-                    const formData = new FormData();
-                    formData.append('image', file);
+        function updateProcessingText(title, desc) {
+            document.getElementById('processingTitle').textContent = title;
+            document.getElementById('processingDesc').textContent = desc;
+        }
 
-                    const uploadResponse = await fetch('/upload', {
-                        method: 'POST',
-                        body: formData
-                    });
-                    
-                    const data = await uploadResponse.json();
-                    
-                    if (data.success && data.job_id) {
-                        // Process immediately after upload
-                        processImage(data.job_id);
-                    } else {
-                        loadingOverlay.classList.remove('active');
-                        alert(data.error || 'Error processing image');
-                    }
-                } catch (error) {
-                    loadingOverlay.classList.remove('active');
-                    console.error('Error:', error);
-                    alert('Error processing sample image. Please try again.');
-                }
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.add('active');
+        }
+
+        function resetToUpload() {
+            processingState.classList.remove('active');
+            uploadContent.style.display = 'block';
+            errorMessage.classList.remove('active');
+            
+            // Reset progress steps
+            document.querySelectorAll('.progress-step').forEach(step => {
+                step.classList.remove('active', 'completed');
+                const indicator = step.querySelector('.step-indicator');
+                indicator.textContent = indicator.textContent.replace('✓', '');
             });
-        });
+            document.querySelectorAll('.step-connector').forEach(conn => {
+                conn.classList.remove('completed');
+            });
+            document.getElementById('step1').querySelector('.step-indicator').textContent = '1';
+            document.getElementById('step2').querySelector('.step-indicator').textContent = '2';
+            document.getElementById('step3').querySelector('.step-indicator').textContent = '3';
+        }
+
+        function resetUpload() {
+            currentJobId = null;
+            uploadArea.style.display = 'flex';
+            resultContainer.classList.remove('active');
+            previewContainer.classList.remove('active');
+            resetToUpload();
+            fileInput.value = '';
+            
+            // Clear URL params
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
     </script>
 </body>
 </html>
