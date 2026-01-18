@@ -1,2129 +1,746 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BGRemover Pro</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <!-- Add FontAwesome for more icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Add AOS for scroll animations -->
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <title>Upload Image - Background Remover</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎨</text></svg>">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
-        /* Base animations */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        
-        @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+
+        :root {
+            --primary: #5C4EFA;
+            --primary-hover: #4B3ED9;
+            --primary-light: #EEF2FF;
+            --secondary: #FF6B6B;
+            --dark: #1A1A2E;
+            --gray-900: #111827;
+            --gray-800: #1f2937;
+            --gray-700: #374151;
+            --gray-600: #4b5563;
+            --gray-500: #6b7280;
+            --gray-400: #9ca3af;
+            --gray-300: #d1d5db;
+            --gray-200: #e5e7eb;
+            --gray-100: #f3f4f6;
+            --gray-50: #f9fafb;
+            --white: #ffffff;
+            --success: #10b981;
+            --success-light: #D1FAE5;
         }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #F8F7FF 0%, #EEF2FF 50%, #F8F7FF 100%);
+            min-height: 100vh;
+            color: var(--gray-900);
         }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        
-        @keyframes shimmer {
-            0% { background-position: -1000px 0; }
-            100% { background-position: 1000px 0; }
-        }
-        
-        /* Loading spinner */
-        .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top: 4px solid #3b82f6;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-        
-        /* Animated elements */
-        .fade-in {
-            animation: fadeIn 0.5s ease-out forwards;
-        }
-        
-        .slide-up {
-            animation: slideUp 0.5s ease-out forwards;
-        }
-        
-        .pulse-effect {
-            animation: pulse 2s infinite;
-        }
-        
-        /* Drop zone styling */
-        .drop-zone {
-            border: 2px dashed #4b5563;
-            border-radius: 1rem;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .drop-zone::before {
-            content: '';
-            position: absolute;
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, rgba(59, 130, 246, 0), rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0));
-            transform: translateX(-100%);
-            transition: transform 0.6s ease-out;
+            right: 0;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--gray-200);
         }
-        
-        .drop-zone:hover::before, .drop-zone.active::before {
-            transform: translateX(100%);
-        }
-        
-        .drop-zone:hover, .drop-zone.active {
-            border-color: #3b82f6;
-            box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
-            transform: translateY(-2px);
-        }
-        
-        /* History item animations */
-        .recent-item {
-            cursor: pointer;
-            transition: all 0.3s ease;
-            opacity: 0;
-            transform: translateY(10px);
-            animation: slideUp 0.5s ease-out forwards;
-            animation-delay: calc(var(--index) * 0.1s);
-        }
-        
-        .recent-item:hover {
-            transform: scale(1.05) translateY(-5px);
-            box-shadow: 0 10px 25px -10px rgba(0, 0, 0, 0.2);
-        }
-        
-        /* Button effects */
-        .btn {
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            z-index: 30;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2), 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        
-        .btn::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 5px;
-            height: 5px;
-            background: rgba(255, 255, 255, 0.5);
-            opacity: 0;
-            border-radius: 100%;
-            transform: scale(1, 1) translate(-50%, -50%);
-            transform-origin: 50% 50%;
-        }
-        
-        .btn:hover::after {
-            animation: ripple 1s ease-out;
-        }
-        
-        @keyframes ripple {
-            0% {
-                transform: scale(0, 0);
-                opacity: 0.5;
-            }
-            100% {
-                transform: scale(100, 100);
-                opacity: 0;
-            }
-        }
-        
-        /* Skeleton loading state */
-        .skeleton {
-            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-            background-size: 1000px 100%;
-            animation: shimmer 2s infinite linear;
-            border-radius: 4px;
-        }
-        
-        /* Image comparison slider */
-        .img-compare-container {
-            position: relative;
-            overflow: hidden;
-            width: 100%;
-            max-width: 600px;
+
+        .nav-container {
+            max-width: 1280px;
             margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 72px;
         }
-        
-        .img-compare-before, .img-compare-after {
-            width: 100%;
-            display: block;
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--gray-900);
         }
-        
-        .img-compare-after {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 50%;
-            height: 100%;
-            border-right: 2px solid white;
-            overflow: hidden;
-            box-shadow: 5px 0 10px -2px rgba(0,0,0,0.4);
-        }
-        
-        .img-compare-slider {
-            position: absolute;
-            z-index: 9;
-            cursor: ew-resize;
+
+        .logo-icon {
             width: 40px;
             height: 40px;
-            background-color: white;
-            border-radius: 50%;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, var(--primary), #8B5CF6);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
         }
-        
-        .img-compare-slider::before, .img-compare-slider::after {
-            content: '';
-            position: absolute;
-            width: 10px;
-            height: 2px;
-            background-color: #3b82f6;
+
+        .logo-icon svg {
+            width: 24px;
+            height: 24px;
+            color: white;
         }
-        
-        .img-compare-slider::before {
-            transform: rotate(45deg);
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
         }
-        
-        .img-compare-slider::after {
-            transform: rotate(-45deg);
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
         }
-        
-        /* Glassmorphism UI elements */
-        .glass {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--gray-700);
         }
-        
-        /* Progress bar */
-        .progress-container {
+
+        .btn-ghost:hover {
+            background: var(--gray-100);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 120px 24px 60px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .upload-container {
             width: 100%;
-            height: 8px;
-            background-color: #f0f0f0;
-            border-radius: 4px;
-            margin: 20px 0;
+            max-width: 720px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--gray-900);
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
+        }
+
+        .page-subtitle {
+            font-size: 1.125rem;
+            color: var(--gray-600);
+        }
+
+        /* Upload Card */
+        .upload-card {
+            background: var(--white);
+            border-radius: 24px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06), 0 0 0 1px var(--gray-200);
             overflow: hidden;
         }
-        
-        .progress-bar {
-            height: 100%;
-            background-color: #3b82f6;
-            border-radius: 4px;
-            width: 0%;
-            transition: width 0.4s ease;
+
+        .upload-area {
+            padding: 64px 48px;
+            border: 2px dashed transparent;
+            border-radius: 24px;
+            margin: 16px;
+            background: var(--gray-50);
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
         }
-        
-        /* Confetti effect for successful operations */
-        .confetti {
-            position: fixed;
-            width: 10px;
-            height: 10px;
-            background-color: #f00;
-            opacity: 0;
-            animation: confetti-fall 5s ease-out forwards;
-            z-index: 1000;
+
+        .upload-area:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
         }
-        
-        @keyframes confetti-fall {
-            0% {
-                transform: translateY(-100vh) rotate(0deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(100vh) rotate(720deg);
-                opacity: 0;
-            }
+
+        .upload-area.dragover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            transform: scale(1.01);
         }
-        
-        /* Theme toggle */
-        .theme-switch {
-            display: inline-block;
-            height: 24px;
-            position: relative;
-            width: 50px;
+
+        .upload-icon-wrapper {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 28px;
+            background: linear-gradient(135deg, var(--primary), #8B5CF6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 12px 40px rgba(92, 78, 250, 0.3);
         }
-        
-        .theme-switch input {
+
+        .upload-icon-wrapper svg {
+            width: 44px;
+            height: 44px;
+            color: white;
+        }
+
+        .upload-text-main {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 8px;
+        }
+
+        .upload-text-sub {
+            font-size: 1rem;
+            color: var(--gray-500);
+            margin-bottom: 28px;
+        }
+
+        .upload-btn-main {
+            background: var(--primary);
+            color: white;
+            padding: 16px 40px;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 16px rgba(92, 78, 250, 0.3);
+        }
+
+        .upload-btn-main:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(92, 78, 250, 0.4);
+        }
+
+        .upload-formats {
+            margin-top: 20px;
+            font-size: 0.875rem;
+            color: var(--gray-400);
+        }
+
+        #file-input {
             display: none;
         }
-        
-        .slider {
-            background-color: #ccc;
-            bottom: 0;
+
+        /* Sample Images */
+        .sample-section {
+            padding: 32px;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .sample-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .sample-line {
+            height: 1px;
+            width: 60px;
+            background: var(--gray-300);
+        }
+
+        .sample-label {
+            font-size: 0.875rem;
+            color: var(--gray-500);
+            font-weight: 500;
+        }
+
+        .sample-images {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .sample-image {
+            width: 72px;
+            height: 72px;
+            border-radius: 16px;
+            overflow: hidden;
             cursor: pointer;
-            left: 0;
-            position: absolute;
-            right: 0;
-            top: 0;
-            transition: .4s;
-            border-radius: 34px;
+            transition: all 0.2s ease;
+            border: 3px solid transparent;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
-        
-        .slider:before {
-            background-color: white;
-            bottom: 4px;
-            content: "";
-            height: 16px;
-            left: 4px;
-            position: absolute;
-            transition: .4s;
-            width: 16px;
-            border-radius: 50%;
+
+        .sample-image:hover {
+            transform: scale(1.1) rotate(2deg);
+            border-color: var(--primary);
+            box-shadow: 0 8px 24px rgba(92, 78, 250, 0.3);
         }
-        
-        input:checked + .slider {
-            background-color: #3b82f6;
-        }
-        
-        input:checked + .slider:before {
-            transform: translateX(26px);
-        }
-        
-        /* Dark mode */
-        .dark-mode {
-            background-color: #1f2937;
-            color: #f3f4f6;
-        }
-        
-        .dark-mode .bg-white {
-            background-color: #374151 !important;
-            color: #f3f4f6;
-        }
-        
-        .dark-mode .text-gray-800 {
-            color: #f3f4f6 !important;
-        }
-        
-        .dark-mode .text-gray-600, .dark-mode .text-gray-500 {
-            color: #d1d5db !important;
-        }
-        
-        .dark-mode .border-gray-200 {
-            border-color: #4b5563 !important;
-        }
-        
-        .dark-mode .drop-zone {
-            border-color: #6b7280;
-        }
-        
-        .dark-mode .drop-zone:hover, .dark-mode .drop-zone.active {
-            border-color: #60a5fa;
-        }
-        
-        .dark-mode .skeleton {
-            background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
-        }
-        
-        /* Pixel animation overlay */
-        .pixel-animation-container {
-            position: absolute;
-            top: 0;
-            left: 0;
+
+        .sample-image img {
             width: 100%;
             height: 100%;
-            overflow: hidden;
-            border-radius: 0.5rem;
+            object-fit: cover;
         }
-        
-        .pixel {
+
+        /* Features */
+        .features-bar {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gray-600);
+            font-size: 0.9rem;
+        }
+
+        .feature-icon {
+            width: 20px;
+            height: 20px;
+            color: var(--success);
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.98);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-container {
+            text-align: center;
+        }
+
+        .loading-animation {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 32px;
+            position: relative;
+        }
+
+        .loading-circle {
+            width: 100%;
+            height: 100%;
+            border: 4px solid var(--gray-200);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-icon {
             position: absolute;
-            background-color: #3b82f6;
-            opacity: 0.7;
-            transform: scale(0);
-            animation: pixelAnimation 0.8s forwards;
-        }
-        
-        @keyframes pixelAnimation {
-            0% { transform: scale(0); }
-            50% { transform: scale(1); }
-            100% { transform: scale(0); }
-        }
-        
-        /* Custom breakpoint for very small screens */
-        @media (min-width: 480px) {
-            .xs\:inline {
-                display: inline;
-            }
-            
-            .xs\:ml-1 {
-                margin-left: 0.25rem;
-            }
-        }
-        
-        /* Ensure buttons stand out against ads */
-        .btn {
-            position: relative;
-            z-index: 30;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2), 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        
-        /* Make upload container stand out */
-        .drop-zone {
-            position: relative;
-            z-index: 15;
-            background-color: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(5px);
-        }
-        
-        /* Add space at the bottom to accommodate the second ad */
-        section.mb-12 {
-            padding-bottom: 150px;
-            margin-bottom: 3rem;
-        }
-        
-        /* Ensure ad containers don't interfere with interaction */
-        .ad-container {
-            pointer-events: none;
-            z-index: 5;
-        }
-        
-        .ad-container ins,
-        .ad-container script {
-            pointer-events: auto;
-        }
-        
-        .history-container::-webkit-scrollbar {
-            height: 4px;
-        }
-        .history-container::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        .history-container::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 4px;
-        }
-        .history-container::-webkit-scrollbar-thumb:hover {
-            background: #555;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 48px;
+            height: 48px;
+            color: var(--primary);
         }
 
-        /* Plus button hover effects */
-        .history-container .group:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        .loading-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 12px;
         }
 
-        /* Smooth transition for plus button */
-        .history-container .group {
-            transition: all 0.3s ease;
+        .loading-subtitle {
+            font-size: 1rem;
+            color: var(--gray-500);
         }
 
-        /* Download dropdown positioning */
-        #download-dropdown {
-            min-width: 200px;
+        .loading-progress {
+            width: 280px;
+            height: 6px;
+            background: var(--gray-200);
+            border-radius: 100px;
+            margin: 24px auto 0;
+            overflow: hidden;
         }
 
-        /* Ensure download section has proper z-index */
-        #download-section {
-            z-index: 40;
+        .loading-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), #8B5CF6);
+            border-radius: 100px;
+            animation: progress 3s ease-in-out infinite;
         }
 
-        #download-section .relative {
-            z-index: 41;
-        }
-
-        #download-dropdown {
-            z-index: 42;
-        }
-
-        /* History item container styling */
-        .history-item-container {
-            position: relative;
-        }
-
-        /* Delete button styling */
-        .delete-history-btn {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            border: 2px solid white;
-            transition: all 0.2s ease;
-            transform: scale(0.8);
-        }
-
-        .delete-history-btn:hover {
-            transform: scale(1);
-            background: linear-gradient(135deg, #dc2626, #b91c1c);
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
-        }
-
-        /* Show delete button on hover */
-        .history-item-container:hover .delete-history-btn {
-            opacity: 1 !important;
-        }
-
-        /* Prevent click through on delete button */
-        .delete-history-btn {
-            pointer-events: auto;
-        }
-
-        /* Add subtle animation for delete button appearance */
-        .delete-history-btn {
-            animation: deleteButtonAppear 0.2s ease-out;
-        }
-
-        @keyframes deleteButtonAppear {
-            from {
-                opacity: 0;
-                transform: scale(0.5);
-            }
+        @keyframes spin {
             to {
-                opacity: 1;
-                transform: scale(0.8);
+                transform: rotate(360deg);
             }
         }
 
-        /* Improve history item hover effects */
-        .history-item {
-            transition: all 0.3s ease;
+        @keyframes progress {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
         }
 
-        .history-item-container:hover .history-item img {
-            transform: scale(1.05);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        /* Responsive */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 1.75rem;
+            }
+
+            .upload-area {
+                padding: 40px 24px;
+            }
+
+            .upload-icon-wrapper {
+                width: 80px;
+                height: 80px;
+            }
+
+            .upload-icon-wrapper svg {
+                width: 36px;
+                height: 36px;
+            }
+
+            .upload-text-main {
+                font-size: 1.25rem;
+            }
+
+            .features-bar {
+                gap: 20px;
+            }
         }
     </style>
 </head>
-
-<body class="bg-gray-50 text-gray-800 min-h-screen transition-colors duration-300">
-    <!-- Header with animation -->
-    <header class="bg-white shadow-sm py-3 transition-all duration-300" data-aos="fade-down">
-        <div class="container mx-auto px-4 flex justify-between items-center">
-            <div class="flex items-center">
-                <div class="text-xl sm:text-2xl font-bold text-blue-600 mr-1 whitespace-nowrap">
-                    <i class="fas fa-cut mr-1 sm:mr-2"></i><span>BGRemover</span>
-                </div>
-                <span class="text-xs bg-blue-100 text-blue-800 px-1 sm:px-2 py-1 rounded">Beta</span>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-container">
+            <div class="loading-animation">
+                <div class="loading-circle"></div>
+                <svg class="loading-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
             </div>
-            <div class="flex items-center">
-                <!-- <a href="#" id="view-history" class="text-blue-600 hover:text-blue-800 transition-all mr-3">
-                    <i class="fas fa-history"></i><span class="hidden xs:inline ml-1">History</span>
-                </a> -->
-                <label class="theme-switch">
-                    <input type="checkbox" id="theme-toggle">
-                    <span class="slider"></span>
-                </label>
+            <h2 class="loading-title">Removing background...</h2>
+            <p class="loading-subtitle">Our AI is working its magic</p>
+            <div class="loading-progress">
+                <div class="loading-progress-bar"></div>
             </div>
         </div>
-    </header>
-
-    <!-- Add History Bar Container with Plus Button -->
-    <div class="history-container hidden flex overflow-x-auto py-4 gap-3 mb-4 container mx-auto px-4" style="scrollbar-width: thin;">
-        <!-- Add New Image Button (Plus Button) -->
-        <div class="flex-shrink-0 cursor-pointer add-new-image-btn">
-            <div class="w-16 h-16 bg-blue-100 border-2 border-dashed border-blue-400 rounded flex items-center justify-center hover:bg-blue-200 hover:border-blue-500 transition-colors group">
-                <i class="fas fa-plus text-blue-600 text-xl group-hover:text-blue-700"></i>
-            </div>
-        </div>
-        
-        <!-- History thumbnails will be added here by JavaScript -->
     </div>
 
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <div class="logo-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                </div>
+                BGRemover
+            </a>
+
+            <div class="nav-actions">
+                <a href="/" class="btn btn-ghost">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                    Home
+                </a>
+            </div>
+        </div>
+    </nav>
+
     <!-- Main Content -->
-    <main class="container mx-auto px-4 py-8">
-        <div class="max-w-4xl mx-auto">
-            <!-- Hero Section with animations -->
-            <section class="text-center mb-10" data-aos="fade-up">
-                <h1 class="text-4xl font-bold mb-4 relative">
-                    <span class="inline-block">Remove</span>
-                    <span class="inline-block ml-2 text-blue-600">Image Background</span>
-                </h1>
-                <p class="text-lg text-gray-600 mb-6">100% automatic and free - powered by AI</p>
-                <div class="flex justify-center space-x-4">
-                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm flex items-center">
-                        <i class="fas fa-bolt mr-1"></i> Fast Processing
-                    </span>
-                    <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm flex items-center">
-                        <i class="fas fa-lock mr-1"></i> Privacy First
-                    </span>
-                    <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm flex items-center">
-                        <i class="fas fa-magic mr-1"></i> AI Powered
-                    </span>
-                </div>
-            </section>
+    <main class="main-content">
+        <div class="upload-container">
+            <div class="page-header">
+                <h1 class="page-title">Remove Background</h1>
+                <p class="page-subtitle">Upload an image and watch the magic happen</p>
+            </div>
 
-            <!-- Update the Upload Section -->
-            <section class="mb-12 relative" data-aos="fade-up" data-aos-delay="200">
-                <!-- Button Container with Ad Background -->
-                <div class="relative mb-6">
-                    <!-- Advertisement Space - Behind Upload Button -->
-                    <div class="ad-container absolute inset-0 w-full h-full">
-                        <div class="bg-gray-100 border border-gray-200 rounded-lg p-4 h-full flex items-center justify-center">
-                            <div class="text-gray-500 text-center">
-                                <i class="fas fa-ad text-3xl mb-2"></i>
-                                <p class="text-sm">Advertisement</p>
-                                <p class="text-xs mt-1">Button Background Ad</p>
-                            </div>
+            <div class="upload-card">
+                <form id="upload-form" action="/upload" method="POST" enctype="multipart/form-data">
+                    <div class="upload-area" id="upload-area">
+                        <div class="upload-icon-wrapper">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                            </svg>
                         </div>
-                        <!-- Google AdSense Script -->
-                        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
-                                crossorigin="anonymous"></script>
-                        <ins class="adsbygoogle"
-                             style="display:block;position:absolute;top:0;left:0;width:100%;height:100%;"
-                             data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-                             data-ad-slot="1111111111"
-                             data-ad-format="auto"
-                             data-full-width-responsive="true"></ins>
-                        <script>
-                             (adsbygoogle = window.adsbygoogle || []).push({});
-                        </script>
-                    </div>
-                    
-                    <!-- Upload Button - On top of ad -->
-                    <div class="text-center relative z-20 py-8">
-                        <label for="image" class="btn bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-md cursor-pointer transition-all shadow-lg">
-                            <i class="fas fa-upload mr-2"></i> Upload Image
-                        </label>
-                        <input type="file" id="image" name="image" accept="image/*" class="hidden">
-                    </div>
-                </div>
-                
-                <!-- Upload Container - Drag & Drop Area (NO AD BACKGROUND) -->
-                <div id="upload-container" class="drop-zone rounded-lg p-10 text-center bg-white shadow-md transition-all duration-300 mb-6">
-                    <div id="drop-text" class="transition-all duration-300">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400 mb-4 pulse-effect" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        <p class="text-lg mb-2">Drag and drop an image here</p>
-                        <p class="text-gray-500">Or use the upload button above</p>
-                    </div>
-                    
-                    <div id="preview-container" class="hidden transition-all duration-300">
-                        <!-- Regular preview mode -->
-                        <div id="standard-preview" class="flex flex-col md:flex-row items-center justify-center gap-6">
-                            <div class="relative">
-                                <p class="text-sm text-gray-500 mb-2">Original</p>
-                                <img id="original-preview" class="max-h-64 max-w-full rounded border border-gray-200 shadow-sm transition-all duration-300" alt="Original image">
-                            </div>
-                            <div id="result-container" class="hidden relative">
-                                <p class="text-sm text-gray-500 mb-2">Result</p>
-                                <img id="result-preview" class="max-h-64 max-w-full rounded border border-gray-200 shadow-sm transition-all duration-300" alt="Result image">
-                            </div>
-                        </div>
-                        
-                        <!-- Comparison slider mode (hidden by default) -->
-                        <div id="comparison-preview" class="hidden mt-4">
-                            <p class="text-sm text-gray-500 mb-2 text-center">Drag slider to compare</p>
-                            <div class="img-compare-container rounded overflow-hidden border border-gray-200 shadow-sm">
-                                <img id="compare-original" class="img-compare-before" alt="Original image">
-                                <div class="img-compare-after">
-                                    <img id="compare-result" alt="Result image">
-                                </div>
-                                <div class="img-compare-slider">
-                                    <i class="fas fa-arrows-alt-h text-blue-600"></i>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Processing indicators -->
-                        <div id="processing-indicator" class="hidden mt-8 text-center">
-                            <p class="text-sm text-gray-600 mb-2">Processing your image...</p>
-                            <div class="progress-container">
-                                <div id="progress-bar" class="progress-bar"></div>
-                            </div>
-                        </div>
-                        
-                        <!-- Controls -->
-                        <div id="controls" class="mt-8 flex flex-wrap justify-center gap-4">
-                            <!-- <button id="remove-bg-btn" class="btn bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-md transition-all">
-                                <i class="fas fa-magic mr-2"></i> Remove Background
-                            </button> -->
-                            
-                            <!-- <button id="compare-btn" class="btn hidden bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-6 rounded-md transition-all">
-                                <i class="fas fa-exchange-alt mr-2"></i> Compare
-                            </button> -->
-                            <!-- <button id="upload-new-btn" class="btn bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-6 rounded-md transition-all">
-                                <i class="fas fa-redo-alt mr-2"></i> New Image
-                            </button> -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Paste Button Container with Ad Background -->
-                <div class="relative mb-6">
-                    <!-- Advertisement Space - Behind Paste Button -->
-                    <div class="ad-container absolute inset-0 w-full h-full">
-                        <div class="bg-gray-100 border border-gray-200 rounded-lg p-4 h-full flex items-center justify-center">
-                            <div class="text-gray-500 text-center">
-                                <i class="fas fa-ad text-3xl mb-2"></i>
-                                <p class="text-sm">Advertisement</p>
-                                <p class="text-xs mt-1">Button Background Ad</p>
-                            </div>
-                        </div>
-                        <!-- Google AdSense Script -->
-                        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
-                                crossorigin="anonymous"></script>
-                        <ins class="adsbygoogle"
-                             style="display:block;position:absolute;top:0;left:0;width:100%;height:100%;"
-                             data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-                             data-ad-slot="2222222222"
-                             data-ad-format="auto"
-                             data-full-width-responsive="true"></ins>
-                        <script>
-                             (adsbygoogle = window.adsbygoogle || []).push({});
-                        </script>
-                    </div>
-                    
-                    <!-- Paste Buttons - On top of ad -->
-                    <div class="text-center relative z-20 py-8">
-                        <div class="flex justify-center gap-4">
-                            <button id="paste-image-btn" class="btn bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-6 rounded-md transition-all shadow-lg">
-                                <i class="fas fa-paste mr-2"></i> Paste Image
-                            </button>
-                           <!-- <button id="url-image-btn" class="btn bg-orange-600 hover:bg-orange-700 text-white font-medium py-2 px-6 rounded-md transition-all shadow-lg relative z-30">
-    <i class="fas fa-link mr-2"></i> Insert Image URL
-</button> -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Download Button Container with Ad Background (UPDATED) -->
-                <div class="relative mb-6 hidden" id="download-section">
-                    <!-- Advertisement Space - Behind Download Button -->
-                    <div class="ad-container absolute inset-0 w-full h-full">
-                        <div class="bg-gray-100 border border-gray-200 rounded-lg p-4 h-full flex items-center justify-center">
-                            <div class="text-gray-500 text-center">
-                                <i class="fas fa-ad text-3xl mb-2"></i>
-                                <p class="text-sm">Advertisement</p>
-                                <p class="text-xs mt-1">Download Background Ad</p>
-                            </div>
-                        </div>
-                        <!-- Google AdSense Script -->
-                        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
-                                crossorigin="anonymous"></script>
-                        <ins class="adsbygoogle"
-                             style="display:block;position:absolute;top:0;left:0;width:100%;height:100%;"
-                             data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-                             data-ad-slot="3333333333"
-                             data-ad-format="auto"
-                             data-full-width-responsive="true"></ins>
-                        <script>
-                             (adsbygoogle = window.adsbygoogle || []).push({});
-                        </script>
-                    </div>
-                    
-                    <!-- Download Button with Dropdown - On top of ad -->
-                    <div class="text-center relative z-20 py-8">
-                        <div class="relative inline-block">
-                            <button id="download-btn" class="btn bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-md transition-all shadow-lg flex items-center">
-                                <i class="fas fa-download mr-2"></i> Download Result
-                                <i class="fas fa-chevron-down ml-2"></i>
-                            </button>
-                            
-                            <!-- Dropdown Menu - ADD THIS -->
-                            <div id="download-dropdown" class="hidden absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-white border border-gray-200 rounded-md shadow-lg z-50 min-w-full whitespace-nowrap">
-                                <button id="download-preview-btn" class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center">
-                                    <i class="fas fa-eye mr-2 text-blue-500"></i> Preview Quality
-                                </button>
-                                <button id="download-original-btn" class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center">
-                                    <i class="fas fa-star mr-2 text-yellow-500"></i> Original Quality
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Remove Background Button Container with Ad Background -->
-                <div class="relative mb-6 hidden" id="remove-bg-container">
-                    <!-- Advertisement Space - Behind Remove Background Button -->
-                    <div class="ad-container absolute inset-0 w-full h-full">
-                        <div class="bg-gray-100 border border-gray-200 rounded-lg p-4 h-full flex items-center justify-center">
-                            <div class="text-gray-500 text-center">
-                                <i class="fas fa-ad text-3xl mb-2"></i>
-                                <p class="text-sm">Advertisement</p>
-                                <p class="text-xs mt-1">Button Background Ad</p>
-                            </div>
-                        </div>
-                        <!-- Google AdSense Script -->
-                        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
-                                crossorigin="anonymous"></script>
-                        <ins class="adsbygoogle"
-                             style="display:block;position:absolute;top:0;left:0;width:100%;height:100%;"
-                             data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-                             data-ad-slot="4444444444"
-                             data-ad-format="auto"
-                             data-full-width-responsive="true"></ins>
-                        <script>
-                             (adsbygoogle = window.adsbygoogle || []).push({});
-                        </script>
-                    </div>
-                    
-                    <!-- Remove Background Button - On top of ad -->
-                    <div class="text-center relative z-20 py-8">
-                        <button id="remove-bg-btn" class="btn bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-md transition-all shadow-lg">
-                            <i class="fas fa-magic mr-2"></i> Remove Background
+                        <h3 class="upload-text-main">Start from a photo</h3>
+                        <p class="upload-text-sub">or drop an image here</p>
+                        <button type="button" class="upload-btn-main" id="upload-btn">
+                            Choose Image
                         </button>
+                        <p class="upload-formats">PNG, JPG, JPEG, WEBP • Max 16MB</p>
+                        <input type="file" id="file-input" name="image" accept="image/png,image/jpeg,image/jpg,image/webp">
                     </div>
-                </div>
-            </section>
+                </form>
 
-            <!-- URL Input Modal (hidden by default) -->
-            <div id="url-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-                    <h3 class="text-lg font-semibold mb-4">Insert Image URL</h3>
-                    <input type="url" id="image-url-input" placeholder="https://example.com/image.jpg" class="w-full p-3 border border-gray-300 rounded-md mb-4">
-                    <div class="flex justify-end gap-3">
-                        <button id="cancel-url-btn" class="px-4 py-2 text-gray-600 hover:text-gray-800">Cancel</button>
-                        <button id="load-url-btn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md">Load Image</button>
+                <div class="sample-section">
+                    <div class="sample-header">
+                        <div class="sample-line"></div>
+                        <span class="sample-label">No image? Try one of these</span>
+                        <div class="sample-line"></div>
+                    </div>
+                    <div class="sample-images">
+                        <div class="sample-image" data-sample="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop" alt="Sample portrait">
+                        </div>
+                        <div class="sample-image" data-sample="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&h=200&fit=crop">
+                            <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&h=200&fit=crop" alt="Sample product">
+                        </div>
+                        <div class="sample-image" data-sample="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&h=200&fit=crop">
+                            <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&h=200&fit=crop" alt="Sample headphones">
+                        </div>
+                        <div class="sample-image" data-sample="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200&h=200&fit=crop">
+                            <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200&h=200&fit=crop" alt="Sample shoe">
+                        </div>
+                        <div class="sample-image" data-sample="https://images.unsplash.com/photo-1560343090-f0409e92791a?w=200&h=200&fit=crop">
+                            <img src="https://images.unsplash.com/photo-1560343090-f0409e92791a?w=200&h=200&fit=crop" alt="Sample cosmetic">
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Recent Images Section with animations -->
-            <section id="history-section" class="hidden transition-all duration-300" data-aos="fade-up">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-2xl font-bold">Recent Images</h2>
-                    <button id="clear-history-btn" class="text-red-500 hover:text-red-700 text-sm transition-all">
-                        <i class="fas fa-trash-alt mr-1"></i> Clear All
-                    </button>
+            <div class="features-bar">
+                <div class="feature-item">
+                    <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    100% Free
                 </div>
-                <div id="recent-images" class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <!-- Recent images will be added here dynamically -->
+                <div class="feature-item">
+                    <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    AI-Powered
                 </div>
-                <div class="text-center mt-8 py-12" id="no-history-message">
-                    <i class="fas fa-history text-gray-300 text-5xl mb-4"></i>
-                    <p class="text-gray-500">No recent images found</p>
+                <div class="feature-item">
+                    <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    No Signup Required
                 </div>
-            </section>
+                <div class="feature-item">
+                    <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    HD Quality
+                </div>
+            </div>
         </div>
     </main>
 
-    <!-- Minimal Footer -->
-    <footer class="py-6 bg-white border-t border-gray-200 transition-all duration-300" data-aos="fade-up">
-        <div class="container mx-auto px-4 text-center text-gray-500">
-            <p>&copy; 2024 BGRemover Pro. All rights reserved.</p>
-            <div class="flex justify-center mt-3 space-x-3">
-                <a href="https://www.x.com/dixitk941" class="text-gray-400 hover:text-gray-600 transition-colors">
-                    <i class="fab fa-twitter"></i>
-                </a>
-                <!-- <a href="#" class="text-gray-400 hover:text-gray-600 transition-colors">
-                    <i class="fab fa-facebook"></i>
-                </a> -->
-                <a href="https://www.instagram.com/karan_dixit19" class="text-gray-400 hover:text-gray-600 transition-colors">
-                    <i class="fab fa-instagram"></i>
-                </a>
-                <a href="https://www.github.com/dixitk941" class="text-gray-400 hover:text-gray-600 transition-colors">
-                    <i class="fab fa-github"></i>
-                </a>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Scripts -->
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-// Update the addNewImage function:
-function addNewImage() {
-    // Reset UI elements
-    const dropText = document.getElementById('drop-text');
-    const previewContainer = document.getElementById('preview-container');
-    const resultContainer = document.getElementById('result-container');
-    const downloadSection = document.getElementById('download-section');
-    const compareBtn = document.getElementById('compare-btn');
-    const processingIndicator = document.getElementById('processing-indicator');
-    const progressBar = document.getElementById('progress-bar');
-    const fileInput = document.getElementById('image');
-    const heroSection = document.querySelector('section.text-center.mb-10');
-    const historyContainer = document.querySelector('.history-container');
-    const removeBgBtn = document.getElementById('remove-bg-btn');
-    
-    // Reset global variables properly - don't use 'let' here to avoid creating local variables
-    currentJobId = null;
-    currentFileName = '';
-    currentOriginalUrl = '';
-    currentResultUrl = '';
-    currentOriginalQualityUrl = '';
-    
-    // Reset UI elements
-    if (dropText) dropText.classList.remove('hidden');
-    if (previewContainer) previewContainer.classList.add('hidden');
-    if (resultContainer) resultContainer.classList.add('hidden');
-    if (downloadSection) downloadSection.classList.add('hidden');
-    if (compareBtn) compareBtn.classList.add('hidden');
-    
-    // Show button sections again - UPDATED VERSION
-    const buttonSections = document.querySelectorAll('.relative.mb-6:not(#download-section)');
-    buttonSections.forEach(section => {
-        // Reset display to block and ensure visibility
-        section.style.display = 'block';
-        section.style.visibility = 'visible';
-        section.style.opacity = '1';
-    });
-    
-    // Show hero section and hide history bar
-    if (heroSection) heroSection.classList.remove('hidden');
-    if (historyContainer) historyContainer.classList.add('hidden');
-    
-    // Show the Remove Background button
-    if (removeBgBtn) {
-        removeBgBtn.classList.remove('hidden');
-        removeBgBtn.disabled = false;
-    }
-    
-    // Reset file input
-    if (fileInput) fileInput.value = '';
-    
-    // Remove any pixel animations
-    const pixelContainer = document.querySelector('.pixel-animation-container');
-    if (pixelContainer) {
-        pixelContainer.remove();
-    }
-    
-    // Show notification
-    showNotification('Ready to upload a new image!', 'info');
-    
-    // Scroll to upload section smoothly
-    const uploadSection = document.getElementById('upload-container');
-    if (uploadSection) {
-        uploadSection.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'center' 
-        });
-        
-        // Add a subtle pulse effect to draw attention
-        uploadSection.classList.add('pulse-effect');
-        setTimeout(() => {
-            uploadSection.classList.remove('pulse-effect');
-        }, 2000);
-    }
-    
-    // Update URL
-    window.history.pushState({}, '', '/upload');
-}
+        // Upload functionality
+        const uploadArea = document.getElementById('upload-area');
+        const uploadBtn = document.getElementById('upload-btn');
+        const fileInput = document.getElementById('file-input');
+        const loadingOverlay = document.getElementById('loading-overlay');
 
-// Global showNotification function
-function showNotification(message, type = 'info') {
-    const notification = document.createElement('div');
-    notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg text-white max-w-sm shadow-lg transform transition-all duration-300 ${
-        type === 'success' ? 'bg-green-500' : 
-        type === 'error' ? 'bg-red-500' : 'bg-blue-500'
-    }`;
-    notification.innerHTML = `
-        <div class="flex items-center gap-2">
-            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
-            <span>${message}</span>
-        </div>
-    `;
-    
-    document.body.appendChild(notification);
-    
-    // Animate in
-    setTimeout(() => {
-        notification.style.transform = 'translateX(0)';
-    }, 100);
-    
-    // Remove after delay
-    setTimeout(() => {
-        notification.style.transform = 'translateX(100%)';
-        notification.style.opacity = '0';
-        setTimeout(() => {
-            if (document.body.contains(notification)) {
-                document.body.removeChild(notification);
-            }
-        }, 300);
-    }, 4000);
-}
+        // Check if we have a job_id from the URL (means we need to process)
+        const urlParams = new URLSearchParams(window.location.search);
+        const jobId = urlParams.get('job_id');
+        const currentStep = '{{ step | default("upload") }}';
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize AOS animations
-    AOS.init({
-        duration: 800,
-        once: true
-    });
-    
-    // DOM Elements
-    const fileInput = document.getElementById('image');
-    const uploadContainer = document.getElementById('upload-container');
-    const dropText = document.getElementById('drop-text');
-    const previewContainer = document.getElementById('preview-container');
-    const originalPreview = document.getElementById('original-preview');
-    const resultContainer = document.getElementById('result-container');
-    const resultPreview = document.getElementById('result-preview');
-    const processingIndicator = document.getElementById('processing-indicator');
-    const progressBar = document.getElementById('progress-bar');
-    const spinner = document.getElementById('spinner');
-    const removeBgBtn = document.getElementById('remove-bg-btn');
-    const downloadContainer = document.getElementById('download-container');
-    const downloadBtn = document.getElementById('download-btn');
-    const downloadDropdown = document.getElementById('download-dropdown');
-    const downloadPreviewBtn = document.getElementById('download-preview-btn');
-    const downloadOriginalBtn = document.getElementById('download-original-btn');
-    const downloadSection = document.getElementById('download-section'); // ADD THIS LINE
-    const compareBtn = document.getElementById('compare-btn');
-    const uploadNewBtn = document.getElementById('upload-new-btn');
-    const viewHistoryBtn = document.getElementById('view-history');
-    const clearHistoryBtn = document.getElementById('clear-history-btn');
-    const historySection = document.getElementById('history-section');
-    const recentImagesContainer = document.getElementById('recent-images');
-    const noHistoryMessage = document.getElementById('no-history-message');
-    const standardPreview = document.getElementById('standard-preview');
-    const comparisonPreview = document.getElementById('comparison-preview');
-    const compareOriginal = document.getElementById('compare-original');
-    const compareResult = document.getElementById('compare-result');
-    const themeToggle = document.getElementById('theme-toggle');
-    
-    // URL Modal Elements
-    const urlImageBtn = document.getElementById('url-image-btn');
-    const urlModal = document.getElementById('url-modal');
-    const imageUrlInput = document.getElementById('image-url-input');
-    const loadUrlBtn = document.getElementById('load-url-btn');
-    const cancelUrlBtn = document.getElementById('cancel-url-btn');
-    
-    // Paste Button Element
-    const pasteImageBtn = document.getElementById('paste-image-btn');
-    
-    // Comparison slider elements
-    const slider = document.querySelector('.img-compare-slider');
-    const afterContainer = document.querySelector('.img-compare-after');
-    
-    let currentFileName = '';
-    let currentOriginalUrl = '';
-    let currentResultUrl = '';
-    let currentOriginalQualityUrl = '';
-    let isSliderActive = false;
-    let currentJobId = null;
-    let processingInterval = null;
-    
-    // Define these variables properly
-    const heroSection = document.querySelector('section.text-center.mb-10');
-    const historyContainer = document.querySelector('.history-container');
-    
-    // Initialize from session storage
-    const historyData = loadHistory();
-    initializeTheme();
+        // If we have a job_id, auto-process the image
+        if (jobId) {
+            processImage(jobId);
+        }
 
-    // Always show history bar (for the plus button)
-    if (historyData.length > 0) {
-        if (heroSection) heroSection.classList.add('hidden');
-        if (historyContainer) historyContainer.classList.remove('hidden');
-    } else {
-        // Show plus button even with no history
-        if (historyContainer) {
-            historyContainer.classList.remove('hidden');
-        }
-    }
-    
-    // Function to update URL without reload
-    function updateUrl(path, params = {}) {
-        const url = new URL(path, window.location.origin);
-        Object.keys(params).forEach(key => {
-            url.searchParams.set(key, params[key]);
-        });
-        window.history.pushState({}, '', url);
-    }
-    
-    // Initialize theme based on localStorage
-    function initializeTheme() {
-        if (localStorage.getItem('darkMode') === 'true') {
-            document.body.classList.add('dark-mode');
-            themeToggle.checked = true;
-        }
-    }
-    
-    // STEP 1: File Upload Handler (Complete Implementation)
-    // Update the handleFileSelection function:
-function handleFileSelection(file) {
-    if (!file || !file.type.match('image.*')) {
-        showNotification('Please select a valid image file', 'error');
-        return;
-    }
-    
-    // Check file size (16MB limit)
-    if (file.size > 16 * 1024 * 1024) {
-        showNotification('File too large. Maximum size is 16MB', 'error');
-        return;
-    }
-    
-    console.log('File selected:', file.name, file.size, file.type);
-    
-    const formData = new FormData();
-    formData.append('image', file);
-    
-    // Show initial preview
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        originalPreview.src = e.target.result;
-        dropText.classList.add('hidden');
-        previewContainer.classList.remove('hidden');
-        originalPreview.parentNode.classList.remove('hidden');
-        resultContainer.classList.add('hidden');
-        
-        // Hide hero section and show history bar
-        if (heroSection) heroSection.classList.add('hidden');
-        if (historyContainer) historyContainer.classList.remove('hidden');
-        
-        // RESTORE THIS LINE - Hide upload and paste buttons:
-        hideButtonSections();
-        
-        // Show the Remove Background button container
-        const removeBgContainer = document.getElementById('remove-bg-container');
-        if (removeBgContainer) {
-            removeBgContainer.classList.remove('hidden');
-            removeBgContainer.style.display = 'block';
-        }
-        
-        console.log('Preview loaded in UI');
-    };
-    reader.readAsDataURL(file);
-    
-    // STEP 1: Upload to server
-    console.log('STEP 1: Uploading file to server');
-    showNotification('Uploading image...', 'info');
-    
-    fetch('/upload', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => {
-        console.log('Upload response status:', response.status);
-        if (!response.ok) {
-            return response.text().then(text => {
-                console.error('Error response text:', text);
-                throw new Error(`HTTP error! status: ${response.status}, message: ${text}`);
-            });
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log('Upload success response:', data);
-        if (data.success) {
-            handleUploadSuccess(data);
-        } else {
-            throw new Error(data.error || 'Upload failed');
-        }
-    })
-    .catch(error => {
-        console.error('STEP 1 ERROR:', error);
-        showNotification('Upload failed: ' + error.message, 'error');
-        resetUI();
-    });
-}
-    
-    // Handle upload success
-    function handleUploadSuccess(data) {
-        if (data.success) {
-            currentJobId = data.job_id;
-            currentFileName = data.filename;
-            currentOriginalUrl = data.original_url;
+        async function processImage(jobId) {
+            loadingOverlay.classList.add('active');
             
-            console.log('STEP 1 SUCCESS: Upload successful:', data);
-            showNotification('Image uploaded successfully! Ready for processing.', 'success');
-            
-            // Update URL without refresh
-            updateUrl('/initiate-process', { job_id: currentJobId });
-        }
-    }
-    
-    // Update the handleProcessingComplete function:
-function handleProcessingComplete(data) {
-    try {
-        // Complete progress bar
-        if (progressBar) progressBar.style.width = '100%';
-        
-        // Set result data
-        if (data && data.data) {
-            if (data.data.processed_data) {
-                currentResultUrl = data.data.processed_data;
-                currentOriginalUrl = data.data.original_data || currentOriginalUrl;
-                currentOriginalQualityUrl = data.data.processed_data;
-            } else {
-                currentResultUrl = data.data.processed_url;
-                currentOriginalUrl = data.data.original_url || currentOriginalUrl;
-                currentOriginalQualityUrl = data.data.processed_url;
-            }
-            
-            // Update UI with safer null checks
-            if (originalPreview && originalPreview.parentNode) 
-                originalPreview.parentNode.classList.add('hidden');
-            if (resultPreview) resultPreview.src = currentResultUrl;
-            if (resultContainer) resultContainer.classList.remove('hidden');
-            
-            // Setup comparison view with null checks
-            if (compareOriginal) compareOriginal.src = currentOriginalUrl;
-            if (compareResult) compareResult.src = currentResultUrl;
-            
-            // Show download section and hide other button sections
-            if (downloadSection) downloadSection.classList.remove('hidden');
-            
-            // Safely hide button sections
             try {
-                hideButtonSections();
-            } catch (err) {
-                console.log('Error hiding button sections:', err);
-            }
-            
-            // Safely hide the Remove Background container
-            const removeBgContainer = document.getElementById('remove-bg-container');
-            if (removeBgContainer) removeBgContainer.classList.add('hidden');
-            
-            // Hide the Remove Background button safely
-            if (removeBgBtn) {
-                removeBgBtn.classList.add('hidden');
-                removeBgBtn.disabled = false;
-            }
-            
-            if (compareBtn) compareBtn.classList.remove('hidden');
-            if (processingIndicator) processingIndicator.classList.add('hidden');
-            
-            // Save to history
-            saveToHistory(currentFileName, currentOriginalUrl, currentResultUrl, data.data.filename);
-            
-            // Safely create confetti effect
-            try {
-                createConfetti();
-            } catch (err) {
-                console.log('Error creating confetti:', err);
-            }
-            
-            // Remove pixel animation
-            const pixelContainer = document.querySelector('.pixel-animation-container');
-            if (pixelContainer) {
-                pixelContainer.remove();
-            }
-            
-            showNotification('Background removed successfully!', 'success');
-            
-            // Update URL to show completion
-            updateUrl('/background-removed', { 
-                job_id: currentJobId, 
-                completed: 'true' 
-            });
-        }
-    } catch (error) {
-        console.error('Error in handleProcessingComplete:', error);
-        showNotification('Error displaying results, but processing completed', 'info');
-        
-        // Try to show download section anyway
-        if (downloadSection) downloadSection.classList.remove('hidden');
-    }
-}
-
-    // Reset processing UI
-    function resetProcessingUI() {
-        if (removeBgBtn) removeBgBtn.disabled = false;
-        if (processingIndicator) processingIndicator.classList.add('hidden');
-        if (progressBar) progressBar.style.width = '0%';
-        
-        const pixelContainer = document.querySelector('.pixel-animation-container');
-        if (pixelContainer) {
-            pixelContainer.remove();
-        }
-    }
-
-    // Reset UI function
-    function resetUI() {
-        currentJobId = null;
-        currentFileName = '';
-        currentOriginalUrl = '';
-        currentResultUrl = '';
-        currentOriginalQualityUrl = '';
-        
-        // Reset UI elements
-        dropText.classList.remove('hidden');
-        previewContainer.classList.add('hidden');
-        resultContainer.classList.add('hidden');
-        downloadSection.classList.add('hidden');
-        compareBtn.classList.add('hidden');
-        processingIndicator.classList.add('hidden');
-        progressBar.style.width = '0%';
-        
-        // Show button sections again
-        showButtonSections();
-        
-        // Show hero section and hide history bar
-        if (heroSection) heroSection.classList.remove('hidden');
-        if (historyContainer) historyContainer.classList.add('hidden');
-        
-        // Reset file input
-        fileInput.value = '';
-        
-        // Remove any pixel animations
-        const pixelContainer = document.querySelector('.pixel-animation-container');
-        if (pixelContainer) {
-            pixelContainer.remove();
-        }
-        
-        // Reset comparison view
-        standardPreview.classList.remove('hidden');
-        comparisonPreview.classList.add('hidden');
-        compareBtn.innerHTML = '<i class="fas fa-exchange-alt mr-2"></i> Compare';
-        
-        // Re-enable buttons
-        removeBgBtn.classList.remove('hidden');
-        removeBgBtn.disabled = false;
-        
-        // Hide the Remove Background button container
-        const removeBgContainer = document.getElementById('remove-bg-container');
-        if (removeBgContainer) {
-            removeBgContainer.classList.add('hidden');
-        }
-        
-        // Update URL
-        window.history.pushState({}, '', '/upload');
-    }
-
-    // Save to history function
-    function saveToHistory(filename, originalUrl, resultUrl, processedFilename) {
-        try {
-            const historyData = JSON.parse(sessionStorage.getItem('bgRemoverHistory') || '[]');
-            
-            const historyItem = {
-                id: Date.now(),
-                filename: filename,
-                processedFilename: processedFilename,
-                originalUrl: originalUrl,
-                resultUrl: resultUrl,
-                timestamp: new Date().toISOString(),
-                date: new Date().toLocaleDateString()
-            };
-            
-            // Add to beginning of array
-            historyData.unshift(historyItem);
-            
-            // Keep only last 10 items
-            if (historyData.length > 10) {
-                historyData.splice(10);
-            }
-            
-            sessionStorage.setItem('bgRemoverHistory', JSON.stringify(historyData));
-            updateHistoryBar(historyData);
-        } catch (error) {
-            console.error('Error saving to history:', error);
-        }
-    }
-
-    // Load history function
-    function loadHistory() {
-        try {
-            const historyData = JSON.parse(sessionStorage.getItem('bgRemoverHistory') || '[]');
-            
-            if (historyData.length === 0) {
-                if (recentImagesContainer) recentImagesContainer.innerHTML = '';
-                if (noHistoryMessage) noHistoryMessage.classList.remove('hidden');
-            } else {
-                if (noHistoryMessage) noHistoryMessage.classList.add('hidden');
+                // Step 1: Initiate processing
+                const initiateResponse = await fetch('/initiate-process', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ job_id: jobId })
+                });
                 
-                if (recentImagesContainer) {
-                    recentImagesContainer.innerHTML = historyData.map((item, index) => `
-                        <div class="recent-item bg-white rounded-lg shadow-md overflow-hidden cursor-pointer" 
-                             style="--index: ${index}" 
-                             onclick="loadFromHistory('${item.id}')">
-                            <img src="${item.resultUrl}" alt="${item.filename}" class="w-full h-32 object-cover">
-                            <div class="p-3">
-                                <p class="text-sm font-medium truncate">${item.filename}</p>
-                                <p class="text-xs text-gray-500">${item.date}</p>
-                            </div>
-                        </div>
-                    `).join('');
+                const initiateData = await initiateResponse.json();
+                
+                if (!initiateData.success) {
+                    throw new Error(initiateData.error || 'Failed to initiate processing');
                 }
-            }
-            
-            updateHistoryBar(historyData);
-            return historyData;
-        } catch (error) {
-            console.error('Error loading history:', error);
-            sessionStorage.removeItem('bgRemoverHistory');
-            return [];
-        }
-    }
-
-    // Update history bar function
-    function updateHistoryBar(historyData) {
-        if (!document.querySelector('.history-container')) return;
-        
-        const historyContainer = document.querySelector('.history-container');
-        
-        if (historyData.length === 0) {
-            // Show only the plus button when no history
-            historyContainer.innerHTML = `
-                <div class="flex-shrink-0 cursor-pointer add-new-image-btn">
-                    <div class="w-16 h-16 bg-blue-100 border-2 border-dashed border-blue-400 rounded flex items-center justify-center hover:bg-blue-200 hover:border-blue-500 transition-colors group">
-                        <i class="fas fa-plus text-blue-600 text-xl group-hover:text-blue-700"></i>
-                    </div>
-                </div>
-            `;
-            historyContainer.classList.remove('hidden');
-            return;
-        }
-        
-        // Show plus button + history items with delete buttons
-        const plusButton = `
-            <div class="flex-shrink-0 cursor-pointer add-new-image-btn">
-                <div class="w-16 h-16 bg-blue-100 border-2 border-dashed border-blue-400 rounded flex items-center justify-center hover:bg-blue-200 hover:border-blue-500 transition-colors group">
-                    <i class="fas fa-plus text-blue-600 text-xl group-hover:text-blue-700"></i>
-                </div>
-            </div>
-        `;
-        
-        const historyItems = historyData.slice(0, 5).map(item => `
-            <div class="flex-shrink-0 cursor-pointer history-item-container relative group" data-item-id="${item.id}">
-                <div class="history-item relative" data-item-id="${item.id}">
-                    <img src="${item.resultUrl}" alt="${item.filename}" 
-                         class="w-16 h-16 object-cover rounded border-2 border-gray-200 hover:border-blue-400 transition-colors">
-                    
-                    <!-- Delete button overlay -->
-                    <button class="delete-history-btn absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity z-50 flex items-center justify-center shadow-lg" 
-                            data-item-id="${item.id}" 
-                            title="Delete from history">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            </div>
-        `).join('');
-        
-        historyContainer.innerHTML = plusButton + historyItems;
-    }
-
-    // Load from history function
-    function loadFromHistory(itemId) {
-        try {
-            const history = JSON.parse(sessionStorage.getItem('bgRemoverHistory') || '[]');
-            const item = history.find(h => h.id.toString() === itemId.toString());
-            
-            if (item) {
-                currentFileName = item.filename;
-                currentOriginalUrl = item.originalUrl;
-                currentResultUrl = item.resultUrl;
-                currentOriginalQualityUrl = item.resultUrl;
                 
-                // Update UI with null checks
-                if (originalPreview) originalPreview.src = item.originalUrl;
-                if (resultPreview) resultPreview.src = item.resultUrl;
-                
-                if (dropText) dropText.classList.add('hidden');
-                if (previewContainer) previewContainer.classList.remove('hidden');
-                if (originalPreview && originalPreview.parentNode) 
-                    originalPreview.parentNode.classList.add('hidden');
-                if (resultContainer) resultContainer.classList.remove('hidden');
-                
-                // Show download section and hide other button sections
-                if (downloadSection) downloadSection.classList.remove('hidden');
-                hideButtonSections(); // This function should also have null checks
-                if (compareBtn) compareBtn.classList.remove('hidden');
-                
-                // Setup comparison view
-                if (compareOriginal) compareOriginal.src = item.originalUrl;
-                if (compareResult) compareResult.src = item.resultUrl;
-                
-                // Hide hero section and show history bar
-                if (heroSection) heroSection.classList.add('hidden');
-                if (historyContainer) historyContainer.classList.remove('hidden');
-                
-                // Hide the Remove Background button
-                if (removeBgBtn) removeBgBtn.classList.add('hidden');
-                
-                showNotification('Image loaded from history!', 'success');
-            }
-        } catch (error) {
-            console.error('Error loading from history:', error);
-            showNotification('Failed to load from history', 'error');
-        }
-    }
-    
-    // Enhanced delete function with confirmation:
-function deleteFromHistory(itemId) {
-    try {
-        const historyData = JSON.parse(sessionStorage.getItem('bgRemoverHistory') || '[]');
-        const item = historyData.find(h => h.id.toString() === itemId.toString());
-        
-        if (!item) {
-            showNotification('Item not found in history', 'error');
-            return;
-        }
-        
-        // Show confirmation dialog
-        if (!confirm(`Delete "${item.filename}" from history?`)) {
-            return; // User cancelled
-        }
-        
-        const itemIndex = historyData.findIndex(h => h.id.toString() === itemId.toString());
-        
-        if (itemIndex !== -1) {
-            // Remove the item from history
-            historyData.splice(itemIndex, 1);
-            
-            // Update session storage
-            sessionStorage.setItem('bgRemoverHistory', JSON.stringify(historyData));
-            
-            // Update the history bar
-            updateHistoryBar(historyData);
-            
-            // If no more items, hide history bar and show hero
-            if (historyData.length === 0) {
-                if (historyContainer) historyContainer.classList.add('hidden');
-                if (heroSection) heroSection.classList.remove('hidden');
-            }
-            
-            // Show notification
-            showNotification(`"${item.filename}" deleted from history`, 'success');
-            
-            console.log('Deleted item from history:', item.filename);
-        }
-    } catch (error) {
-        console.error('Error deleting from history:', error);
-        showNotification('Failed to delete from history', 'error');
-    }
-}
-
-// Make the delete function globally accessible
-window.deleteFromHistory = deleteFromHistory;
-
-document.addEventListener('click', function(e) {
-    // Handle delete button clicks
-    if (e.target.closest('.delete-history-btn')) {
-        e.stopPropagation(); // Prevent triggering the load function
-        const deleteBtn = e.target.closest('.delete-history-btn');
-        const itemId = deleteBtn.dataset.itemId;
-        deleteFromHistory(itemId);
-        return;
-    }
-    
-    // Handle add new image button
-    if (e.target.closest('.add-new-image-btn')) {
-        addNewImage();
-        return;
-    }
-    
-    // Handle history item clicks (only if not clicking delete button)
-    const historyItem = e.target.closest('.history-item');
-    if (historyItem) {
-        const itemId = historyItem.dataset.itemId;
-        loadFromHistory(itemId);
-    }
-});
-
-    // Theme toggle
-    themeToggle.addEventListener('change', function() {
-        document.body.classList.toggle('dark-mode');
-        localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
-    });
-    
-    // File Input Change Handler
-    fileInput.addEventListener('change', function(e) {
-        console.log('File input changed!', e.target.files);
-        if (e.target.files.length > 0) {
-            try {
-                const file = e.target.files[0];
-                console.log('Selected file:', file.name, file.size, file.type);
-                
-                // Show preview immediately
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    originalPreview.src = e.target.result;
-                    dropText.classList.add('hidden');
-                    previewContainer.classList.remove('hidden');
-                    originalPreview.parentNode.classList.remove('hidden');
-                    resultContainer.classList.add('hidden');
-                    
-                    // Hide hero section and show history bar
-                    if (heroSection) heroSection.classList.add('hidden');
-                    if (historyContainer) historyContainer.classList.remove('hidden');
-                    
-                    // RESTORE THIS LINE - Hide upload and paste buttons:
-                    hideButtonSections();
-                    
-                    // Show the Remove Background button container
-                    const removeBgContainer = document.getElementById('remove-bg-container');
-                    if (removeBgContainer) {
-                        removeBgContainer.classList.remove('hidden');
-                        removeBgContainer.style.display = 'block';
-                    }
-                    
-                    console.log('Preview loaded in UI');
-                };
-                reader.readAsDataURL(file);
-                
-                // Now upload to server
-                handleFileSelection(file);
-            } catch (error) {
-                console.error('Error handling file selection:', error);
-                showNotification('Error selecting file: ' + error.message, 'error');
-            }
-        }
-    });
-
-    // Drag & Drop Handlers
-    uploadContainer.addEventListener('dragover', function(e) {
-        e.preventDefault();
-        uploadContainer.classList.add('active');
-    });
-
-    uploadContainer.addEventListener('dragleave', function() {
-        uploadContainer.classList.remove('active');
-    });
-
-    uploadContainer.addEventListener('drop', function(e) {
-        e.preventDefault();
-        uploadContainer.classList.remove('active');
-        
-        if (e.dataTransfer.files.length) {
-            handleFileSelection(e.dataTransfer.files[0]);
-        }
-    });
-
-    // Remove Background Button
-    removeBgBtn.addEventListener('click', function() {
-        if (!currentJobId) {
-            showNotification('Please upload an image first', 'error');
-            return;
-        }
-        
-        removeBgBtn.disabled = true;
-        processingIndicator.classList.remove('hidden');
-        
-        // Create pixel animation
-        const pixelContainer = document.createElement('div');
-        pixelContainer.className = 'pixel-animation-container';
-        originalPreview.parentNode.style.position = 'relative';
-        originalPreview.parentNode.appendChild(pixelContainer);
-        createPixelAnimation(pixelContainer, originalPreview.offsetWidth, originalPreview.offsetHeight);
-        
-        // Start progress simulation
-        let progress = 0;
-        const progressInterval = setInterval(() => {
-            progress += Math.random() * 15;
-            if (progress > 80) progress = 80;
-            progressBar.style.width = progress + '%';
-        }, 1000);
-        
-        // STEP 2: Initiate processing with better error handling
-        console.log('STEP 2: Initiating process for job:', currentJobId);
-        showNotification('Initiating background removal...', 'info');
-        
-        fetch('/initiate-process', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                job_id: currentJobId
-            })
-        })
-        .then(response => {
-            console.log('STEP 2 Response status:', response.status);
-            if (!response.ok) {
-                return response.text().then(text => {
-                    console.error('STEP 2 Error response:', text);
-                    throw new Error(`HTTP ${response.status}: ${text}`);
+                // Step 2: Perform background removal
+                const processResponse = await fetch('/background-removed', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ job_id: jobId })
                 });
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('STEP 2 Response data:', data);
-            
-            if (data.success) {
-                console.log('STEP 2 SUCCESS: Processing initiated');
-                progressBar.style.width = '50%';
-                showNotification('Processing image...', 'info');
-                updateUrl('/background-removed', { job_id: currentJobId });
                 
-                // Longer delay and better error handling for step 3
-                setTimeout(() => {
-                    performBackgroundRemoval(progressInterval);
-                }, 2000); // Increased delay
+                const processData = await processResponse.json();
                 
-            } else {
-                throw new Error(data.error || 'Processing initiation failed');
-            }
-        })
-        .catch(error => {
-            console.error('STEP 2 ERROR:', error);
-            clearInterval(progressInterval);
-            showNotification('Failed to initiate processing: ' + error.message, 'error');
-            resetProcessingUI();
-        });
-    });
-    
-    // Separate function for background removal with retry logic
-    function performBackgroundRemoval(progressInterval, retryCount = 0) {
-        const maxRetries = 3;
-        
-        console.log(`STEP 3: Performing background removal (attempt ${retryCount + 1})`);
-        showNotification('Removing background...', 'info');
-        
-        fetch('/background-removed', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                job_id: currentJobId
-            })
-        })
-        .then(response => {
-            console.log('STEP 3 Response status:', response.status);
-            if (!response.ok) {
-                return response.text().then(text => {
-                    console.error('STEP 3 Error response:', text);
-                    throw new Error(`HTTP ${response.status}: ${text}`);
-                });
-            }
-            return response.json();
-        })
-        .then(finalData => {
-            console.log('STEP 3 Response data:', finalData);
-            clearInterval(progressInterval);
-            
-            if (finalData.success) {
-                if (finalData.status === 'completed') {
-                    console.log('STEP 3 SUCCESS: Background removal completed');
-                    handleProcessingComplete(finalData);
-                } else if (finalData.status === 'processing') {
-                    // Still processing, check again
-                    console.log('Still processing, checking again...');
-                    progressBar.style.width = '70%';
-                    setTimeout(() => {
-                        performBackgroundRemoval(progressInterval, retryCount);
-                    }, 3000);
+                if (processData.success) {
+                    // Redirect to results page
+                    window.location.href = '/result?job_id=' + jobId;
                 } else {
-                    throw new Error(`Unexpected status: ${finalData.status}`);
+                    throw new Error(processData.error || 'Failed to process image');
                 }
-            } else {
-                throw new Error(finalData.error || 'Background removal failed');
-            }
-        })
-        .catch(error => {
-            console.error('STEP 3 ERROR:', error);
-            
-            if (retryCount < maxRetries) {
-                console.log(`Retrying... (${retryCount + 1}/${maxRetries})`);
-                showNotification(`Retrying... (${retryCount + 1}/${maxRetries})`, 'info');
-                setTimeout(() => {
-                    performBackgroundRemoval(progressInterval, retryCount + 1);
-                }, 5000);
-            } else {
-                if (progressInterval) clearInterval(progressInterval);
-                showNotification('Background removal failed after multiple attempts: ' + error.message, 'error');
-                
-                // Safe UI reset with null checks
-                if (removeBgBtn) removeBgBtn.disabled = false;
-                if (processingIndicator) processingIndicator.classList.add('hidden');
-                if (progressBar) progressBar.style.width = '0%';
-                
-                const pixelContainer = document.querySelector('.pixel-animation-container');
-                if (pixelContainer) {
-                    pixelContainer.remove();
-                }
-                
-                // Show the Remove Background button container again
-                const removeBgContainer = document.getElementById('remove-bg-container');
-                if (removeBgContainer) {
-                    removeBgContainer.classList.remove('hidden');
-                    removeBgContainer.style.display = 'block';
-                }
-            }
-        });
-    }
-
-    // ADD THESE MISSING HELPER FUNCTIONS:
-
-    // Function to hide button sections
-    function hideButtonSections() {
-        try {
-            const buttonSections = document.querySelectorAll('.relative.mb-6:not(#download-section):not(#remove-bg-container)');
-            if (!buttonSections || buttonSections.length === 0) return;
-            
-            buttonSections.forEach(section => {
-                if (!section) return;
-                
-                // Check if this section contains upload/paste/url buttons
-                if (section.querySelector('#image') || 
-                    section.querySelector('#paste-image-btn') || 
-                    section.querySelector('#url-image-btn')) {
-                    section.style.display = 'none';
-                }
-            });
-        } catch (error) {
-            console.error('Error in hideButtonSections:', error);
-        }
-    }
-
-    // Update the showButtonSections function:
-function showButtonSections() {
-    const buttonSections = document.querySelectorAll('.relative.mb-6:not(#download-section)');
-    buttonSections.forEach(section => {
-        // Check if this section contains upload/paste/url buttons or remove-bg button
-        if (section.querySelector('#image') || 
-            section.querySelector('#paste-image-btn') || 
-            section.querySelector('#url-image-btn') ||
-            section.querySelector('#remove-bg-btn')) {
-            
-            // Reset all display properties to ensure visibility
-            section.style.display = 'block';
-            section.style.visibility = 'visible';
-            section.style.opacity = '1';
-        }
-    });
-}
-    
-    function createPixelAnimation(container, width, height) {
-        // Create pixel animation effect
-        for (let i = 0; i < 50; i++) {
-            setTimeout(() => {
-                const pixel = document.createElement('div');
-                pixel.className = 'pixel';
-                pixel.style.left = Math.random() * width + 'px';
-                pixel.style.top = Math.random() * height + 'px';
-                pixel.style.width = '4px';
-                pixel.style.height = '4px';
-                pixel.style.animationDelay = Math.random() * 2 + 's';
-                container.appendChild(pixel);
-                
-                setTimeout(() => {
-                    if (container.contains(pixel)) {
-                        container.removeChild(pixel);
-                    }
-                }, 3000);
-            }, i * 100);
-        }
-    }
-
-    function createConfetti() {
-        const colors = ['#f43f5e', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'];
-        
-        for (let i = 0; i < 50; i++) {
-            setTimeout(() => {
-                const confetti = document.createElement('div');
-                confetti.className = 'confetti';
-                confetti.style.left = Math.random() * window.innerWidth + 'px';
-                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                confetti.style.animationDelay = Math.random() * 3 + 's';
-                document.body.appendChild(confetti);
-                
-                setTimeout(() => {
-                    if (document.body.contains(confetti)) {
-                        document.body.removeChild(confetti);
-                    }
-                }, 5000);
-            }, i * 50);
-        }
-    }
-
-    // Download handlers
-    if (downloadBtn) {
-        downloadBtn.addEventListener('click', function() {
-            if (downloadDropdown) {
-                downloadDropdown.classList.toggle('hidden');
-            }
-        });
-    }
-
-    if (downloadPreviewBtn) {
-        downloadPreviewBtn.addEventListener('click', function() {
-            if (currentResultUrl) {
-                // Store image data for taskpage1
-                localStorage.setItem('downloadImageData', currentResultUrl);
-                localStorage.setItem('downloadFilename', `bg_removed_${currentFileName || 'image'}.png`);
-                localStorage.setItem('downloadType', 'png');
-                
-                // Clear any existing session steps
-                sessionStorage.removeItem('downloadStep');
-                
-                // Navigate to taskpage1 for preview quality download
-                window.location.href = '/taskpage1.html';
-            }
-            if (downloadDropdown) {
-                downloadDropdown.classList.add('hidden');
-            }
-        });
-    }
-
-    if (downloadOriginalBtn) {
-        downloadOriginalBtn.addEventListener('click', function() {
-            if (currentOriginalQualityUrl) {
-                // Store image data for taskpage2
-                localStorage.setItem('downloadImageData', currentOriginalQualityUrl);
-                localStorage.setItem('downloadFilename', `bg_removed_original_${currentFileName || 'image'}.png`);
-                localStorage.setItem('downloadType', 'png');
-                
-                // Clear any existing session steps
-                sessionStorage.removeItem('downloadStep');
-                
-                // Navigate to taskpage2 for original quality download
-                window.location.href = '/taskpage2.html';
-            }
-            if (downloadDropdown) {
-                downloadDropdown.classList.add('hidden');
-            }
-        });
-    }
-
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function(e) {
-        if (downloadBtn && downloadDropdown && 
-            !downloadBtn.contains(e.target) && 
-            !downloadDropdown.contains(e.target)) {
-            downloadDropdown.classList.add('hidden');
-        }
-    });
-
-    // Compare button functionality
-    if (compareBtn) {
-        compareBtn.addEventListener('click', function() {
-            if (standardPreview.classList.contains('hidden')) {
-                // Show standard view
-                standardPreview.classList.remove('hidden');
-                comparisonPreview.classList.add('hidden');
-                compareBtn.innerHTML = '<i class="fas fa-exchange-alt mr-2"></i> Compare';
-            } else {
-                // Show comparison view
-                standardPreview.classList.add('hidden');
-                comparisonPreview.classList.remove('hidden');
-                compareBtn.innerHTML = '<i class="fas fa-eye mr-2"></i> Standard View';
-            }
-        });
-    }
-
-    // Upload new button
-    if (uploadNewBtn) {
-        uploadNewBtn.addEventListener('click', function() {
-            resetUI();
-        });
-    }
-
-    // Clear history
-    if (clearHistoryBtn) {
-        clearHistoryBtn.addEventListener('click', function() {
-            if (confirm('Are you sure you want to clear all history?')) {
-                sessionStorage.removeItem('bgRemoverHistory');
-                loadHistory();
-                showNotification('History cleared', 'success');
-            }
-        });
-    }
-
-    // Paste button functionality
-    if (pasteImageBtn) {
-        pasteImageBtn.addEventListener('click', async function() {
-            try {
-                const clipboardItems = await navigator.clipboard.read();
-                
-                for (const clipboardItem of clipboardItems) {
-                    for (const type of clipboardItem.types) {
-                        if (type.startsWith('image/')) {
-                            const blob = await clipboardItem.getType(type);
-                            const file = new File([blob], 'pasted-image.png', { type: blob.type });
-                            handleFileSelection(file);
-                            showNotification('Image pasted successfully!', 'success');
-                            return;
-                        }
-                    }
-                }
-                
-                showNotification('No image found in clipboard', 'error');
             } catch (error) {
-                console.error('Error pasting image:', error);
-                showNotification('Failed to paste image. Please try uploading instead.', 'error');
+                loadingOverlay.classList.remove('active');
+                console.error('Processing error:', error);
+                alert('Error processing image: ' + error.message);
+                // Redirect back to upload
+                window.location.href = '/upload';
             }
-        });
-    }
-
-    // URL button functionality
-    if (urlImageBtn) {
-        urlImageBtn.addEventListener('click', function() {
-            urlModal.classList.remove('hidden');
-        });
-    }
-
-    if (cancelUrlBtn) {
-        cancelUrlBtn.addEventListener('click', function() {
-            urlModal.classList.add('hidden');
-            imageUrlInput.value = '';
-        });
-    }
-
-    if (loadUrlBtn) {
-        loadUrlBtn.addEventListener('click', function() {
-            const url = imageUrlInput.value.trim();
-            if (!url) {
-                showNotification('Please enter a valid URL', 'error');
-                return;
-            }
-            
-            // Close modal
-            urlModal.classList.add('hidden');
-            imageUrlInput.value = '';
-            
-            // Load image from URL
-            const img = new Image();
-            img.crossOrigin = 'anonymous';
-            
-            img.onload = function() {
-                // Convert image to file
-                const canvas = document.createElement('canvas');
-                canvas.width = img.width;
-                canvas.height = img.height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-                
-                canvas.toBlob(function(blob) {
-                    const file = new File([blob], 'url-image.png', { type: 'image/png' });
-                    handleFileSelection(file);
-                }, 'image/png');
-            };
-            
-            img.onerror = function() {
-                showNotification('Failed to load image from URL', 'error');
-            };
-            
-                       
-            img.src = url;
-                       showNotification('Loading image from URL...', 'info');
-        });
-    }
-
-    // Close modal when clicking outside
-    urlModal.addEventListener('click', function(e) {
-
-        if (e.target === urlModal) {
-            urlModal.classList.add('hidden');
-            imageUrlInput.value = '';
         }
-    });
 
-    // Check if there's a job ID in the URL on page load
-    const urlParams = new URLSearchParams(window.location.search);
-    const jobId = urlParams.get('job_id');
-    
-    if (jobId) {
-        console.log('Found job ID in URL:', jobId);
-        
-        // STEP 3: Check job status with better error handling
-        showNotification('Checking job status...', 'info');
-        
-        fetch('/background-removed', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                job_id: jobId
-            })
-        })
-        .then(response => {
-            console.log('STEP 3 Response status:', response.status);
-            if (!response.ok) {
-                return response.text().then(text => {
-                    console.error('STEP 3 Error response:', text);
-                    throw new Error(`HTTP ${response.status}: ${text}`);
+        uploadBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            fileInput.click();
+        });
+
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                handleFileUpload();
+            }
+        });
+
+        fileInput.addEventListener('change', handleFileUpload);
+
+        function handleFileUpload() {
+            const file = fileInput.files[0];
+            if (file) {
+                // Validate file type
+                const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+                if (!allowedTypes.includes(file.type)) {
+                    alert('Please upload a valid image file (PNG, JPG, JPEG, or WEBP)');
+                    return;
+                }
+
+                // Validate file size (16MB)
+                if (file.size > 16 * 1024 * 1024) {
+                    alert('File size must be less than 16MB');
+                    return;
+                }
+
+                // Show loading and submit
+                loadingOverlay.classList.add('active');
+                
+                const formData = new FormData();
+                formData.append('image', file);
+
+                fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.job_id) {
+                        // Process immediately after upload
+                        processImage(data.job_id);
+                    } else {
+                        loadingOverlay.classList.remove('active');
+                        alert(data.error || 'Error uploading image');
+                    }
+                })
+                .catch(error => {
+                    loadingOverlay.classList.remove('active');
+                    console.error('Error:', error);
+                    alert('Error uploading image. Please try again.');
                 });
             }
-            return response.json();
-        })
-        .then(data => {
-            console.log('STEP 3 Response data:', data);
-            
-            if (data.success) {
-                if (data.status === 'completed') {
-                    console.log('Job completed successfully');
-                    showCompletedState(data);
-                } else if (data.status === 'processing') {
-                    console.log('Job is still processing');
-                    setTimeout(() => {
-                        // Check again after a delay
-                        window.location.reload();
-                    }, 5000);
-                } else {
-                    throw new Error(`Unexpected job status: ${data.status}`);
-                }
-            } else {
-                throw new Error(data.error || 'Failed to check job status');
-            }
-        })
-        .catch(error => {
-            console.error('Error loading job:', error);
-            showNotification('Failed to load job status', 'error');
-        });
-    }
+        }
 
-    function showCompletedState(data) {
-        dropText.classList.add('hidden');
-        previewContainer.classList.remove('hidden');
-        originalPreview.parentNode.classList.add('hidden');
-        resultContainer.classList.remove('hidden');
-        
-        downloadSection.classList.remove('hidden');
-        hideButtonSections();
-        
-        // Hide the Remove Background button
-        removeBgBtn.classList.add('hidden');
-        
-        compareBtn.classList.remove('hidden');
-        processingIndicator.classList.add('hidden');
-        progressBar.style.width = '100%';
-        
-        if (heroSection) heroSection.classList.add('hidden');
-        if (historyContainer) historyContainer.classList.remove('hidden');
-        
-        showNotification('Background removed successfully!', 'success');
-    }
+        // Sample images
+        document.querySelectorAll('.sample-image').forEach(img => {
+            img.addEventListener('click', async () => {
+                const imageUrl = img.dataset.sample;
+                loadingOverlay.classList.add('active');
+                
+                try {
+                    const response = await fetch(imageUrl);
+                    const blob = await response.blob();
+                    const file = new File([blob], 'sample.jpg', { type: 'image/jpeg' });
+                    
+                    const formData = new FormData();
+                    formData.append('image', file);
 
-}); // Close DOMContentLoaded event listener
-
-// Make global functions available
-window.loadFromHistory = loadFromHistory;
-window.addNewImage = addNewImage;
-window.showNotification = showNotification;
-
-// Fix the initializeAdSense function:
-function initializeAdSense() {
-    // Check if AdSense is already loaded
-    if (typeof adsbygoogle !== 'undefined') {
-        try {
-            // Only push ads for visible containers
-            const visibleAdContainers = document.querySelectorAll('.adsbygoogle:not([data-adsbygoogle-status])');
-            
-            visibleAdContainers.forEach((adContainer) => {
-                // Check if the container is visible and has dimensions
-                const rect = adContainer.getBoundingClientRect();
-                if (rect.width > 0 && rect.height > 0) {
-                    (adsbygoogle = window.adsbygoogle || []).push({});
+                    const uploadResponse = await fetch('/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const data = await uploadResponse.json();
+                    
+                    if (data.success && data.job_id) {
+                        // Process immediately after upload
+                        processImage(data.job_id);
+                    } else {
+                        loadingOverlay.classList.remove('active');
+                        alert(data.error || 'Error processing image');
+                    }
+                } catch (error) {
+                    loadingOverlay.classList.remove('active');
+                    console.error('Error:', error);
+                    alert('Error processing sample image. Please try again.');
                 }
             });
-        } catch (error) {
-            console.log('AdSense initialization skipped:', error.message);
-        }
-    }
-}
-
-
-// Initialize ads after page load
-setTimeout(initializeAdSense, 2000);
-
-// Re-initialize when download section becomes visible
-function showDownloadSection() {
-    if (downloadSection) downloadSection.classList.remove('hidden');
-    
-    // Wait for element to be visible, then try to load ads
-    setTimeout(() => {
-        initializeAdSense();
-    }, 500);
-}
-
-</script>
+        });
+    </script>
 </body>
 </html>

@@ -7,12 +7,13 @@ import uuid
 import json
 from datetime import datetime
 import logging
-from rembg import remove
-from PIL import Image, UnidentifiedImageError
+from rembg import remove, new_session
+from PIL import Image, UnidentifiedImageError, ImageFilter, ImageEnhance
 import io
 import shutil
 import base64
 import tempfile
+import numpy as np
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -40,6 +41,10 @@ os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'jobs'), exist_ok=True)
 
 # In-memory storage for processing status (use Redis in production)
 processing_status = {}
+
+# Initialize rembg session with better model for edge detection
+# isnet-general-use is better for complex edges and fine details
+rembg_session = new_session("isnet-general-use")
 
 def allowed_file(filename):
     """Check if the file extension is allowed"""
@@ -408,12 +413,75 @@ def background_removed():
             processed_path = job_info['processed_path']
             
             try:
-                # Process with rembg
-                with open(original_path, 'rb') as input_file:
-                    input_data = input_file.read()
+                # Load the original image - keep as is, rembg handles all formats
+                with Image.open(original_path) as img:
+                    # Get original size
+                    original_size = img.size
+                    original_width, original_height = original_size
+                    
+                    # Upscale small images for better edge detection
+                    # Process at minimum 1500px for better detail
+                    min_dimension = min(original_size)
+                    scale_factor = 1.0
+                    if min_dimension < 1500:
+                        scale_factor = 1500 / min_dimension
+                        new_size = (int(original_width * scale_factor), int(original_height * scale_factor))
+                        img = img.resize(new_size, Image.Resampling.LANCZOS)
+                        logger.info(f"Upscaled image from {original_size} to {new_size}")
+                    
+                    # Convert to bytes for rembg - save as PNG to preserve quality
+                    img_byte_arr = io.BytesIO()
+                    img.save(img_byte_arr, format='PNG')
+                    input_data = img_byte_arr.getvalue()
                 
-                logger.info(f"Removing background for job {job_id}")
-                output_data = remove(input_data)
+                logger.info(f"Removing background for job {job_id} with isnet-general-use model")
+                
+                # Use isnet-general-use session for better edge detection
+                # Enhanced alpha matting settings for fine details like hair
+                output_data = remove(
+                    input_data,
+                    session=rembg_session,
+                    alpha_matting=True,
+                    alpha_matting_foreground_threshold=270,  # Higher = more foreground preserved
+                    alpha_matting_background_threshold=20,   # Lower = more background removed
+                    alpha_matting_erode_size=15,             # Larger = smoother edges
+                    post_process_mask=True
+                )
+                
+                # Post-process for better edge quality
+                output_image = Image.open(io.BytesIO(output_data))
+                
+                # Ensure RGBA mode for transparency
+                if output_image.mode != 'RGBA':
+                    output_image = output_image.convert('RGBA')
+                
+                # Advanced edge refinement
+                r, g, b, a = output_image.split()
+                alpha_np = np.array(a, dtype=np.float32)
+                
+                # Remove semi-transparent edge artifacts (make edges cleaner)
+                # Threshold: pixels below 30 become fully transparent, above 225 become fully opaque
+                alpha_np = np.where(alpha_np < 30, 0, alpha_np)
+                alpha_np = np.where(alpha_np > 225, 255, alpha_np)
+                
+                # Smooth the transition zone for natural edges
+                alpha_pil = Image.fromarray(alpha_np.astype(np.uint8))
+                
+                # Apply gaussian blur for smooth edges, then re-threshold
+                alpha_pil = alpha_pil.filter(ImageFilter.GaussianBlur(radius=1))
+                
+                # Recombine with refined alpha
+                output_image = Image.merge('RGBA', (r, g, b, alpha_pil))
+                
+                # Resize back to original size if we scaled up
+                if scale_factor > 1.0:
+                    output_image = output_image.resize(original_size, Image.Resampling.LANCZOS)
+                    logger.info(f"Resized output back to {original_size}")
+                
+                # Save the result with high quality
+                output_byte_arr = io.BytesIO()
+                output_image.save(output_byte_arr, format='PNG', optimize=True)
+                output_data = output_byte_arr.getvalue()
                 
                 # Save the result
                 with open(processed_path, 'wb') as output_file:
@@ -539,7 +607,7 @@ def serve_file(filename):
     if ".." in filename or filename.startswith("/"):
         abort(404)
     
-    # For originals and processed files
+    # For originals files: /file/originals/job_id/filename
     if filename.startswith('originals/'):
         parts = filename.split('/')
         if len(parts) >= 3:  # originals/job_id/filename
@@ -547,12 +615,12 @@ def serve_file(filename):
             file_name = parts[2]
             return send_from_directory(os.path.join(app.config['UPLOAD_FOLDER'], job_id, 'originals'), file_name)
     
+    # For processed files: /file/processed/filename (in shared processed folder)
     if filename.startswith('processed/'):
         parts = filename.split('/')
-        if len(parts) >= 3:  # processed/job_id/filename
-            job_id = parts[1]
-            file_name = parts[2]
-            return send_from_directory(os.path.join(app.config['UPLOAD_FOLDER'], job_id, 'processed'), file_name)
+        if len(parts) >= 2:  # processed/filename
+            file_name = parts[1]
+            return send_from_directory(os.path.join(app.config['UPLOAD_FOLDER'], 'processed'), file_name)
     
     abort(404)
 
@@ -581,6 +649,38 @@ def taskpage2():
 def bgremove():
     """Alternative route to main background remover"""
     return redirect(url_for('upload'))
+
+# ==================== ROUTE: RESULT PAGE ====================
+@app.route('/result')
+def result_page():
+    """Display the result page with processed images"""
+    job_id = request.args.get('job_id')
+    
+    if not job_id:
+        return redirect(url_for('upload'))
+    
+    # Load job info
+    job_info = load_job_info(job_id)
+    
+    if not job_info:
+        return redirect(url_for('upload'))
+    
+    # Check if job is completed
+    if job_info.get('status') != 'completed':
+        # If not completed, redirect to process
+        return redirect(url_for('initiate_process', job_id=job_id))
+    
+    # Prepare data for template
+    original_url = f"/file/originals/{job_id}/{job_info['original_filename']}"
+    processed_url = f"/file/processed/{job_info['processed_filename']}"
+    download_url = f"/download/{job_info['processed_filename']}"
+    
+    return render_template('result.html', 
+                         job_id=job_id,
+                         original_url=original_url,
+                         processed_url=processed_url,
+                         download_url=download_url,
+                         filename=job_info.get('user_filename', 'image.png'))
 
 # ==================== ERROR HANDLERS ====================
 @app.errorhandler(413)
@@ -634,7 +734,7 @@ def health_check():
     return jsonify({'status': 'healthy'}), 200
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
+    port = int(os.environ.get('PORT', 5001))
     debug = os.environ.get('DEBUG', 'False').lower() in ['true', '1', 't']
     
     logger.info(f"Starting application on port {port} with debug={debug}")
