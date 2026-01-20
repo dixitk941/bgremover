@@ -5,7 +5,7 @@ from werkzeug.utils import secure_filename as werkzeug_secure_filename
 import os
 import uuid
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 from rembg import remove, new_session
 from PIL import Image, UnidentifiedImageError, ImageFilter, ImageEnhance
@@ -14,6 +14,9 @@ import shutil
 import base64
 import tempfile
 import numpy as np
+import threading
+import time
+import atexit
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -696,42 +699,107 @@ def server_error(error):
     return jsonify({'error': 'Server error. Please try again later'}), 500
 
 # ==================== CLEANUP ====================
-@app.before_request
-def cleanup_old_files():
-    """Clean up old files and processing status"""
-    if request.endpoint == 'index' and request.method == 'GET':
+# Auto-cleanup settings: Delete files older than 10 minutes
+CLEANUP_INTERVAL_SECONDS = 60  # Check every minute
+FILE_RETENTION_MINUTES = 10   # Delete files after 10 minutes
+
+cleanup_thread = None
+cleanup_running = False
+
+def cleanup_old_files_background():
+    """Background thread to clean up old files automatically"""
+    global cleanup_running
+    cleanup_running = True
+    
+    while cleanup_running:
         try:
             now = datetime.now()
-            retention_period = datetime.timedelta(hours=1) if os.environ.get('CLOUD_RUN') else datetime.timedelta(hours=24)
+            retention_period = timedelta(minutes=FILE_RETENTION_MINUTES)
+            upload_folder = app.config['UPLOAD_FOLDER']
             
-            # Clean up files
-            for folder in ['originals', 'processed', 'jobs']:
-                directory = os.path.join(app.config['UPLOAD_FOLDER'], folder)
-                if os.path.exists(directory):
-                    for filename in os.listdir(directory):
-                        filepath = os.path.join(directory, filename)
-                        file_modified = datetime.datetime.fromtimestamp(os.path.getmtime(filepath))
-                        if (now - file_modified) > retention_period:
-                            os.remove(filepath)
-                            logger.info(f"Removed old file: {filepath}")
+            # Clean up job directories (each upload creates a job folder)
+            if os.path.exists(upload_folder):
+                for item in os.listdir(upload_folder):
+                    item_path = os.path.join(upload_folder, item)
+                    
+                    # Skip non-directories and special folders
+                    if not os.path.isdir(item_path):
+                        continue
+                    if item in ['originals', 'processed', 'jobs']:
+                        # Clean up legacy folders
+                        for filename in os.listdir(item_path):
+                            filepath = os.path.join(item_path, filename)
+                            try:
+                                file_modified = datetime.fromtimestamp(os.path.getmtime(filepath))
+                                if (now - file_modified) > retention_period:
+                                    if os.path.isdir(filepath):
+                                        shutil.rmtree(filepath)
+                                    else:
+                                        os.remove(filepath)
+                                    logger.info(f"Cleaned up old file: {filepath}")
+                            except Exception as e:
+                                logger.error(f"Error cleaning file {filepath}: {str(e)}")
+                        continue
+                    
+                    # Check if job directory is old enough to delete
+                    try:
+                        # Check the modification time of the directory
+                        dir_modified = datetime.fromtimestamp(os.path.getmtime(item_path))
+                        if (now - dir_modified) > retention_period:
+                            # Delete the entire job directory
+                            shutil.rmtree(item_path)
+                            logger.info(f"Cleaned up old job directory: {item_path}")
+                            
+                            # Also remove from in-memory status
+                            if item in processing_status:
+                                del processing_status[item]
+                    except Exception as e:
+                        logger.error(f"Error cleaning directory {item_path}: {str(e)}")
             
-            # Clean up processing status
+            # Clean up expired jobs from in-memory storage
             expired_jobs = []
-            for job_id, job_info in processing_status.items():
-                job_time = datetime.datetime.fromisoformat(job_info['upload_time'])
-                if (now - job_time) > retention_period:
-                    expired_jobs.append(job_id)
+            for job_id, job_info in list(processing_status.items()):
+                try:
+                    if 'upload_time' in job_info:
+                        job_time = datetime.fromisoformat(job_info['upload_time'])
+                        if (now - job_time) > retention_period:
+                            expired_jobs.append(job_id)
+                except Exception as e:
+                    logger.error(f"Error checking job {job_id}: {str(e)}")
             
             for job_id in expired_jobs:
                 del processing_status[job_id]
-                logger.info(f"Removed expired job: {job_id}")
+                logger.info(f"Removed expired job from memory: {job_id}")
                 
         except Exception as e:
-            logger.error(f"Error cleaning up: {str(e)}")
+            logger.error(f"Error in cleanup thread: {str(e)}")
+        
+        # Sleep for the cleanup interval
+        time.sleep(CLEANUP_INTERVAL_SECONDS)
+
+def start_cleanup_thread():
+    """Start the background cleanup thread"""
+    global cleanup_thread
+    if cleanup_thread is None or not cleanup_thread.is_alive():
+        cleanup_thread = threading.Thread(target=cleanup_old_files_background, daemon=True)
+        cleanup_thread.start()
+        logger.info(f"Started automatic cleanup thread (deleting files older than {FILE_RETENTION_MINUTES} minutes)")
+
+def stop_cleanup_thread():
+    """Stop the background cleanup thread"""
+    global cleanup_running
+    cleanup_running = False
+    logger.info("Stopped cleanup thread")
+
+# Register cleanup on exit
+atexit.register(stop_cleanup_thread)
 
 @app.route('/health')
 def health_check():
     return jsonify({'status': 'healthy'}), 200
+
+# Start cleanup thread when module is imported (for production servers like gunicorn)
+start_cleanup_thread()
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5001))
@@ -739,5 +807,6 @@ if __name__ == '__main__':
     
     logger.info(f"Starting application on port {port} with debug={debug}")
     logger.info(f"Upload folder: {app.config['UPLOAD_FOLDER']}")
+    logger.info(f"Auto-cleanup enabled: files older than {FILE_RETENTION_MINUTES} minutes will be deleted")
     
     app.run(debug=debug, host='0.0.0.0', port=port)
