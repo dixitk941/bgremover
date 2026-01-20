@@ -12,7 +12,7 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
         * {
@@ -44,7 +44,7 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Onest', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--gray-50);
             color: var(--gray-900);
             line-height: 1.6;
@@ -256,7 +256,7 @@
         .breadcrumb {
             max-width: 1280px;
             margin: 0 auto;
-            padding: 100px 24px 0;
+            padding: 88px 24px 0;
         }
 
         .breadcrumb-list {
@@ -286,61 +286,71 @@
 
         /* Hero Section */
         .hero {
-            padding: 40px 24px 80px;
+            padding: 20px 24px 100px;
             text-align: center;
+            position: relative;
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
         .hero-content {
-            max-width: 800px;
-            margin: 0 auto 48px;
+            max-width: 850px;
+            margin: 0 auto 60px;
+            position: relative;
+            z-index: 2;
         }
 
         .hero-title {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
-            flex-wrap: wrap;
+            display: block;
+            margin-bottom: 20px;
         }
 
         .hero-icon {
             width: 48px;
             height: 48px;
+            margin: 0 auto 16px;
+            display: block;
         }
 
         .hero h1 {
-            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            font-size: clamp(2.8rem, 5vw, 4.5rem);
             font-weight: 800;
             color: var(--gray-900);
             line-height: 1.1;
             letter-spacing: -0.02em;
-            animation: fadeInUp 0.8s ease;
+            margin-bottom: 24px;
         }
 
         .hero p {
-            font-size: 1.125rem;
+            font-size: 1.1rem;
             color: var(--gray-600);
-            max-width: 600px;
-            margin: 24px auto 0;
-            animation: fadeInUp 0.8s ease 0.2s backwards;
+            max-width: 680px;
+            margin: 0 auto;
+            line-height: 1.65;
         }
 
         /* Upload Card */
         .upload-section {
-            max-width: 900px;
+            max-width: 1050px;
             margin: 0 auto;
             position: relative;
-            animation: fadeInUp 0.8s ease 0.4s backwards;
+            padding: 0 20px;
         }
 
         .upload-card {
             background: var(--white);
-            border-radius: 24px;
-            padding: 60px 40px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-            border: 1px solid var(--gray-200);
+            border-radius: 28px;
+            padding: 70px 50px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+            border: 2px solid var(--gray-200);
             position: relative;
             overflow: hidden;
+            min-height: 380px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            max-width: 900px;
+            margin: 0 auto;
         }
 
         /* Transparent checkered background */
@@ -371,31 +381,33 @@
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            background: var(--primary);
+            background: #6D28D9;
             color: white;
-            padding: 16px 32px;
-            border-radius: 14px;
+            padding: 18px 36px;
+            border-radius: 12px;
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 1.05rem;
             cursor: pointer;
             border: none;
             transition: all 0.2s ease;
+            box-shadow: 0 4px 14px rgba(109, 40, 217, 0.3);
         }
 
         .upload-btn:hover {
-            background: #6D28D9;
+            background: #5B21B6;
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(124, 58, 237, 0.25);
+            box-shadow: 0 8px 25px rgba(109, 40, 217, 0.4);
         }
 
         .upload-btn svg {
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
         }
 
         .upload-hint {
-            color: var(--gray-500);
-            font-size: 0.95rem;
+            color: var(--gray-900);
+            font-size: 1rem;
+            font-weight: 500;
         }
 
         .file-input {
@@ -410,21 +422,26 @@
             pointer-events: none;
             top: 0;
             left: 0;
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
         .floating-image {
             position: absolute;
-            border-radius: 16px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
             overflow: hidden;
             animation: float 4s ease-in-out infinite;
             pointer-events: auto;
             cursor: pointer;
-            transition: transform 0.3s ease;
+            transition: all 0.3s ease;
+            border: 4px solid white;
         }
 
         .floating-image:hover {
-            transform: scale(1.05) rotate(0deg) !important;
+            transform: scale(1.08) rotate(0deg) !important;
+            box-shadow: 0 25px 80px rgba(124, 58, 237, 0.25);
+            border-color: var(--primary);
         }
 
         .floating-image img {
@@ -434,21 +451,135 @@
         }
 
         .floating-image.left-1 {
-            width: 140px;
-            height: 140px;
-            left: -180px;
-            top: 50%;
-            transform: translateY(-50%) rotate(-5deg);
+            width: 160px;
+            height: 160px;
+            left: 5%;
+            top: 15%;
+            transform: rotate(-12deg);
             animation-delay: 0s;
         }
 
         .floating-image.right-1 {
-            width: 160px;
-            height: 180px;
-            right: -200px;
-            top: 50%;
-            transform: translateY(-50%) rotate(5deg);
+            width: 200px;
+            height: 220px;
+            right: 5%;
+            bottom: 20%;
+            transform: rotate(8deg);
             animation-delay: 1s;
+        }
+
+        /* Video Demo Section */
+        .video-demo-section {
+            padding: 100px 24px;
+            background: var(--gray-50);
+        }
+
+        .video-demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .video-demo-left {
+            position: relative;
+        }
+
+        .video-demo-video {
+            width: 100%;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            border: 2px solid var(--gray-200);
+        }
+
+        .video-demo-video video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .video-demo-right {
+            padding: 20px 0;
+        }
+
+        .video-demo-right h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            color: var(--gray-900);
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            margin-bottom: 24px;
+        }
+
+        .video-demo-right p {
+            font-size: 1.125rem;
+            color: var(--gray-600);
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+
+        .video-demo-features {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 32px;
+        }
+
+        .video-demo-feature {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .video-demo-feature-icon {
+            width: 24px;
+            height: 24px;
+            color: var(--primary);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .video-demo-feature-text {
+            flex: 1;
+        }
+
+        .video-demo-feature-text strong {
+            font-weight: 600;
+            color: var(--gray-900);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .video-demo-feature-text span {
+            color: var(--gray-600);
+            font-size: 0.95rem;
+        }
+
+        @media (max-width: 1024px) {
+            .video-demo-container {
+                grid-template-columns: 1fr;
+                gap: 50px;
+            }
+
+            .video-demo-left {
+                order: 2;
+            }
+
+            .video-demo-right {
+                order: 1;
+                text-align: center;
+            }
+
+            .video-demo-features {
+                align-items: center;
+            }
+
+            .video-demo-feature {
+                max-width: 500px;
+            }
         }
 
         /* Live Demo Animation Section */
@@ -1127,12 +1258,55 @@
                 display: block;
             }
 
+            .hero {
+                padding: 20px 16px 60px;
+            }
+
             .hero h1 {
-                font-size: 2rem;
+                font-size: 2.2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .hero-icon {
+                width: 40px;
+                height: 40px;
+            }
+
+            .upload-section {
+                padding: 0 10px;
             }
 
             .upload-card {
-                padding: 40px 24px;
+                padding: 60px 24px;
+                min-height: 280px;
+            }
+
+            .upload-btn {
+                padding: 16px 28px;
+                font-size: 0.95rem;
+            }
+
+            .video-demo-section {
+                padding: 60px 16px;
+            }
+
+            .video-demo-container {
+                gap: 40px;
+            }
+
+            .video-demo-right h2 {
+                font-size: 1.8rem;
+            }
+
+            .video-demo-right p {
+                font-size: 1rem;
+            }
+
+            .video-demo-feature {
+                text-align: left;
             }
 
             .demo-container {
@@ -1176,17 +1350,14 @@
             </a>
             
             <ul class="nav-links">
-                <li><a href="#features">Product</a></li>
-                <li><a href="#how-it-works">Solutions</a></li>
-                <li><a href="#showcase">Resources</a></li>
-                <li><a href="#faq">Enterprise</a></li>
-                <li><a href="#pricing">Pricing</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#how-it-works">How It Works</a></li>
+                <li><a href="#showcase">Examples</a></li>
+                <li><a href="#faq">FAQ</a></li>
             </ul>
             
             <div class="nav-actions">
-                <a href="#" class="btn btn-ghost">Contact Sales</a>
-                <a href="#" class="btn btn-ghost">Log in</a>
-                <a href="/upload" class="btn btn-primary">Start creating</a>
+                <a href="/upload" class="btn btn-primary">Remove Background Now</a>
             </div>
             
             <button class="mobile-menu-btn" aria-label="Menu">
@@ -1204,36 +1375,32 @@
         <ul class="breadcrumb-list">
             <li><a href="/">Home</a></li>
             <li><span>›</span></li>
-            <li><a href="#">Tools</a></li>
-            <li><span>›</span></li>
             <li class="current">Background Remover</li>
         </ul>
     </div>
 
     <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content">
-            <div class="hero-title">
-                <svg class="hero-icon" viewBox="0 0 48 48" fill="none">
-                    <rect x="4" y="4" width="40" height="40" rx="8" stroke="currentColor" stroke-width="3"/>
-                    <path d="M4 36l12-12 8 8 12-16 8 12" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                <h1>Remove backgrounds<br>instantly with AI</h1>
+    <section class="hero" id="home">
+        <!-- Floating sample images -->
+        <div class="floating-images">
+            <div class="floating-image left-1">
+                <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=200&h=200&fit=crop" alt="Jewelry sample">
             </div>
-            <p>Automatically remove backgrounds from any product image with our AI background remover—no design skills or expensive tools required.</p>
+            <div class="floating-image right-1">
+                <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200&h=240&fit=crop" alt="Sneaker sample">
+            </div>
+        </div>
+
+        <div class="hero-content">
+            <svg class="hero-icon" viewBox="0 0 48 48" fill="none">
+                <rect x="4" y="4" width="40" height="40" rx="8" stroke="currentColor" stroke-width="3"/>
+                <path d="M4 36l12-12 8 8 12-16 8 12" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <h1>Remove backgrounds<br>instantly with AI</h1>
+            <p>Automatically remove backgrounds from any product image with Photoroom's AI background remover—no design skills or expensive tools required.</p>
         </div>
 
         <div class="upload-section">
-            <!-- Floating sample images -->
-            <div class="floating-images">
-                <div class="floating-image left-1">
-                    <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=200&h=200&fit=crop" alt="Jewelry sample">
-                </div>
-                <div class="floating-image right-1">
-                    <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200&h=240&fit=crop" alt="Sneaker sample">
-                </div>
-            </div>
-
             <div class="upload-card" id="dropZone">
                 <div class="upload-content">
                     <label class="upload-btn" for="fileInput">
@@ -1250,12 +1417,60 @@
         </div>
     </section>
 
+    <!-- Video Demo Section -->
+    <section class="video-demo-section">
+        <div class="video-demo-container">
+            <div class="video-demo-left">
+                <div class="video-demo-video">
+                    <video autoplay loop muted playsinline>
+                        <source src="{{ url_for('static', filename='remove-background-animation-v1_1.mp4') }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            </div>
+            <div class="video-demo-right">
+                <h2>AI-powered background removal in seconds</h2>
+                <p>Our advanced AI technology automatically detects subjects and removes backgrounds with incredible precision, saving you hours of manual editing work.</p>
+                
+                <div class="video-demo-features">
+                    <div class="video-demo-feature">
+                        <svg class="video-demo-feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 6L9 17l-5-5"/>
+                        </svg>
+                        <div class="video-demo-feature-text">
+                            <strong>Instant Processing</strong>
+                            <span>Remove backgrounds in just 2-3 seconds with one click</span>
+                        </div>
+                    </div>
+                    <div class="video-demo-feature">
+                        <svg class="video-demo-feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 6L9 17l-5-5"/>
+                        </svg>
+                        <div class="video-demo-feature-text">
+                            <strong>Pixel-Perfect Edges</strong>
+                            <span>Advanced AI preserves fine details like hair and transparent objects</span>
+                        </div>
+                    </div>
+                    <div class="video-demo-feature">
+                        <svg class="video-demo-feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 6L9 17l-5-5"/>
+                        </svg>
+                        <div class="video-demo-feature-text">
+                            <strong>High-Quality Output</strong>
+                            <span>Download transparent PNGs with original image quality preserved</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Live Demo Section -->
     <section class="live-demo-section" id="demo">
         <div class="section-container">
             <div class="section-header animate-on-scroll">
                 <h2>See the magic happen</h2>
-                <p>Watch how our AI instantly removes backgrounds with precision edge detection</p>
+                <p>Watch how our AI instantly removes backgrounds with precision edge detection and smart processing</p>
             </div>
 
             <div class="demo-container">
@@ -1271,22 +1486,22 @@
                     <div class="demo-step">
                         <div class="step-number">1</div>
                         <div class="step-content">
-                            <h3>Choose a photo</h3>
-                            <p>Upload any JPEG or PNG product image. BG Remover removes the background for you.</p>
+                            <h3>Upload Your Image</h3>
+                            <p>Drag and drop or click to upload any JPEG, PNG, or WebP image. Works with photos, products, portraits, and more.</p>
                         </div>
                     </div>
                     <div class="demo-step">
                         <div class="step-number">2</div>
                         <div class="step-content">
-                            <h3>Let AI do the work</h3>
-                            <p>Our AI removes the background instantly. It's up to you.</p>
+                            <h3>AI Processes Automatically</h3>
+                            <p>Our advanced AI instantly detects the subject and removes the background with pixel-perfect precision in seconds.</p>
                         </div>
                     </div>
                     <div class="demo-step">
                         <div class="step-number">3</div>
                         <div class="step-content">
-                            <h3>Download your image</h3>
-                            <p>Download your photo in PNG, JPEG, or save to your account for easy access.</p>
+                            <h3>Download High-Quality Result</h3>
+                            <p>Get your transparent PNG image ready to use. No watermarks, no sign-up, completely free forever.</p>
                         </div>
                     </div>
                 </div>
@@ -1298,8 +1513,8 @@
     <section class="features-section" id="features">
         <div class="section-container">
             <div class="section-header animate-on-scroll">
-                <h2>All the AI product photography tools you need</h2>
-                <p>Keep your brand unique while saving time and budget with AI-generated photography tools</p>
+                <h2>Powerful Background Removal Features</h2>
+                <p>Professional-grade AI technology that makes background removal simple and fast</p>
             </div>
 
             <div class="features-grid">
@@ -1309,8 +1524,8 @@
                             <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
                         </svg>
                     </div>
-                    <h3>Erase photo backgrounds</h3>
-                    <p>Remove any unwanted background from your product photos instantly with AI.</p>
+                    <h3>Smart AI Detection</h3>
+                    <p>Advanced AI automatically identifies subjects and removes backgrounds with incredible accuracy, preserving fine details like hair and edges.</p>
                 </div>
 
                 <div class="feature-card animate-on-scroll">
@@ -1321,8 +1536,8 @@
                             <path d="M9 21V9"/>
                         </svg>
                     </div>
-                    <h3>Generate AI backgrounds</h3>
-                    <p>Create stunning backgrounds for your products with AI in seconds.</p>
+                    <h3>Multiple Image Types</h3>
+                    <p>Works perfectly with product photos, portraits, pet photos, logos, and any other image type you need to process.</p>
                 </div>
 
                 <div class="feature-card animate-on-scroll">
@@ -1332,8 +1547,8 @@
                             <path d="M8 12l2 2 4-4"/>
                         </svg>
                     </div>
-                    <h3>Create lifestyle images</h3>
-                    <p>Generate realistic lifestyle photos for your products without a photo shoot.</p>
+                    <h3>High-Quality Output</h3>
+                    <p>Get crystal-clear transparent PNG images that maintain the original quality. Perfect for professional use in any project.</p>
                 </div>
 
                 <div class="feature-card animate-on-scroll">
@@ -1343,8 +1558,8 @@
                             <polyline points="22,6 12,13 2,6"/>
                         </svg>
                     </div>
-                    <h3>Enhance and resize images</h3>
-                    <p>Upscale low-resolution images and resize for any platform with perfect quality.</p>
+                    <h3>Lightning Fast Processing</h3>
+                    <p>Process images in seconds, not minutes. Our optimized AI delivers results faster than traditional editing tools.</p>
                 </div>
 
                 <div class="feature-card animate-on-scroll">
@@ -1355,8 +1570,8 @@
                             <path d="M2 12l10 5 10-5"/>
                         </svg>
                     </div>
-                    <h3>Export and share</h3>
-                    <p>Download in any format or share directly to your marketplace listings.</p>
+                    <h3>No Sign-Up Required</h3>
+                    <p>Start removing backgrounds immediately without creating an account. Your privacy is protected, files are processed securely.</p>
                 </div>
 
                 <div class="feature-card animate-on-scroll">
@@ -1368,8 +1583,8 @@
                             <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                         </svg>
                     </div>
-                    <h3>Collaborate with your team</h3>
-                    <p>Work together with shared folders, templates, and brand assets.</p>
+                    <h3>Works on All Devices</h3>
+                    <p>Use BG Remover on desktop, tablet, or mobile. Fully responsive design works perfectly everywhere you need it.</p>
                 </div>
             </div>
         </div>
@@ -1379,26 +1594,26 @@
     <section class="stats-section">
         <div class="stats-container">
             <div class="stats-header animate-on-scroll">
-                <h2>Real results from brands and marketplaces</h2>
-                <p>See what happens when you use BG Remover</p>
+                <h2>Trusted by Thousands of Users</h2>
+                <p>Join users worldwide who use BG Remover for professional results</p>
             </div>
 
             <div class="stats-grid">
                 <div class="stat-item animate-on-scroll">
-                    <div class="stat-value">96%</div>
-                    <div class="stat-label">average boost in sales</div>
+                    <div class="stat-value">100%</div>
+                    <div class="stat-label">Free to use forever</div>
                 </div>
                 <div class="stat-item animate-on-scroll">
-                    <div class="stat-value">93%</div>
-                    <div class="stat-label">reduction in photo editing costs</div>
+                    <div class="stat-value">&lt;3s</div>
+                    <div class="stat-label">Average processing time</div>
                 </div>
                 <div class="stat-item animate-on-scroll">
-                    <div class="stat-value">56%</div>
-                    <div class="stat-label">uplift in sell-through rate</div>
+                    <div class="stat-value">AI</div>
+                    <div class="stat-label">Powered precision removal</div>
                 </div>
                 <div class="stat-item animate-on-scroll">
-                    <div class="stat-value">99%</div>
-                    <div class="stat-label">visual branding compliance achieved</div>
+                    <div class="stat-value">0</div>
+                    <div class="stat-label">Watermarks or hidden fees</div>
                 </div>
             </div>
         </div>
@@ -1408,7 +1623,7 @@
     <section class="how-section" id="how-it-works">
         <div class="section-container">
             <div class="section-header animate-on-scroll">
-                <h2>How to remove a background from an image</h2>
+                <h2>Remove Backgrounds in 3 Simple Steps</h2>
             </div>
 
             <div class="how-grid">
@@ -1421,8 +1636,8 @@
                             <line x1="12" y1="3" x2="12" y2="15"/>
                         </svg>
                     </div>
-                    <h3>Choose a photo</h3>
-                    <p>Upload your JPEG or PNG product image. The tool removes the background for you.</p>
+                    <h3>Upload Your Image</h3>
+                    <p>Click to upload or drag and drop any JPEG, PNG, or WebP image. No size limits or account required.</p>
                 </div>
 
                 <div class="how-card animate-on-scroll">
@@ -1437,8 +1652,8 @@
                             <path d="M7 14v.01"/>
                         </svg>
                     </div>
-                    <h3>Let AI do the work</h3>
-                    <p>Our AI removes the background instantly. It takes just a few seconds.</p>
+                    <h3>AI Removes Background</h3>
+                    <p>Our advanced AI automatically detects the subject and removes the background with precision in just seconds.</p>
                 </div>
 
                 <div class="how-card animate-on-scroll">
@@ -1450,18 +1665,18 @@
                             <line x1="12" y1="15" x2="12" y2="3"/>
                         </svg>
                     </div>
-                    <h3>Download your image</h3>
-                    <p>Download your photo in PNG, JPEG, or save to your account at each step.</p>
+                    <h3>Download PNG Image</h3>
+                    <p>Get your transparent PNG image instantly. High quality, no watermarks, ready to use in any project.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Comparison Section -->
-    <section class="comparison-section">
+    <section class="comparison-section" id="showcase">
         <div class="section-container">
             <div class="section-header animate-on-scroll">
-                <h2>AI product photography for every type of product shot</h2>
+                <h2>Perfect for Every Type of Image</h2>
             </div>
 
             <div class="comparison-grid">
@@ -1470,38 +1685,38 @@
                         <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&h=225&fit=crop" alt="Watch product">
                     </div>
                     <div class="comparison-content">
-                        <h4>Create e-commerce product photos with AI</h4>
-                        <p>Perfect for online stores and marketplaces</p>
+                        <h4>E-commerce Product Photos</h4>
+                        <p>Create clean product images for online stores, Amazon, eBay, and marketplaces</p>
                     </div>
                 </div>
 
                 <div class="comparison-card animate-on-scroll">
                     <div class="comparison-image">
-                        <img src="https://images.unsplash.com/photo-1560343090-f0409e92791a?w=300&h=225&fit=crop" alt="Skincare product">
+                        <img src="https://images.unsplash.com/photo-1560343090-f0409e92791a?w=300&h=225&fit=crop" alt="Portrait">
                     </div>
                     <div class="comparison-content">
-                        <h4>Create authentic lifestyle product photos with AI</h4>
-                        <p>Generate realistic lifestyle scenes instantly</p>
+                        <h4>Portrait Photography</h4>
+                        <p>Remove backgrounds from headshots, profile pictures, and professional portraits</p>
                     </div>
                 </div>
 
                 <div class="comparison-card animate-on-scroll">
                     <div class="comparison-image">
-                        <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=300&h=225&fit=crop" alt="Clothing product">
+                        <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=300&h=225&fit=crop" alt="Fashion">
                     </div>
                     <div class="comparison-content">
-                        <h4>Create authentic skincare product photos with AI</h4>
-                        <p>Perfect for beauty and cosmetics brands</p>
+                        <h4>Fashion & Apparel</h4>
+                        <p>Perfect for clothing, accessories, and fashion product photography</p>
                     </div>
                 </div>
 
                 <div class="comparison-card animate-on-scroll">
                     <div class="comparison-image">
-                        <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300&h=225&fit=crop" alt="Electronics product">
+                        <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300&h=225&fit=crop" alt="Creative">
                     </div>
                     <div class="comparison-content">
-                        <h4>Create authentic photos with AI</h4>
-                        <p>Works for any product category</p>
+                        <h4>Creative & Design Projects</h4>
+                        <p>Use in graphic design, presentations, social media, and marketing materials</p>
                     </div>
                 </div>
             </div>
@@ -1512,7 +1727,7 @@
     <section class="faq-section" id="faq">
         <div class="faq-container">
             <div class="section-header animate-on-scroll">
-                <h2>Background remover:<br>your questions answered</h2>
+                <h2>Frequently Asked Questions</h2>
             </div>
 
             <div class="faq-list">
@@ -1587,10 +1802,10 @@
     <!-- CTA Section -->
     <section class="cta-section">
         <div class="cta-card animate-on-scroll">
-            <h2>Go further with BG Remover</h2>
-            <p>Remove backgrounds instantly. Create professional product photos. All for free.</p>
+            <h2>Ready to Remove Backgrounds?</h2>
+            <p>Start creating professional transparent images in seconds. Free forever, no sign-up required.</p>
             <a href="/upload" class="btn btn-primary btn-large">
-                Start creating
+                Remove Background Now
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M5 12h14M12 5l7 7-7 7"/>
                 </svg>
@@ -1613,52 +1828,52 @@
                         </div>
                         BG Remover
                     </h3>
-                    <p>AI-powered background removal for everyone. Create professional product photos in seconds.</p>
+                    <p>AI-powered background removal made simple. Free, fast, and professional quality results in seconds.</p>
                 </div>
 
                 <div class="footer-column">
-                    <h4>Free tools</h4>
+                    <h4>Product</h4>
                     <ul>
-                        <li><a href="#">AI Photo Remove</a></li>
-                        <li><a href="#">AI Enhance</a></li>
-                        <li><a href="#">AI Shadow</a></li>
-                        <li><a href="#">Image Resize</a></li>
+                        <li><a href="/upload">Background Remover</a></li>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#how-it-works">How It Works</a></li>
+                        <li><a href="#faq">FAQ</a></li>
                     </ul>
                 </div>
 
                 <div class="footer-column">
-                    <h4>Our apps</h4>
+                    <h4>Resources</h4>
                     <ul>
-                        <li><a href="#">iPhone app</a></li>
-                        <li><a href="#">Android app</a></li>
-                        <li><a href="#">macOS app</a></li>
-                        <li><a href="#">Web App</a></li>
+                        <li><a href="#showcase">Use Cases</a></li>
+                        <li><a href="https://github.com" target="_blank">GitHub</a></li>
+                        <li><a href="#demo">Live Demo</a></li>
+                        <li><a href="#">API Documentation</a></li>
                     </ul>
                 </div>
 
                 <div class="footer-column">
-                    <h4>Company</h4>
+                    <h4>Support</h4>
                     <ul>
-                        <li><a href="#">About</a></li>
-                        <li><a href="#">Careers</a></li>
-                        <li><a href="#">Press</a></li>
-                        <li><a href="#">Blog</a></li>
+                        <li><a href="#faq">Help Center</a></li>
+                        <li><a href="mailto:support@bgremover.com">Contact Us</a></li>
+                        <li><a href="#">Report an Issue</a></li>
+                        <li><a href="#">Feature Requests</a></li>
                     </ul>
                 </div>
 
                 <div class="footer-column">
-                    <h4>Help & legal</h4>
+                    <h4>Legal</h4>
                     <ul>
-                        <li><a href="#">Help center</a></li>
-                        <li><a href="#">Privacy policy</a></li>
-                        <li><a href="#">Terms of service</a></li>
-                        <li><a href="#">Contact us</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                        <li><a href="#">Acceptable Use</a></li>
                     </ul>
                 </div>
             </div>
 
             <div class="footer-bottom">
-                <p class="footer-copyright">© 2026 BG Remover. All rights reserved.</p>
+                <p class="footer-copyright">© 2026 BG Remover. All rights reserved. Made with ❤️ for creators.</p>
                 <div class="footer-social">
                     <a href="#" aria-label="Twitter">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -1672,9 +1887,9 @@
                             <circle cx="18" cy="6" r="1"/>
                         </svg>
                     </a>
-                    <a href="#" aria-label="YouTube">
+                    <a href="#" aria-label="GitHub">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                         </svg>
                     </a>
                 </div>
@@ -1683,6 +1898,18 @@
     </footer>
 
     <script>
+        // Ensure page loads at top
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                window.scrollTo(0, 0);
+            }, 10);
+        });
+
+        // Prevent scroll restoration
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+
         // Navbar scroll effect
         const navbar = document.getElementById('navbar');
         window.addEventListener('scroll', () => {
