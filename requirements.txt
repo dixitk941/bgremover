@@ -7,3 +7,5 @@ requests
 Werkzeug
 onnxruntime
 gunicorn
+scipy
+opencv-python-headless
