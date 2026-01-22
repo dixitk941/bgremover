@@ -1,1 +1,192 @@
+# Local development (Windows)
 .\venv\Scripts\python.exe app.py
+
+# ============================================
+# BGCUTPRO.COM VPS DEPLOYMENT COMMANDS
+# VPS: root@31.97.206.224 (Ubuntu 24.04)
+# Domain: bgcutpro.com
+# ============================================
+
+# ========================
+# 1. INITIAL SERVER SETUP
+# ========================
+
+# Connect to VPS
+ssh root@31.97.206.224
+
+# Update system
+apt update && apt upgrade -y
+
+# Install required packages
+apt install -y python3-pip python3-venv nginx certbot python3-certbot-nginx git
+
+# ========================
+# 2. APPLICATION SETUP
+# ========================
+
+# Create application directory
+mkdir -p /var/www/bgcutpro
+
+# Upload files from local machine (run from local):
+rsync -avz --exclude '__pycache__' --exclude '.git' --exclude 'venv' --exclude 'static/uploads/jobs/*' --exclude 'static/uploads/originals/*' --exclude 'static/uploads/processed/*' /path/to/bgremover/ root@31.97.206.224:/var/www/bgcutpro/
+
+# Create Python virtual environment
+cd /var/www/bgcutpro
+python3 -m venv venv
+source venv/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
+deactivate
+
+# Create model cache directory (for rembg)
+mkdir -p /var/www/.u2net
+chown -R www-data:www-data /var/www/.u2net
+chmod 755 /var/www/.u2net
+
+# Set proper permissions
+chown -R www-data:www-data /var/www/bgcutpro
+chmod -R 755 /var/www/bgcutpro
+
+# ========================
+# 3. SYSTEMD SERVICE
+# ========================
+
+# Create systemd service file
+cat > /etc/systemd/system/bgcutpro.service << 'EOF'
+[Unit]
+Description=BGCutPro Flask Application
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/bgcutpro
+Environment="PATH=/var/www/bgcutpro/venv/bin"
+ExecStart=/var/www/bgcutpro/venv/bin/gunicorn --workers 3 --bind unix:bgcutpro.sock -m 007 app:app
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Enable and start the service
+systemctl daemon-reload
+systemctl enable bgcutpro
+systemctl start bgcutpro
+
+# Check service status
+systemctl status bgcutpro
+
+# ========================
+# 4. NGINX CONFIGURATION
+# ========================
+
+# Create Nginx server block
+cat > /etc/nginx/sites-available/bgcutpro << 'EOF'
+server {
+    listen 80;
+    server_name bgcutpro.com www.bgcutpro.com;
+
+    client_max_body_size 16M;
+
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:/var/www/bgcutpro/bgcutpro.sock;
+        proxy_connect_timeout 300;
+        proxy_send_timeout 300;
+        proxy_read_timeout 300;
+    }
+
+    location /static {
+        alias /var/www/bgcutpro/static;
+        expires 30d;
+    }
+}
+EOF
+
+# Enable the site
+ln -sf /etc/nginx/sites-available/bgcutpro /etc/nginx/sites-enabled/
+
+# Remove default site
+rm -f /etc/nginx/sites-enabled/default
+
+# Test and restart Nginx
+nginx -t
+systemctl restart nginx
+
+# ========================
+# 5. FIREWALL SETUP
+# ========================
+
+# Allow necessary ports
+ufw allow 'Nginx Full'
+ufw allow OpenSSH
+ufw --force enable
+ufw status
+
+# ========================
+# 6. SSL CERTIFICATE (Run after DNS is configured)
+# ========================
+
+# Get SSL certificate from Let's Encrypt
+certbot --nginx -d bgcutpro.com -d www.bgcutpro.com
+
+# Auto-renewal test
+certbot renew --dry-run
+
+# ========================
+# 7. USEFUL MANAGEMENT COMMANDS
+# ========================
+
+# View application logs
+journalctl -u bgcutpro -f
+
+# Restart application
+systemctl restart bgcutpro
+
+# Restart Nginx
+systemctl restart nginx
+
+# Check Nginx error logs
+tail -f /var/log/nginx/error.log
+
+# Check Nginx access logs
+tail -f /var/log/nginx/access.log
+
+# ========================
+# 8. QUICK REDEPLOY COMMANDS
+# ========================
+
+# From local machine (upload new files):
+rsync -avz --exclude '__pycache__' --exclude '.git' --exclude 'venv' --exclude 'static/uploads/jobs/*' --exclude 'static/uploads/originals/*' --exclude 'static/uploads/processed/*' /path/to/bgremover/ root@31.97.206.224:/var/www/bgcutpro/
+
+# On server (restart app after upload):
+chown -R www-data:www-data /var/www/bgcutpro
+systemctl restart bgcutpro
+
+# ============================================
+# DNS CONFIGURATION FOR bgcutpro.com
+# ============================================
+# Add these DNS records in your domain registrar's DNS settings:
+#
+# +------+------+-----------------+------+
+# | Type | Host | Value           | TTL  |
+# +------+------+-----------------+------+
+# | A    | @    | 31.97.206.224   | 3600 |
+# | A    | www  | 31.97.206.224   | 3600 |
+# +------+------+-----------------+------+
+#
+# Optional (if IPv6 is available):
+# | AAAA | @    | [IPv6 address]  | 3600 |
+# | AAAA | www  | [IPv6 address]  | 3600 |
+# ============================================
+
+
+
+
+Passkey :- xEY7yB,)Gy7&wyqmb+2N
+
+
+
+ssh root@31.97.206.224 "journalctl -u bgcutpro -f"
