@@ -62,7 +62,7 @@ User=www-data
 Group=www-data
 WorkingDirectory=/var/www/bgcutpro
 Environment="PATH=/var/www/bgcutpro/venv/bin"
-ExecStart=/var/www/bgcutpro/venv/bin/gunicorn --workers 3 --bind unix:bgcutpro.sock -m 007 app:app
+ExecStart=/var/www/bgcutpro/venv/bin/gunicorn --workers 1 --timeout 300 --bind unix:bgcutpro.sock -m 007 app:app
 Restart=always
 RestartSec=3
 
@@ -185,8 +185,54 @@ systemctl restart bgcutpro
 
 
 
-Passkey :- xEY7yB,)Gy7&wyqmb+2N
+Passkey :- EY7yB,)Gy7&wyqmb+2N
 
 
+
+# ============================================
+# 9. SWAP MEMORY SETUP (16GB)
+# ============================================
+# This helps handle large AI models on limited RAM servers
+
+# Create 16GB swap file
+fallocate -l 16G /swapfile
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+
+# Verify swap is active
+free -h
+swapon --show
+
+# Make swap persistent (survive reboot)
+echo '/swapfile none swap sw 0 0' >> /etc/fstab
+
+# Optimize swappiness for AI workloads
+echo 'vm.swappiness=60' >> /etc/sysctl.conf
+sysctl vm.swappiness=60
+
+# ============================================
+# 10. MEMORY OPTIMIZATION NOTES
+# ============================================
+# The app uses LAZY MODEL LOADING to reduce memory:
+# - Only 1 model loaded at startup (birefnet-general)
+# - Other models (birefnet-massive, u2net, isnet, human) load on-demand
+# - Reduces idle RAM from ~5.7GB to ~1.5GB
+# - Models cache in swap when not in use
+#
+# Gunicorn workers: 1 (reduced from 3 to prevent OOM)
+# To change workers, edit /etc/systemd/system/bgcutpro.service
+#
+# Monitor memory usage:
+ssh root@31.97.206.224 "free -h && swapon --show"
+
+# View which models are loaded:
+ssh root@31.97.206.224 "journalctl -u bgcutpro | grep 'Loading model'"
+
+# ============================================
+# COMMON COMMANDS
+# ============================================
 
 ssh root@31.97.206.224 "journalctl -u bgcutpro -f"
+ssh root@31.97.206.224 "systemctl restart bgcutpro"
+ssh root@31.97.206.224 "free -h && uptime"

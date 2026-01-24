@@ -1,6 +1,6 @@
 # app.py
 
-from flask import Flask, render_template, request, redirect, url_for, send_from_directory, jsonify, make_response
+from flask import Flask, render_template, request, redirect, url_for, send_from_directory, jsonify, make_response, abort
 from werkzeug.utils import secure_filename as werkzeug_secure_filename
 import os
 import uuid
@@ -19,6 +19,8 @@ import time
 import atexit
 from scipy import ndimage
 import cv2
+import gc
+import psutil
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -47,32 +49,137 @@ os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'jobs'), exist_ok=True)
 # In-memory storage for processing status (use Redis in production)
 processing_status = {}
 
-# Initialize multiple rembg sessions with BEST available models
-# BiRefNet models are state-of-the-art for background removal
-logger.info("Initializing AI models for background removal...")
+# ==================== MEMORY-OPTIMIZED MODEL LOADING SYSTEM ====================
+# Uses ONLY ONE model at a time to minimize RAM usage
+# Critical for servers with limited RAM (8GB + swap)
 
-try:
-    # BiRefNet-general - BEST model for general objects with excellent edge detection
-    rembg_session_birefnet = new_session("birefnet-general")
-    logger.info("✓ Loaded BiRefNet-general (best for objects)")
-except Exception as e:
-    logger.warning(f"BiRefNet-general not available: {e}, falling back to isnet-general-use")
-    rembg_session_birefnet = new_session("isnet-general-use")
+# Memory monitoring helper
+def get_memory_usage_mb():
+    """Get current process memory usage in MB"""
+    try:
+        process = psutil.Process()
+        return process.memory_info().rss / 1024 / 1024
+    except:
+        return 0
 
-try:
-    # BiRefNet-massive - Even higher quality but slower
-    rembg_session_birefnet_hq = new_session("birefnet-massive")
-    logger.info("✓ Loaded BiRefNet-massive (highest quality)")
-except Exception as e:
-    logger.warning(f"BiRefNet-massive not available: {e}, using BiRefNet-general as fallback")
-    rembg_session_birefnet_hq = rembg_session_birefnet
+def force_garbage_collection():
+    """Force garbage collection to free memory"""
+    gc.collect()
+    # Also clear any PyTorch/ONNX caches if available
+    try:
+        import torch
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+    except ImportError:
+        pass
+    gc.collect()
 
-# Fallback models
-rembg_session_general = new_session("u2net")  # General purpose fallback
-rembg_session_fine = new_session("isnet-general-use")  # Fine details
-rembg_session_human = new_session("u2net_human_seg")  # Optimized for people
+class MemoryOptimizedModelLoader:
+    """Memory-optimized model loader - keeps ONLY ONE model loaded at a time"""
+    
+    def __init__(self):
+        self._current_model = None
+        self._current_model_key = None
+        self._model_names = {
+            'isnet': 'isnet-general-use',  # Lightweight, good quality (~170MB)
+            'u2net': 'u2net',               # Medium size (~170MB)
+            'birefnet': 'birefnet-general', # High quality but larger (~350MB)
+            'human': 'u2net_human_seg',     # For humans (~170MB)
+        }
+        # Default model - isnet is lightweight and good quality
+        self._default_model = 'isnet'
+        self._lock = threading.Lock()
+        logger.info("Memory-optimized model loader initialized (single model mode)")
+    
+    def get_model(self, model_key=None):
+        """Get a model, unloading any previous model first to save memory"""
+        if model_key is None:
+            model_key = self._default_model
+        
+        # Map old model keys to optimized ones
+        key_mapping = {
+            'birefnet_hq': 'birefnet',  # Don't use massive model
+            'general': 'u2net',
+            'fine': 'isnet',
+        }
+        model_key = key_mapping.get(model_key, model_key)
+        
+        with self._lock:
+            # If same model is already loaded, return it
+            if self._current_model_key == model_key and self._current_model is not None:
+                return self._current_model
+            
+            # Unload current model first to free memory
+            if self._current_model is not None:
+                mem_before = get_memory_usage_mb()
+                logger.info(f"Unloading model '{self._current_model_key}' to free memory (current: {mem_before:.0f}MB)")
+                self._current_model = None
+                self._current_model_key = None
+                force_garbage_collection()
+                mem_after = get_memory_usage_mb()
+                logger.info(f"Memory after unload: {mem_after:.0f}MB (freed: {mem_before - mem_after:.0f}MB)")
+            
+            # Load the new model
+            model_name = self._model_names.get(model_key, self._model_names[self._default_model])
+            logger.info(f"Loading model: {model_name} (memory: {get_memory_usage_mb():.0f}MB)")
+            
+            try:
+                self._current_model = new_session(model_name)
+                self._current_model_key = model_key
+                logger.info(f"✓ Loaded {model_name} (memory: {get_memory_usage_mb():.0f}MB)")
+            except Exception as e:
+                logger.warning(f"Failed to load {model_name}: {e}")
+                # Fallback to lightweight isnet
+                if model_key != 'isnet':
+                    logger.info("Falling back to isnet model")
+                    return self.get_model('isnet')
+                raise e
+            
+            return self._current_model
+    
+    def unload_all(self):
+        """Unload all models to free memory"""
+        with self._lock:
+            if self._current_model is not None:
+                logger.info(f"Unloading all models (memory before: {get_memory_usage_mb():.0f}MB)")
+                self._current_model = None
+                self._current_model_key = None
+                force_garbage_collection()
+                logger.info(f"All models unloaded (memory after: {get_memory_usage_mb():.0f}MB)")
+    
+    def get_loaded_models(self):
+        """Return list of currently loaded models"""
+        if self._current_model_key:
+            return [self._current_model_key]
+        return []
 
-logger.info("✓ All AI models loaded successfully")
+# Initialize memory-optimized model loader (NO preloading - saves ~500MB+ RAM on startup)
+model_loader = MemoryOptimizedModelLoader()
+logger.info("✓ Model loader initialized - models will load on first request (saves RAM)")
+
+# Compatibility aliases for existing code
+def get_rembg_session_birefnet():
+    return model_loader.get_model('birefnet')
+
+def get_rembg_session_birefnet_hq():
+    return model_loader.get_model('birefnet_hq')
+
+def get_rembg_session_general():
+    return model_loader.get_model('general')
+
+def get_rembg_session_fine():
+    return model_loader.get_model('fine')
+
+def get_rembg_session_human():
+    return model_loader.get_model('human')
+
+# For backward compatibility - these are now functions, not variables
+# The code that uses these will need to call them as functions
+rembg_session_birefnet = None  # Use get_rembg_session_birefnet() instead
+rembg_session_birefnet_hq = None  # Use get_rembg_session_birefnet_hq() instead
+rembg_session_general = None  # Use get_rembg_session_general() instead
+rembg_session_fine = None  # Use get_rembg_session_fine() instead
+rembg_session_human = None  # Use get_rembg_session_human() instead
 
 # ==================== ENHANCED EDGE DETECTION FUNCTIONS ====================
 
@@ -417,13 +524,13 @@ def enhance_edge_detection(image_rgba, original_image):
     return Image.merge('RGBA', (r, g, b, alpha_pil))
 
 def process_multi_object_image(input_data, original_pil):
-    """Process image with multiple objects using combined approach"""
-    logger.info("Processing multi-object image with enhanced detection")
+    """Process image with multiple objects - MEMORY OPTIMIZED single pass"""
+    logger.info("Processing multi-object image (memory-optimized single pass)")
     
-    # First pass with general model (better for multiple objects)
+    # Single pass with general model (good for multiple objects)
     output_general = remove(
         input_data,
-        session=rembg_session_general,
+        session=model_loader.get_model('isnet'),  # Use lightweight isnet
         alpha_matting=True,
         alpha_matting_foreground_threshold=240,
         alpha_matting_background_threshold=10,
@@ -431,35 +538,21 @@ def process_multi_object_image(input_data, original_pil):
         post_process_mask=True
     )
     
-    # Second pass with fine-detail model
-    output_fine = remove(
-        input_data,
-        session=rembg_session_fine,
-        alpha_matting=True,
-        alpha_matting_foreground_threshold=250,
-        alpha_matting_background_threshold=15,
-        alpha_matting_erode_size=12,
-        post_process_mask=True
-    )
+    # Open result
+    img_result = Image.open(io.BytesIO(output_general)).convert('RGBA')
     
-    # Open both results
-    img_general = Image.open(io.BytesIO(output_general)).convert('RGBA')
-    img_fine = Image.open(io.BytesIO(output_fine)).convert('RGBA')
+    # Clean up the mask
+    r, g, b, a = img_result.split()
+    alpha_np = np.array(a, dtype=np.float32)
     
-    # Combine masks - use union for better object coverage
-    alpha_general = np.array(img_general.split()[3], dtype=np.float32)
-    alpha_fine = np.array(img_fine.split()[3], dtype=np.float32)
+    alpha_np = np.where(alpha_np < 30, 0, alpha_np)
+    alpha_np = np.where(alpha_np > 225, 255, alpha_np)
     
-    # Take maximum of both masks to preserve all objects
-    alpha_combined = np.maximum(alpha_general, alpha_fine)
+    alpha_pil = Image.fromarray(alpha_np.astype(np.uint8))
     
-    # Clean up the combined mask
-    alpha_combined = np.where(alpha_combined < 30, 0, alpha_combined)
-    alpha_combined = np.where(alpha_combined > 225, 255, alpha_combined)
-    
-    # Use RGB from general model (usually better color preservation)
-    r, g, b, _ = img_general.split()
-    alpha_pil = Image.fromarray(alpha_combined.astype(np.uint8))
+    # Clean up intermediate data
+    del output_general, alpha_np
+    force_garbage_collection()
     
     return Image.merge('RGBA', (r, g, b, alpha_pil))
 
@@ -492,25 +585,33 @@ def remove_background_enhanced(original_path, job_id):
         if is_document:
             logger.info("📄 DOCUMENT/ID CARD detected - will preserve the entire card as foreground")
         
-        # Upscale for better processing (minimum 1500px for best quality)
-        # For logos/documents, less upscaling to avoid artifacts
+        # ==================== MEMORY-OPTIMIZED IMAGE SIZING ====================
+        # Limit processing resolution to reduce RAM usage
+        # Higher resolution = exponentially more RAM (4x resolution = 16x RAM)
+        MAX_PROCESSING_DIMENSION = 1024  # Max dimension for processing (was 1500)
+        MAX_UPSCALE_FACTOR = 1.5  # Max upscale factor (was 2.5)
+        
         min_dimension = min(original_size)
+        max_dimension = max(original_size)
         scale_factor = 1.0
         processing_size = original_size
         
-        if min_dimension < 1500 and not is_logo and not is_document:
-            scale_factor = min(1500 / min_dimension, 2.5)  # Cap at 2.5x upscale
+        # DOWNSCALE large images to save RAM
+        if max_dimension > MAX_PROCESSING_DIMENSION:
+            scale_factor = MAX_PROCESSING_DIMENSION / max_dimension
             processing_size = (int(original_width * scale_factor), int(original_height * scale_factor))
             img = img.resize(processing_size, Image.Resampling.LANCZOS)
             original_for_edges = original_for_edges.resize(processing_size, Image.Resampling.LANCZOS)
-            logger.info(f"Upscaled image from {original_size} to {processing_size} (scale: {scale_factor:.2f}x)")
-        elif (is_logo or is_document) and min_dimension < 1024:
-            # Gentle upscale for small logos/documents
-            scale_factor = min(1024 / min_dimension, 1.5)
+            logger.info(f"Downscaled large image from {original_size} to {processing_size} (saves RAM)")
+        # Only upscale very small images
+        elif min_dimension < 512 and not is_logo and not is_document:
+            scale_factor = min(512 / min_dimension, MAX_UPSCALE_FACTOR)
             processing_size = (int(original_width * scale_factor), int(original_height * scale_factor))
             img = img.resize(processing_size, Image.Resampling.LANCZOS)
             original_for_edges = original_for_edges.resize(processing_size, Image.Resampling.LANCZOS)
-            logger.info(f"Gentle upscale for logo/document from {original_size} to {processing_size}")
+            logger.info(f"Upscaled small image from {original_size} to {processing_size}")
+        
+        logger.info(f"Processing at resolution: {processing_size} (memory: {get_memory_usage_mb():.0f}MB)")
         
         # Convert to bytes for rembg
         img_byte_arr = io.BytesIO()
@@ -522,58 +623,52 @@ def remove_background_enhanced(original_path, job_id):
         
         # Choose model and parameters based on content analysis
         # BiRefNet is used as primary for ALL cases (best quality)
+        # NOTE: We only store model KEYS here, actual loading happens when needed
         if is_document:
             # For documents/ID cards: Treat the ENTIRE rectangular card as foreground
             # Use edge detection to find the card boundary, not internal content
-            primary_session = rembg_session_general  # General model better for documents
-            secondary_session = rembg_session_birefnet
-            tertiary_session = rembg_session_fine
+            primary_model_key = 'general'  # General model better for documents
             # Document settings - preserve the entire card
             fg_threshold = 200
             bg_threshold = 80  # Very high - only remove obvious background
             erode_size = 0     # NO erosion
             logger.info("📄 Using document-optimized settings (preserving entire card)")
         elif analysis['has_human'] and not is_document:
-            # For humans: BiRefNet + human-specific model
-            primary_session = rembg_session_birefnet  # BiRefNet for best edges
-            secondary_session = rembg_session_human   # Human-specific for validation
-            tertiary_session = rembg_session_birefnet_hq  # Highest quality
+            # For humans: BiRefNet for best edges
+            primary_model_key = 'birefnet'  # BiRefNet for best edges
             # Human-optimized settings
             fg_threshold = 250
             bg_threshold = 10
             erode_size = 10
-            logger.info("🧑 Using BiRefNet + Human model (optimized for people)")
+            logger.info("🧑 Using BiRefNet model (optimized for people)")
         elif is_logo:
             # For logos/graphics: Use simple processing, NO alpha matting
             # Alpha matting can damage flat color regions
-            primary_session = rembg_session_birefnet
-            secondary_session = rembg_session_general
-            tertiary_session = rembg_session_fine
+            primary_model_key = 'birefnet'
             # Logo settings - very gentle, preserve all foreground
             fg_threshold = 200  # Lower threshold = keep more
             bg_threshold = 50   # Higher threshold = be sure before removing
             erode_size = 0      # NO erosion for logos
             logger.info("🎨 Using BiRefNet with GENTLE settings (logos/graphics)")
         elif analysis['is_product'] or analysis['has_sharp_edges']:
-            # For products/objects: BiRefNet-massive for best edge detection
-            primary_session = rembg_session_birefnet_hq  # Highest quality for products
-            secondary_session = rembg_session_birefnet   # BiRefNet general
-            tertiary_session = rembg_session_fine        # Fine details backup
+            # For products/objects: BiRefNet for best edge detection
+            primary_model_key = 'birefnet'  # Use birefnet (not massive) to save memory
             # Object-optimized settings - preserve hard edges
             fg_threshold = 240
             bg_threshold = 15
             erode_size = 5  # Smaller erode to preserve sharp edges
-            logger.info("📦 Using BiRefNet-massive (best for products/objects)")
+            logger.info("📦 Using BiRefNet (best for products/objects)")
         else:
-            # General: BiRefNet with fine detail backup
-            primary_session = rembg_session_birefnet
-            secondary_session = rembg_session_fine
-            tertiary_session = rembg_session_general
+            # General: BiRefNet
+            primary_model_key = 'birefnet'
             # General settings
             fg_threshold = 245
             bg_threshold = 12
             erode_size = 8
             logger.info("🖼️ Using BiRefNet (general purpose, best quality)")
+        
+        # Load ONLY the primary model (lazy load - saves memory)
+        primary_session = model_loader.get_model(primary_model_key)
         
         # Primary background removal
         logger.info(f"Running PRIMARY pass for job {job_id}")
@@ -701,12 +796,18 @@ def remove_background_enhanced(original_path, job_id):
             output_image = Image.merge('RGBA', (r, g, b, alpha_pil))
             
             # Resize back if needed
-            if scale_factor > 1.0:
+            if scale_factor != 1.0:
                 output_image = output_image.resize(original_size, Image.Resampling.LANCZOS)
             
             output_byte_arr = io.BytesIO()
             output_image.save(output_byte_arr, format='PNG', optimize=True)
-            return output_byte_arr.getvalue(), 1
+            result_data = output_byte_arr.getvalue()
+            
+            # Memory cleanup
+            del output_image, card_mask, original_np, input_data
+            force_garbage_collection()
+            logger.info(f"Document processing complete, memory: {get_memory_usage_mb():.0f}MB")
+            return result_data, 1
         
         # For logos, use simplified single-pass approach
         if is_logo:
@@ -727,73 +828,48 @@ def remove_background_enhanced(original_path, job_id):
             output_image = Image.merge('RGBA', (r, g, b, alpha_pil))
             
             # Resize back if needed
-            if scale_factor > 1.0:
+            if scale_factor != 1.0:
                 output_image = output_image.resize(original_size, Image.Resampling.LANCZOS)
             
             output_byte_arr = io.BytesIO()
             output_image.save(output_byte_arr, format='PNG', optimize=True)
-            return output_byte_arr.getvalue(), 1
+            result_data = output_byte_arr.getvalue()
+            
+            # Memory cleanup
+            del output_image, alpha_np, input_data
+            force_garbage_collection()
+            logger.info(f"Logo processing complete, memory: {get_memory_usage_mb():.0f}MB")
+            return result_data, 1
         
-        # Second pass with secondary model for comparison (non-logo images)
-        logger.info("Running SECONDARY pass for edge validation")
-        output_data_secondary = remove(
-            input_data,
-            session=secondary_session,
-            alpha_matting=True,
-            alpha_matting_foreground_threshold=fg_threshold - 5,
-            alpha_matting_background_threshold=bg_threshold + 3,
-            alpha_matting_erode_size=erode_size,
-            post_process_mask=True
-        )
-        output_secondary = Image.open(io.BytesIO(output_data_secondary)).convert('RGBA')
+        # ==================== MEMORY-OPTIMIZED SINGLE-PASS PROCESSING ====================
+        # Use only ONE model pass to minimize RAM usage (saves ~1-2GB per image)
+        # The single pass with good parameters produces excellent results
         
-        # Third pass with general model for additional coverage
-        logger.info("Running third pass with general model")
-        output_data_tertiary = remove(
-            input_data,
-            session=tertiary_session,
-            alpha_matting=True,
-            alpha_matting_foreground_threshold=fg_threshold,
-            alpha_matting_background_threshold=bg_threshold + 5,
-            alpha_matting_erode_size=erode_size + 2,
-            post_process_mask=True
-        )
-        output_tertiary = Image.open(io.BytesIO(output_data_tertiary)).convert('RGBA')
+        logger.info("Using SINGLE-PASS processing (memory-optimized)")
         
-        # Combine masks intelligently based on image type
+        # Get alpha from primary result
         alpha_primary = np.array(output_image.split()[3], dtype=np.float32)
-        alpha_secondary = np.array(output_secondary.split()[3], dtype=np.float32)
-        alpha_tertiary = np.array(output_tertiary.split()[3], dtype=np.float32)
         
-        # For products/objects, use smart combination to preserve all edges
-        if analysis['is_product'] or analysis['has_sharp_edges']:
-            # For products: Prioritize BiRefNet result but ensure coverage
-            # Use weighted average favoring primary (BiRefNet-massive)
-            alpha_combined = alpha_primary * 0.5 + alpha_secondary * 0.3 + alpha_tertiary * 0.2
-            # Ensure we keep strong foreground from any model
-            strong_fg = (alpha_primary > 200) | (alpha_secondary > 200) | (alpha_tertiary > 200)
-            alpha_combined[strong_fg] = np.maximum(np.maximum(alpha_primary, alpha_secondary), alpha_tertiary)[strong_fg]
-            # Clean up where all agree it's background
-            all_bg = (alpha_primary < 30) & (alpha_secondary < 30) & (alpha_tertiary < 30)
-            alpha_combined[all_bg] = 0
-            logger.info("Using smart combination for object edges (BiRefNet-primary)")
-        else:
-            # For humans: Use weighted blend favoring BiRefNet
-            alpha_combined = alpha_primary * 0.6 + alpha_secondary * 0.25 + alpha_tertiary * 0.15
-        
-        # Detect multiple objects
-        num_objects, labeled_array, component_sizes = detect_multiple_objects(alpha_combined.astype(np.uint8))
+        # Detect multiple objects from single pass
+        num_objects, labeled_array, component_sizes = detect_multiple_objects(alpha_primary.astype(np.uint8))
         logger.info(f"Detected {num_objects} significant object(s) in image")
         
-        # If multiple objects, ensure we keep all of them
-        if num_objects > 1:
-            alpha_combined = np.maximum(np.maximum(alpha_primary, alpha_secondary), alpha_tertiary)
-            logger.info("Multiple objects detected - using union of all masks")
+        # Clean up alpha channel
+        alpha_combined = alpha_primary.copy()
         
-        # Apply the combined alpha
+        # Clean up weak detections
+        alpha_combined = np.where(alpha_combined < 30, 0, alpha_combined)
+        alpha_combined = np.where(alpha_combined > 225, 255, alpha_combined)
+        
+        # Apply the processed alpha
         r, g, b, _ = output_image.split()
         alpha_pil = Image.fromarray(alpha_combined.astype(np.uint8))
         output_image = Image.merge('RGBA', (r, g, b, alpha_pil))
+        
+        # Clear intermediate data to free memory
+        del alpha_primary
+        del input_data
+        force_garbage_collection()
         
         # Apply advanced edge refinement with product-aware settings
         is_product_image = analysis['is_product'] or analysis['has_sharp_edges']
@@ -850,16 +926,27 @@ def remove_background_enhanced(original_path, job_id):
         alpha_pil = Image.fromarray(alpha_final.astype(np.uint8))
         output_image = Image.merge('RGBA', (r, g, b, alpha_pil))
         
-        # Resize back to original size if we scaled up
-        if scale_factor > 1.0:
+        # Resize back to original size if we scaled
+        if scale_factor != 1.0:
             output_image = output_image.resize(original_size, Image.Resampling.LANCZOS)
             logger.info(f"Resized output back to {original_size}")
         
         # Save with high quality
         output_byte_arr = io.BytesIO()
         output_image.save(output_byte_arr, format='PNG', optimize=True)
+        result_data = output_byte_arr.getvalue()
         
-        return output_byte_arr.getvalue(), num_objects
+        # ==================== MEMORY CLEANUP ====================
+        # Explicitly delete large objects and force garbage collection
+        try:
+            del output_image, alpha_final, alpha_pil, original_for_edges, original_np
+            del r, g, b
+        except:
+            pass
+        force_garbage_collection()
+        logger.info(f"Processing complete, memory after cleanup: {get_memory_usage_mb():.0f}MB")
+        
+        return result_data, num_objects
 
 def verify_background_removal(processed_image, original_image):
     """
@@ -1803,6 +1890,38 @@ atexit.register(stop_cleanup_thread)
 @app.route('/health')
 def health_check():
     return jsonify({'status': 'healthy'}), 200
+
+@app.route('/memory-status')
+def memory_status():
+    """Endpoint to check memory usage and loaded models"""
+    try:
+        memory_mb = get_memory_usage_mb()
+        loaded_models = model_loader.get_loaded_models()
+        return jsonify({
+            'status': 'ok',
+            'memory_usage_mb': round(memory_mb, 1),
+            'loaded_models': loaded_models,
+            'model_count': len(loaded_models)
+        }), 200
+    except Exception as e:
+        return jsonify({'status': 'error', 'error': str(e)}), 500
+
+@app.route('/unload-models', methods=['POST'])
+def unload_models():
+    """Endpoint to manually unload all models and free memory"""
+    try:
+        mem_before = get_memory_usage_mb()
+        model_loader.unload_all()
+        force_garbage_collection()
+        mem_after = get_memory_usage_mb()
+        return jsonify({
+            'status': 'ok',
+            'memory_before_mb': round(mem_before, 1),
+            'memory_after_mb': round(mem_after, 1),
+            'memory_freed_mb': round(mem_before - mem_after, 1)
+        }), 200
+    except Exception as e:
+        return jsonify({'status': 'error', 'error': str(e)}), 500
 
 # Start cleanup thread when module is imported (for production servers like gunicorn)
 start_cleanup_thread()

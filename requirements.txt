@@ -9,3 +9,4 @@ onnxruntime
 gunicorn
 scipy
 opencv-python-headless
+psutil
